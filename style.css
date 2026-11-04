@@ -392,9 +392,6 @@ p { margin: 0 0 12px; }
 .copy-box { display: flex; gap: 8px; align-items: flex-start; background: var(--card); border: 1px dashed var(--wood); border-radius: 10px; padding: 10px 12px; margin-top: 8px; }
 .copy-box code { flex: 1; min-width: 0; font-family: inherit; font-size: .85rem; white-space: pre-wrap; word-break: break-all; }
 .copy-box button { font: inherit; font-size: .82rem; min-height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--ink); background: none; color: var(--ink); cursor: pointer; flex: none; }
-.pick-cta { margin-top: 20px; padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--card); }
-.pick-cta p { margin: 0 0 12px; color: var(--ink-2); font-size: .95rem; }
-.pick-cta .btn { width: 100%; }
 .feat { position: absolute; top: 8px; left: 8px; padding: 2px 9px; border-radius: 999px; background: var(--orange); color: #fff; font-size: .72rem; font-weight: 700; }
 .bi-ed { font-size: .78rem; color: var(--wood-d); margin: 0 0 2px; }
 @media (prefers-color-scheme: dark) { .bi-ed { color: var(--wood); } }
@@ -820,3 +817,119 @@ button.cover { display: block; width: 100%; padding: 0; border: 0; cursor: point
 @media (min-width: 760px) and (max-height: 680px) {
   [data-page="home"] .poster-menu .blk-desc, [data-page="home"] .poster-menu .mini-shelf { display: none; }
 }
+
+/* ─────────────────────────────────────────────
+   책 고르기 — 첫 화면 맨 위의 큰 버튼 (2026-11-05)
+   핵심 행동이라 메뉴에서 빼고 하늘 띠로 올렸다. 표지가 돌아가고, 신호 고리·반짝임·화살표가 살짝 움직인다
+   색은 잉크 바닥 + 연어 포인트 (하늘색 위에서 가장 진하게 보이도록)
+   ───────────────────────────────────────────── */
+.pick-cta {
+  position: absolute; z-index: 4; box-sizing: border-box;
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: clamp(12px, 1.6vw, 20px);
+  padding: 14px clamp(14px, 1.6vw, 22px) 14px clamp(12px, 1.4vw, 18px);
+  background: #4a2018; color: #f3e6da; text-decoration: none; border-radius: 16px;
+  border: 2px solid #4a2018;
+  box-shadow: 0 5px 0 rgba(74, 32, 24, .32), 0 14px 28px rgba(74, 32, 24, .22);
+  isolation: isolate; transition: transform .18s ease, box-shadow .18s ease;
+  animation: pc-in .7s cubic-bezier(.2, .9, .3, 1.15) .55s both;
+}
+.pick-cta:hover { transform: translate(-2px, -3px); box-shadow: 0 8px 0 rgba(74, 32, 24, .32), 0 20px 34px rgba(74, 32, 24, .26); }
+.pick-cta:active { transform: translate(0, 2px); box-shadow: 0 2px 0 rgba(74, 32, 24, .32); }
+.pick-cta:focus-visible { outline: 4px solid #fff8f2; outline-offset: 3px; }
+/* 숨 쉬듯 퍼지는 고리 */
+.pick-cta::before {
+  content: ""; position: absolute; inset: -3px; z-index: -1; border-radius: 19px;
+  border: 3px solid #e09a7a; opacity: 0; pointer-events: none;
+  animation: pc-ring 2.6s ease-out 1.4s infinite;
+}
+/* 지나가는 빛 */
+.pc-shine { position: absolute; inset: 0; border-radius: 14px; overflow: hidden; pointer-events: none; z-index: 0; }
+.pc-shine::after {
+  content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 38%;
+  background: linear-gradient(105deg, transparent 0, rgba(255, 244, 232, .26) 50%, transparent 100%);
+  transform: translateX(-130%) skewX(-18deg); animation: pc-shine 5s ease-in-out 2s infinite;
+}
+.pc-body, .pc-covers, .pc-arrow { position: relative; z-index: 1; }
+
+/* 표지 세 장: 부채꼴로 겹쳐서 위아래로 살랑 */
+.pc-covers { display: block; position: relative; width: clamp(80px, min(8.6vw, 13vh), 136px); height: clamp(88px, min(9vw, 13.5vh), 140px); flex: none; }
+.pc-cv {
+  position: absolute; bottom: 4px; left: calc(var(--k) * 28%); width: 52%; aspect-ratio: 5 / 7.2; background: #f3e6da;
+  border: 2px solid #f3e6da; border-radius: 4px; overflow: hidden; box-shadow: 0 3px 8px rgba(0, 0, 0, .35);
+  transform-origin: 50% 100%; transform: rotate(calc((var(--k) - 1) * 10deg));
+  z-index: calc(3 - var(--k)); animation: pc-bob 3.2s ease-in-out calc(var(--k) * -.5s) infinite;
+}
+.pc-cv img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pc-covers.swap .pc-cv { animation: pc-pop .5s cubic-bezier(.2, .9, .3, 1.2) both, pc-bob 3.2s ease-in-out .5s calc(var(--k) * -.5s) infinite; }
+
+.pc-body { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; gap: 2px; }
+.pc-chip { display: inline-flex; align-items: center; gap: 6px; background: #e09a7a; color: #4a2018; font-weight: 900; font-size: clamp(.8rem, min(1.2vw, 2vh), 1.05rem); line-height: 1; padding: 5px 10px 5px 8px; border-radius: 999px; }
+.pc-chip i { width: 8px; height: 8px; border-radius: 50%; background: #4a2018; animation: pc-dot 1.4s ease-in-out infinite; }
+.pc-title { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, min(4vw, 6vh), 3.8rem); line-height: 1.05; letter-spacing: .01em; color: #fff8f2; margin-top: 4px; }
+.pc-sub { font-size: clamp(.88rem, min(1.3vw, 2.2vh), 1.25rem); white-space: nowrap; font-weight: 700; color: #f3e6da; opacity: .95; line-height: 1.35; }
+.pc-until::before { content: " · "; white-space: pre; }
+.pc-arrow {
+  display: grid; place-items: center; width: clamp(42px, min(4.2vw, 6.4vh), 66px); height: clamp(42px, min(4.2vw, 6.4vh), 66px); border-radius: 50%;
+  background: #e09a7a; color: #4a2018; font-weight: 900; font-size: clamp(1.4rem, 2.2vw, 2rem); line-height: 1;
+  animation: pc-nudge 1.3s ease-in-out infinite;
+}
+.pick-cta:hover .pc-arrow { background: #fff8f2; }
+
+@keyframes pc-in { from { opacity: 0; transform: translateY(18px) scale(.94); } to { opacity: 1; transform: none; } }
+@keyframes pc-ring { 0% { transform: scale(.98); opacity: .95; } 70%, 100% { transform: scale(1.1, 1.28); opacity: 0; } }
+@keyframes pc-shine { 0%, 62% { transform: translateX(-130%) skewX(-18deg); } 100% { transform: translateX(380%) skewX(-18deg); } }
+@keyframes pc-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -5px; } }
+@keyframes pc-pop { from { opacity: 0; transform: translateY(14px) rotate(calc((var(--k) - 1) * 10deg)) scale(.85); } to { opacity: 1; transform: rotate(calc((var(--k) - 1) * 10deg)); } }
+@keyframes pc-dot { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(.55); opacity: .45; } }
+@keyframes pc-nudge { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(6px); } }
+@media (prefers-reduced-motion: reduce) {
+  .pick-cta, .pick-cta::before, .pc-shine::after, .pc-cv, .pc-covers.swap .pc-cv, .pc-chip i, .pc-arrow { animation: none !important; }
+  .pick-cta::before { display: none; }
+}
+
+/* 위치 — 모바일: 하늘 위쪽 가운데 */
+@media (max-width: 759px) {
+  .pick-cta { left: 50%; top: clamp(58px, 9vh, 84px); width: min(92vw, 460px); transform: translateX(-50%); }
+  .pick-cta:hover { transform: translate(-50%, -3px); }
+  .pick-cta:active { transform: translate(-50%, 2px); }
+  @keyframes pc-in { from { opacity: 0; transform: translate(-50%, 18px) scale(.94); } to { opacity: 1; transform: translateX(-50%); } }
+  .pick-cta { top: 56px; padding: 10px 14px 10px 12px; gap: 10px; }
+  .pc-covers { width: 74px; height: 82px; }
+  .pc-title { font-size: clamp(1.7rem, 7.8vw, 2.2rem); margin-top: 2px; }
+  .pc-sub { font-size: .86rem; white-space: normal; }
+  .pc-until { display: block; }
+  .pc-until::before { content: none; }
+  .pc-arrow { width: 42px; height: 42px; font-size: 1.45rem; }
+  /* 아이들 그림을 조금 줄여서 버튼 아래에 서도록 */
+  [data-page="home"] .poster-kids { width: min(84%, 420px); }
+}
+
+/* 위치 — 웹: 하늘 띠 왼쪽에 버튼, 아이들은 오른쪽으로 */
+@media (min-width: 760px) {
+  [data-page="home"] .poster-sky { flex: 0 0 clamp(200px, 28vh, 320px); }
+  [data-page="home"] .poster-tiny { display: none; }   /* 책방, 앤 문구는 꼬리말에 있어요 — 하늘 띠는 버튼 자리 */
+  [data-page="home"] .poster-kids { left: auto; right: clamp(16px, 4vw, 80px); transform: none; width: min(42vw, 600px); }
+  .pick-cta { left: clamp(20px, 3vw, 44px); bottom: clamp(16px, 3.4vh, 32px); width: min(700px, 57vw); padding-top: clamp(14px, 2.2vh, 22px); padding-bottom: clamp(14px, 2.2vh, 22px); }
+}
+
+/* 낮은 데스크톱 창(높이 780px 이하)에서는 서재 칸의 작은 선반을 접어 글이 잘리지 않게 */
+@media (min-width: 760px) and (max-height: 780px) {
+  [data-page="home"] .poster-menu .mini-shelf { display: none; }
+  [data-page="home"] .poster-menu .blk a { padding-top: 8px; padding-bottom: 8px; }
+}
+
+/* 메뉴가 다섯 칸이 됐으니 윗줄 3칸, 아랫줄 2칸으로 */
+@media (min-width: 760px) {
+  [data-page="home"] .poster-menu { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  [data-page="home"] .poster-menu .blk { grid-column: span 2; }
+  [data-page="home"] .poster-menu .blk-org, [data-page="home"] .poster-menu .blk-faq { grid-column: span 3; }
+}
+@media (max-width: 759px) {
+  [data-page="home"] .poster-menu .blk-faq { grid-column: 1 / -1; }
+}
+
+/* 머리글 메뉴의 '책 고르기'도 알약으로 */
+.topnav a[href="pick.html"], [data-page="home"] .topnav a[href="pick.html"] {
+  background: #4a2018; color: #fff8f2; padding: 3px 14px 4px; border-radius: 999px; text-decoration: none;
+}
+.topnav a[href="pick.html"]:hover { background: #6e2f22; }

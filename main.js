@@ -711,14 +711,13 @@
   var BLOCK_WHO = { about: '이야기', shelf: '모두의 서가', donate: '건네는 어른', pick: '고르는 청소년', org: '함께하기', faq: '궁금한 것' };
   function renderHome() {
     var grid = $('#menu-grid'); if (!grid) return;
-    var order = ['shelf', 'donate', 'pick', 'about', 'org', 'faq'];
+    var order = ['shelf', 'donate', 'about', 'org', 'faq'];  // '책 고르기'는 메뉴에서 빼고 위쪽 큰 버튼(renderPickCta)으로
     var by = {}; pages().forEach(function (p) { by[p[0]] = p; });
     grid.innerHTML = order.filter(function (k) { return by[k]; }).map(function (k) {
       var p = by[k];
       return '<li class="blk blk-' + k + '"><a href="' + p[1] + '"><span class="blk-who">' + BLOCK_WHO[k] + '</span>' +
         '<strong class="blk-title">' + p[2] + '</strong><span class="blk-desc">' + p[3] + '</span>' +
         (k === 'shelf' ? '<span class="mini-shelf" id="mini-shelf" aria-hidden="true"></span><span class="blk-stat" id="shelf-stat"></span>' : '') +
-        (k === 'pick' ? '<span class="blk-stat" id="pick-stat"></span>' : '') +
         '<span class="blk-go" aria-hidden="true">→</span></a></li>';
     }).join('');
 
@@ -734,9 +733,42 @@
       }).join('');
       $('#shelf-stat').textContent = '꽂힌 책 ' + real + '권' + (filled(r.targetBooks) ? ' / ' + r.targetBooks + '권' : '');
     }).catch(function () { /* 블록은 글만으로도 충분하다 */ });
-    if (by.pick) fetch(((C.pick || {}).booksSource) || 'data/books.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
-      var n = (d.books || []).length; if (n) $('#pick-stat').textContent = n + '권 중에서 골라요';
-    }).catch(function () {});
+  }
+
+  /* ── 첫 화면 맨 위의 큰 버튼: 책 고르기 ──
+     표지 세 장이 부채꼴로 겹쳐 있다가 몇 초마다 다음 책으로 넘어가고, 버튼은 숨 쉬듯 신호를 보낸다 */
+  function renderPickCta() {
+    var cta = $('#pick-cta'); if (!cta) return;
+    var closed = !!C.applyDeadline && Date.now() > new Date(C.applyDeadline + 'T23:59:59+09:00').getTime();
+    var chip = $('.pc-chip-t', cta); if (chip) chip.textContent = closed ? '행사 날 현장에서' : '신청 받는 중';
+    var sub = $('#pick-sub');
+    var until = filled(C.applyDeadlineLabel) ? String(C.applyDeadlineLabel).replace(/\(.\)/, '') : '';   // 12월 12일(토) → 12월 12일
+    function setSub(main) { if (sub) sub.innerHTML = '<span>' + esc(main) + '</span>' + (!closed && until ? '<span class="pc-until">' + esc(until) + '까지</span>' : ''); }
+    setSub(closed ? '비북스에서 직접 한 권 골라요' : '한 권 골라 신청해요');
+    var box = $('#pick-covers'); if (!box) return;
+    fetch(((C.pick || {}).booksSource) || 'data/books.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
+      var all = (d.books || []).filter(function (b) { return b.cover; });
+      if (!all.length) return;
+      if (!closed) setSub((d.books || []).length + '권 중 한 권 골라요');
+      // 추천(featured) 책을 먼저 돌려요
+      var list = all.filter(function (b) { return b.featured; }).concat(all.filter(function (b) { return !b.featured; }));
+      var n = Math.min(3, list.length), pos = 0, els = [];
+      box.innerHTML = '';
+      for (var k = 0; k < n; k++) {
+        var el = document.createElement('span'); el.className = 'pc-cv'; el.style.setProperty('--k', k);
+        var im = document.createElement('img'); im.alt = ''; im.decoding = 'async';
+        im.onerror = function () { this.parentNode.style.visibility = 'hidden'; };
+        el.appendChild(im); box.appendChild(el); els.push(im);
+      }
+      function paint() {
+        els.forEach(function (im, k) { im.src = list[(pos + k) % list.length].cover; });
+        box.classList.remove('swap'); void box.offsetWidth; box.classList.add('swap');
+      }
+      paint();
+      list.slice(0, 8).forEach(function (b) { var pre = new Image(); pre.src = b.cover; });   // 미리 받아 두기
+      var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!calm && list.length > n) setInterval(function () { if (document.hidden) return; pos = (pos + 1) % list.length; paint(); }, 3600);
+    }).catch(function () { /* 버튼은 글만으로도 충분하다 */ });
   }
 
   // 책 고르기 페이지를 끄면 링크를 숨긴다
@@ -745,7 +777,7 @@
   // 페이지마다 있는 부분만 그린다
   renderChrome();
   if ($('#hero-title')) renderHero();
-  renderPoster(); renderHome();
+  renderPoster(); renderHome(); renderPickCta();
   if ($('#diff-cards')) renderDiff();
   if ($('#steps-list')) renderSteps();
   if ($('#amount-btns')) renderDonate();
