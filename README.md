@@ -8,7 +8,7 @@ about.html        책사줄게 이야기 (원조 · 원미동에서는 · 진행
 shelf.html        내일의 서재
 donate.html       후원하기
 pick.html         책 고르기(예약) — 큐레이션 목록에서 골라 신청 폼으로
-youth.html        청소년 신청
+youth.html        (예전 주소) → 책 고르기로 넘겨줌
 org.html          기관·기업 함께하기
 faq.html          자주 묻는 질문 + 개인정보와 익명 처리
 pick.js           책 고르기 동작 (고르기 · 책 소개 · 내 선택 · 폼 미리 채우기)

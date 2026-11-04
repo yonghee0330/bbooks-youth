@@ -598,12 +598,11 @@
     ['about', 'about.html', '책사줄게 이야기', '청주의 작은 책방에서 시작된 흐름을 원미동에서 이어요.'],
     ['shelf', 'shelf.html', '내일의 서재', '후원이 들어올 때마다 책이 한 권씩 꽂혀요.'],
     ['donate', 'donate.html', '후원하기', '책 한 권 값부터 함께해요.'],
-    ['pick', 'pick.html', '책 고르기', '추천 목록에서 고르거나, 읽고 싶은 책을 직접 골라요.'],
-    ['youth', 'youth.html', '청소년 신청', '청소년이면 누구든 고를 수 있어요.'],
+    ['pick', 'pick.html', '책 고르기', '부천 청소년이면 누구나. 추천 목록에서 고르거나 직접 골라 신청해요.'],
     ['org', 'org.html', '기관·기업', '한 반, 한 동아리 몫을 함께 건네요.'],
     ['faq', 'faq.html', '자주 묻는 질문', '공짜인지, 누가 되는지, 무엇이 공개되는지.']
   ];
-  var NAV = { about: '이야기', shelf: '내일의 서재', donate: '후원', pick: '책 고르기', youth: '신청', faq: 'FAQ' };
+  var NAV = { about: '이야기', shelf: '내일의 서재', donate: '후원', pick: '책 고르기', faq: 'FAQ' };
   var PAGE = document.body.getAttribute('data-page') || 'home';
   function pickOff(id) { return id === 'pick' && (C.pick || {}).enabled === false; }
   function pages() { return PAGES.filter(function (p) { return !pickOff(p[0]); }); }
@@ -631,7 +630,6 @@
     if (PAGE !== 'home' && PAGE !== 'pick') {
       var btns = [['donate', 'donate.html', '후원하기', 'btn-primary'], ['pick', 'pick.html', '책 고르기', 'btn-accent']]
         .filter(function (b) { return b[0] !== PAGE && !pickOff(b[0]); });
-      if (pickOff('pick') && PAGE !== 'youth') btns.push(['youth', 'youth.html', '책 고르러 오기', 'btn-accent']);
       if (btns.length) document.body.insertAdjacentHTML('beforeend', '<div class="dock show" aria-label="빠른 이동">' + btns.map(function (b) {
         return '<a class="btn ' + b[3] + '" href="' + b[1] + '">' + b[2] + '</a>';
       }).join('') + '</div>');
@@ -646,10 +644,10 @@
   }
 
   /* ── 첫 화면: 메뉴 블록 ── */
-  var BLOCK_WHO = { about: '이야기', shelf: '모두의 서가', donate: '건네는 어른', pick: '고르는 청소년', youth: '고르는 청소년', org: '함께하기', faq: '궁금한 것' };
+  var BLOCK_WHO = { about: '이야기', shelf: '모두의 서가', donate: '건네는 어른', pick: '고르는 청소년', org: '함께하기', faq: '궁금한 것' };
   function renderHome() {
     var grid = $('#menu-grid'); if (!grid) return;
-    var order = ['shelf', 'donate', 'pick', 'youth', 'about', 'org', 'faq'];
+    var order = ['shelf', 'donate', 'pick', 'about', 'org', 'faq'];
     var by = {}; pages().forEach(function (p) { by[p[0]] = p; });
     grid.innerHTML = order.filter(function (k) { return by[k]; }).map(function (k) {
       var p = by[k];

@@ -41,7 +41,8 @@
   function renderRules() {
     var items = ['한 사람이 한 권' + (filled(C.bookPrice) ? ', 정가 ' + Number(C.bookPrice).toLocaleString('ko-KR') + '원 이하 책' : '') + '을 받아요.'];
     items.push('신청하면 비북스가 책을 주문해 준비해요.' + (MAX > 1 ? ' 구하기 어려울 때를 위해 대신 받을 책을 하나 더 골라둘 수 있어요.' : ''));
-    items.push((filled(C.regionLimit) ? C.regionLimit + ' 청소년이면 누구나 신청할 수 있어요. ' : '') + '실명 대신 닉네임으로 신청해요.');
+    items.splice(0, 0, (filled(C.regionLimit) ? C.regionLimit + ' ' : '') + (filled(C.ageRange) ? C.ageRange + ' ' : '') + '청소년이면 누구나 신청할 수 있어요. 학교 밖 청소년도 괜찮아요.');
+    items.push('실명 대신 닉네임으로 신청해요. 학교 이름은 지역 확인에만 쓰고, 가정 형편은 묻지 않아요.');
     var when = [C.eventDate, C.eventTime].filter(filled).join(' ');
     items.push('받는 날: ' + (when || '정해지는 대로 알려드려요') + (filled(C.place) ? ' · ' + C.place : ''));
     if (filled(C.applyDeadlineLabel)) items.push('온라인 신청: ' + C.applyDeadlineLabel + '까지. 그 뒤엔 행사 날 비북스에서 직접 골라요.');
