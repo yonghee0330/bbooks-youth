@@ -1,0 +1,11 @@
+{
+  "rounds": [
+    {
+      "round": 1,
+      "title": "1회차",
+      "targetBooks": null,
+      "closed": false,
+      "books": []
+    }
+  ]
+}

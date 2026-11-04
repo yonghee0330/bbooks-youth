@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>책 고르기 · 청소년 책사줄게</title>
+<meta name="description" content="비북스 청소년 책사줄게. 추천 목록에서 고르거나 읽고 싶은 책을 직접 골라 신청하고, 행사 날 비북스에서 받아가요.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:type" content="website">
+<meta property="og:title" content="책 고르기 · 청소년 책사줄게">
+<meta property="og:description" content="추천 목록에서 고르거나 읽고 싶은 책을 직접 골라 신청하고, 행사 날 비북스에서 받아가요.">
+<meta property="og:image" content="https://youth.bbooks.co.kr/images/og.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect x=%226%22 y=%224%22 width=%228%22 height=%2224%22 rx=%221%22 fill=%22%231f3b2d%22/%3E%3Crect x=%2216%22 y=%228%22 width=%228%22 height=%2220%22 rx=%221%22 fill=%22%23e0662b%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=20261104i">
+</head>
+<body class="pick-page" data-page="pick">
+<a class="skip" href="#book-grid">책 목록으로 바로 가기</a>
+
+<header class="topbar" id="site-header"></header>
+
+<main>
+  <section class="pick-intro">
+    <div class="wrap">
+      <p class="who">고르는 청소년</p>
+      <h1 class="pick-title">읽고 싶은 책,<br>직접 골라요</h1>
+      <p class="lead">추천 목록에서 골라도 되고, 목록에 없는 책을 직접 골라도 돼요. 한 사람이 한 권이에요.</p>
+      <ul class="pick-rules" id="pick-rules"></ul>
+      <p class="closed-note" id="closed-note" hidden></p>
+    </div>
+  </section>
+
+  <section class="pick-list" aria-labelledby="list-title">
+    <div class="wrap">
+      <h2 id="list-title" class="visually-hidden">고르는 방법</h2>
+      <div class="list-tabs" id="list-tabs" role="tablist" aria-label="고르는 방법"></div>
+      <p class="list-desc" id="list-desc"></p>
+
+      <div id="list-panel">
+      <div class="toolbar">
+        <label class="search">
+          <span class="visually-hidden">검색</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+          <input id="q" type="search" placeholder="제목, 지은이, 출판사" autocomplete="off">
+        </label>
+        <div class="chips-row" id="genres" role="group" aria-label="분야"></div>
+        <label class="sort">
+          <span>정렬</span>
+          <select id="sort">
+            <option value="">추천 순</option>
+            <option value="title">제목</option>
+            <option value="author">지은이</option>
+          </select>
+        </label>
+      </div>
+      <div class="list-meta" id="list-meta" aria-live="polite"></div>
+      <ul class="book-grid" id="book-grid"></ul>
+      <p class="small muted" id="updated"></p>
+      </div>
+
+      <!-- 직접 고르기: 목록에 없는 책 -->
+      <div id="custom-panel" hidden>
+        <div class="custom-rule" id="custom-rule"></div>
+        <form class="apply-form custom-form" id="custom-form" novalidate>
+          <div class="f-row"><label for="c-title">책 제목 <b>*</b></label><input id="c-title" name="title" maxlength="80" required></div>
+          <div class="f-2">
+            <div class="f-row"><label for="c-author">지은이</label><input id="c-author" name="author" maxlength="40"></div>
+            <div class="f-row"><label for="c-pub">출판사</label><input id="c-pub" name="publisher" maxlength="40"></div>
+          </div>
+          <p class="small muted">제목만 알아도 괜찮아요. 지은이·출판사를 알면 같이 적어주세요.</p>
+          <p class="form-msg" role="alert"></p>
+          <button class="btn btn-primary btn-wide" type="submit">이 책 고르기</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- 아래 고정: 내 선택 요약 -->
+<div class="tray-bar" id="tray-bar">
+  <div class="tray-sum" id="tray-sum">아직 고른 책이 없어요</div>
+  <button type="button" class="btn btn-accent" id="tray-go" disabled>신청하기</button>
+</div>
+
+<!-- 책 소개 -->
+<dialog class="tray detail" id="detail" aria-labelledby="detail-title">
+  <div class="tray-head detail-head">
+    <span class="who">책 소개</span>
+    <button type="button" class="bc-close" id="detail-close" aria-label="닫기">×</button>
+  </div>
+  <div id="detail-body"></div>
+</dialog>
+
+<!-- 내 선택 · 신청 -->
+<dialog class="tray" id="tray" aria-labelledby="tray-title">
+  <div class="tray-head">
+    <h2 id="tray-title">내가 고른 책</h2>
+    <button type="button" class="bc-close" id="tray-close" aria-label="닫기">×</button>
+  </div>
+  <ol class="tray-list" id="tray-list"></ol>
+  <div class="tray-pickup" id="tray-pickup"></div>
+  <form class="apply-form in-tray" id="youth-form" novalidate hidden>
+    <h3 class="form-h">신청하기</h3>
+    <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div class="f-2">
+      <div class="f-row"><label for="y-nick">닉네임 <b>*</b> <em>(실명 아니어도 돼요)</em></label><input id="y-nick" name="nick" maxlength="20" autocomplete="nickname" required></div>
+      <div class="f-row"><label for="y-age">학년 <b>*</b></label><select id="y-age" name="age" required><option value="">고르기</option><option>중학생</option><option>고등학생</option><option>학교 밖 청소년</option></select></div>
+    </div>
+    <div class="f-row" id="y-school-row"><label for="y-school">학교 이름 <b>*</b> <em>(부천 지역 확인에만 쓰고 공개하지 않아요)</em></label><input id="y-school" name="school" maxlength="40" placeholder="예) 부천○○고등학교" required></div>
+    <div class="f-2">
+      <div class="f-row"><label for="y-phone">연락처 <b>*</b></label><input id="y-phone" name="phone" type="tel" inputmode="tel" maxlength="13" autocomplete="tel" placeholder="010-0000-0000" required></div>
+      <div class="f-row"><label for="y-email">이메일 <b>*</b></label><input id="y-email" name="email" type="email" maxlength="80" autocomplete="email" required></div>
+    </div>
+    <label class="check"><input type="checkbox" name="bucheon" required><span>부천에 살거나 부천에 있는 학교에 다녀요 <b>*</b></span></label>
+    <label class="check"><input type="checkbox" name="over14" required><span>만 14세 이상이에요 <b>*</b> <em>(만 14세 미만은 보호자 동의가 필요해서 비북스로 연락 주세요)</em></span></label>
+    <label class="check"><input type="checkbox" name="genrePublic"><span>고른 책의 <b>분야</b>를 서가에 공개해도 돼요 <em>(제목은 공개하지 않아요)</em></span></label>
+    <details class="consent-box"><summary>개인정보 수집·이용 안내</summary><div data-consent="youth"></div></details>
+    <label class="check"><input type="checkbox" name="consent" required><span>개인정보 수집·이용에 동의해요 <b>*</b></span></label>
+    <p class="form-msg" role="alert"></p>
+    <button class="btn btn-accent btn-wide" type="submit">이 책으로 신청하기</button>
+  </form>
+  <div class="done" id="youth-done" hidden tabindex="-1"></div>
+  <p class="small muted" id="tray-note">고른 책은 이 기기의 브라우저에만 저장돼요. 신청하기를 눌러야 접수돼요.</p>
+</dialog>
+
+<footer class="footer" id="site-footer"></footer>
+
+<script src="config.js?v=20261104i"></script>
+<script src="main.js?v=20261104i"></script>
+<script src="pick.js?v=20261104i"></script>
+</body>
+</html>
