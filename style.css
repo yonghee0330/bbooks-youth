@@ -825,7 +825,7 @@ button.cover { display: block; width: 100%; padding: 0; border: 0; cursor: point
    ───────────────────────────────────────────── */
 .pick-cta {
   position: absolute; z-index: 4; box-sizing: border-box;
-  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: clamp(12px, 1.6vw, 20px);
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: clamp(14px, 1.4vw, 22px);
   padding: 14px clamp(14px, 1.6vw, 22px) 14px clamp(12px, 1.4vw, 18px);
   background: #4a2018; color: #f3e6da; text-decoration: none; border-radius: 16px;
   border: 2px solid #4a2018;
@@ -852,7 +852,7 @@ button.cover { display: block; width: 100%; padding: 0; border: 0; cursor: point
 .pc-body, .pc-covers, .pc-arrow { position: relative; z-index: 1; }
 
 /* 표지 세 장: 부채꼴로 겹쳐서 위아래로 살랑 */
-.pc-covers { display: block; position: relative; width: clamp(80px, min(8.6vw, 13vh), 136px); height: clamp(88px, min(9vw, 13.5vh), 140px); flex: none; }
+.pc-covers { display: block; position: relative; width: clamp(84px, min(9.4vw, 14.5vh), 156px); height: clamp(92px, min(10vw, 15vh), 160px); flex: none; }
 .pc-cv {
   position: absolute; bottom: 4px; left: calc(var(--k) * 28%); width: 52%; aspect-ratio: 5 / 7.2; background: #f3e6da;
   border: 2px solid #f3e6da; border-radius: 4px; overflow: hidden; box-shadow: 0 3px 8px rgba(0, 0, 0, .35);
@@ -862,14 +862,14 @@ button.cover { display: block; width: 100%; padding: 0; border: 0; cursor: point
 .pc-cv img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .pc-covers.swap .pc-cv { animation: pc-pop .5s cubic-bezier(.2, .9, .3, 1.2) both, pc-bob 3.2s ease-in-out .5s calc(var(--k) * -.5s) infinite; }
 
-.pc-body { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; gap: 2px; }
-.pc-chip { display: inline-flex; align-items: center; gap: 6px; background: #e09a7a; color: #4a2018; font-weight: 900; font-size: clamp(.8rem, min(1.2vw, 2vh), 1.05rem); line-height: 1; padding: 5px 10px 5px 8px; border-radius: 999px; }
+.pc-body { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; gap: 3px; margin-left: clamp(8px, 1.4vw, 22px); padding-left: clamp(16px, 2vw, 32px); border-left: 2px solid rgba(243, 230, 218, .26); }
+.pc-chip { display: inline-flex; align-items: center; gap: 6px; background: #e09a7a; color: #4a2018; font-weight: 900; font-size: clamp(.82rem, min(1.3vw, 2.1vh), 1.15rem); line-height: 1; padding: 5px 10px 5px 8px; border-radius: 999px; }
 .pc-chip i { width: 8px; height: 8px; border-radius: 50%; background: #4a2018; animation: pc-dot 1.4s ease-in-out infinite; }
-.pc-title { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, min(4vw, 6vh), 3.8rem); line-height: 1.05; letter-spacing: .01em; color: #fff8f2; margin-top: 4px; }
-.pc-sub { font-size: clamp(.88rem, min(1.3vw, 2.2vh), 1.25rem); white-space: nowrap; font-weight: 700; color: #f3e6da; opacity: .95; line-height: 1.35; }
+.pc-title { font-family: var(--display); font-weight: 400; font-size: clamp(2.1rem, min(4.6vw, 7vh), 4.4rem); line-height: 1.05; letter-spacing: .01em; color: #fff8f2; margin-top: 4px; }
+.pc-sub { font-size: clamp(.9rem, min(1.45vw, 2.4vh), 1.4rem); white-space: nowrap; margin-top: 4px; font-weight: 700; color: #f3e6da; opacity: .95; line-height: 1.35; }
 .pc-until::before { content: " · "; white-space: pre; }
 .pc-arrow {
-  display: grid; place-items: center; width: clamp(42px, min(4.2vw, 6.4vh), 66px); height: clamp(42px, min(4.2vw, 6.4vh), 66px); border-radius: 50%;
+  display: grid; place-items: center; width: clamp(44px, min(4.8vw, 7.2vh), 76px); height: clamp(44px, min(4.8vw, 7.2vh), 76px); border-radius: 50%;
   background: #e09a7a; color: #4a2018; font-weight: 900; font-size: clamp(1.4rem, 2.2vw, 2rem); line-height: 1;
   animation: pc-nudge 1.3s ease-in-out infinite;
 }
@@ -893,27 +893,31 @@ button.cover { display: block; width: 100%; padding: 0; border: 0; cursor: point
   .pick-cta:hover { transform: translate(-50%, -3px); }
   .pick-cta:active { transform: translate(-50%, 2px); }
   @keyframes pc-in { from { opacity: 0; transform: translate(-50%, 18px) scale(.94); } to { opacity: 1; transform: translateX(-50%); } }
-  .pick-cta { top: 56px; padding: 10px 14px 10px 12px; gap: 10px; }
+  /* 버튼 안 배치는 웹과 같게: 표지 | 세로선 | 글 | 화살표 — 표지와 글 사이를 띄움 */
+  .pick-cta { top: 56px; padding: 12px 14px 12px 12px; gap: 10px; }
+  .pc-body { margin-left: 8px; padding-left: 14px; }
+  .pc-covers { width: 78px; height: 88px; }
   .pc-covers { width: 74px; height: 82px; }
   .pc-title { font-size: clamp(1.7rem, 7.8vw, 2.2rem); margin-top: 2px; }
   .pc-sub { font-size: .86rem; white-space: normal; }
   .pc-until { display: block; }
   .pc-until::before { content: none; }
   .pc-arrow { width: 42px; height: 42px; font-size: 1.45rem; }
-  /* 아이들 그림을 조금 줄여서 버튼 아래에 서도록 */
-  [data-page="home"] .poster-kids { width: min(84%, 420px); }
+  /* 아이들 그림은 아주 작게, 버튼 아래 땅선 위에 서도록 */
+  [data-page="home"] .poster-sky { min-height: 268px; }
+  [data-page="home"] .poster-kids { width: min(54%, 230px); height: 112px; top: auto; bottom: 0; }
 }
 
 /* 위치 — 웹: 하늘 띠 왼쪽에 버튼, 아이들은 오른쪽으로 */
 @media (min-width: 760px) {
-  [data-page="home"] .poster-sky { flex: 0 0 clamp(200px, 28vh, 320px); }
+  [data-page="home"] .poster-sky { flex: 0 0 clamp(236px, 29vh, 320px); }
   [data-page="home"] .poster-tiny { display: none; }   /* 책방, 앤 문구는 꼬리말에 있어요 — 하늘 띠는 버튼 자리 */
-  [data-page="home"] .poster-kids { left: auto; right: clamp(16px, 4vw, 80px); transform: none; width: min(42vw, 600px); }
-  .pick-cta { left: clamp(20px, 3vw, 44px); bottom: clamp(16px, 3.4vh, 32px); width: min(700px, 57vw); padding-top: clamp(14px, 2.2vh, 22px); padding-bottom: clamp(14px, 2.2vh, 22px); }
+  [data-page="home"] .poster-kids { left: auto; right: clamp(12px, 2.2vw, 44px); transform: none; width: min(21vw, 320px); }
+  .pick-cta { left: 0; right: 0; margin: 0 auto; bottom: clamp(16px, 3.4vh, 32px); width: min(840px, 55vw); padding-top: clamp(16px, 2.6vh, 26px); padding-bottom: clamp(16px, 2.6vh, 26px); }
 }
 
-/* 낮은 데스크톱 창(높이 780px 이하)에서는 서재 칸의 작은 선반을 접어 글이 잘리지 않게 */
-@media (min-width: 760px) and (max-height: 780px) {
+/* 낮은 데스크톱 창(높이 860px 이하)에서는 서재 칸의 작은 선반을 접어 글이 잘리지 않게 */
+@media (min-width: 760px) and (max-height: 860px) {
   [data-page="home"] .poster-menu .mini-shelf { display: none; }
   [data-page="home"] .poster-menu .blk a { padding-top: 8px; padding-bottom: 8px; }
 }
@@ -933,3 +937,18 @@ button.cover { display: block; width: 100%; padding: 0; border: 0; cursor: point
   background: #4a2018; color: #fff8f2; padding: 3px 14px 4px; border-radius: 999px; text-decoration: none;
 }
 .topnav a[href="pick.html"]:hover { background: #6e2f22; }
+
+/* 좁은 웹 창(760~1000px): 가운데 버튼과 오른쪽 아이들이 부딪치지 않게 한 칸씩 줄임 */
+@media (min-width: 760px) and (max-width: 1000px) {
+  .pick-cta { width: 56vw; }
+  [data-page="home"] .poster-kids { width: 19vw; }
+  .pc-body { padding-left: 14px; }
+}
+
+/* 낮은 웹 창(높이 760px 이하): 버튼 위아래를 조금 줄이고 하늘 띠도 낮춰 메뉴 칸에 높이를 돌려줌 */
+@media (min-width: 760px) and (max-height: 760px) {
+  [data-page="home"] .poster-sky { flex-basis: 218px; }
+  .pick-cta { padding-top: 11px; padding-bottom: 11px; }
+  [data-page="home"] .poster-menu .blk a { padding-top: 5px; padding-bottom: 5px; }
+  [data-page="home"] .poster-menu .blk-desc { line-height: 1.3; }
+}
