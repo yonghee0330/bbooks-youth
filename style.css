@@ -661,3 +661,80 @@ button.cover { display: block; width: 100%; padding: 0; border: 0; cursor: point
   .poster-sky { height: auto; padding-top: 78px; }
   .poster-kids { height: auto; }
 }
+
+/* ═════════════════════════════════════════════
+   포스터 톤 — 모든 페이지 공통 (2026-11-05)
+   하늘 #b9c8ca · 잉크 #4a2018 · 연어 #e09a7a · 크림 #f3e6da
+   앞에서 정한 색 변수를 여기서 덮어써서 모든 페이지가 같이 바뀐다
+   ═════════════════════════════════════════════ */
+:root {
+  --sky: #b9c8ca; --sal: #e09a7a; --cream: #f3e6da;
+  --paper: #f5ebe2;
+  --paper-2: #e3eaea;
+  --card: #fcf7f2;
+  --ink: #4a2018;
+  --ink-2: #6e4134;
+  --muted: #8d6b5f;
+  --line: #e3cdbd;
+  --wood: #e09a7a;
+  --wood-d: #b9694b;
+  --orange: #c4643f;
+  --empty: #e9dacd;
+  --trust-h: 192; --trust-s: 20%; --trust-l0: 42%;
+  --sorry-h: 17;  --sorry-s: 60%; --sorry-l0: 60%;
+  --focus: #c4643f;
+  --display: "Black Han Sans", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #23130f;
+    --paper-2: #2c1d18;
+    --card: #301f19;
+    --ink: #f3e6da;
+    --ink-2: #dcc5b5;
+    --muted: #b39483;
+    --line: #4b3027;
+    --wood: #e09a7a;
+    --wood-d: #c97f60;
+    --orange: #ea8f68;
+    --empty: #3c2620;
+    --trust-l0: 66%; --sorry-l0: 64%;
+    --focus: #ea8f68;
+  }
+}
+
+/* 머리말: 포스터의 하늘 + 땅 선 */
+.topbar { background: var(--sky); border-bottom: 6px solid #4a2018; backdrop-filter: none; }
+.topbar .brand, .topbar .brand span, .topnav a, .menu-link, .tray-link { color: #4a2018; }
+.topnav a { font-weight: 700; }
+.topnav a[aria-current="page"] { color: #4a2018; text-decoration-color: #4a2018; }
+.menu-link { border-color: #4a2018; }
+[data-page="home"] .topbar { background: transparent; border: 0; }
+
+/* 제목: 포스터 글꼴 */
+.page-title, .pick-title, .sub .part h2, .shelf-sec h2 {
+  font-family: var(--display); font-weight: 400; letter-spacing: .01em; line-height: 1.15;
+}
+.page-title, .pick-title { font-size: clamp(2rem, 7.5vw, 3.2rem); }
+.who { color: var(--wood-d); letter-spacing: .06em; }
+@media (prefers-color-scheme: dark) { .who { color: var(--sal); } }
+
+/* 버튼: 납작한 포스터 모양 */
+.btn { border-radius: 8px; }
+.btn-accent { color: #fff8f2; }
+.btn:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+.btn[aria-disabled="true"]:hover, .btn:disabled:hover { box-shadow: none; transform: none; }
+.round-tabs button, .chip, .list-tabs button, .amount-btns button, .seg span { border-radius: 8px; }
+
+/* 흰 글자를 쓰던 연어색 바탕은 잉크 바탕으로 (대비) */
+.obi, .dt-note { background: #4a2018; color: var(--cream); }
+.pick-btn.on, .list-tabs .custom-tab[aria-selected="true"] { color: #fff8f2; }
+.tray::backdrop { background: rgba(40, 18, 12, .5); }
+.footer { background: #4a2018; color: var(--cream); }
+.footer .muted, .footer .small { color: rgba(243, 230, 218, .72); }
+@media (prefers-color-scheme: dark) { .footer { background: #160b08; color: var(--cream); } }
+
+/* 내일의 서재: 연어색 선반 */
+.shelf-svg .board { fill: var(--wood); }
+.shelf-svg .board-edge { fill: var(--wood-d); }
+.shelf-sec { background: var(--paper-2); }
