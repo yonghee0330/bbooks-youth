@@ -643,6 +643,70 @@
     }
   }
 
+  /* ── 첫 화면: 포스터 — 키가 자라는 아이들 (남·여 섞어서) ── */
+  var PC = { ink: '#4a2018', sal: '#e09a7a', skin: '#f3ebe3', cream: '#efe0cf' };
+  var KIDS = [
+    { hair: 'long', top: 'dress' },
+    { hair: 'short', top: 'stripe' },
+    { hair: 'pony', top: 'raglan' },
+    { hair: 'short', top: 'stripe', book: true },
+    { hair: 'bob', top: 'jacket', book: true },
+    { hair: 'shag', top: 'ink', book: true },
+    { hair: 'long', top: 'jacket', book: true }
+  ];
+  function kid(i, n, x, H, k) {
+    var G = 430, t = i / (n - 1), o = [];
+    var ry = H * (0.085 - 0.02 * t), rx = ry * 0.86, w = H * (0.25 - 0.06 * t);
+    var cy = G - H + ry, neckY = cy + ry * 0.92, sh = neckY + H * 0.012;
+    var hip = G - H * (0.40 + 0.06 * t), tb = hip + H * 0.03;
+    var armW = w * 0.22, gap = w * 0.07, legW = (w * 0.86 - gap) / 2;
+    function r(x0, y0, ww, hh, f, rr) { return '<rect x="' + x0.toFixed(1) + '" y="' + y0.toFixed(1) + '" width="' + ww.toFixed(1) + '" height="' + hh.toFixed(1) + '"' + (rr ? ' rx="' + rr.toFixed(1) + '"' : '') + ' fill="' + f + '"/>'; }
+    function e(cx0, cy0, ex, ey, f) { return '<ellipse cx="' + cx0.toFixed(1) + '" cy="' + cy0.toFixed(1) + '" rx="' + ex.toFixed(1) + '" ry="' + ey.toFixed(1) + '" fill="' + f + '"/>'; }
+    var pid = 'st' + i, stripe = k.top === 'stripe';
+    if (stripe) o.push('<defs><pattern id="' + pid + '" width="10" height="' + (H * 0.045).toFixed(1) + '" patternUnits="userSpaceOnUse">' +
+      r(0, 0, 10, H * 0.045, PC.sal) + r(0, 0, 10, H * 0.022, PC.ink) + '</pattern></defs>');
+    var shirt = stripe ? 'url(#' + pid + ')' : k.top === 'ink' || k.top === 'jacket' ? PC.ink : PC.sal;
+    var sleeve = k.top === 'raglan' ? PC.ink : shirt;
+    // 뒷머리
+    if (k.hair === 'long') o.push(r(x - rx * 1.15, cy - ry * 0.3, rx * 2.3, sh - cy + H * 0.1, PC.ink, rx * 0.5));
+    if (k.hair === 'bob') o.push(r(x - rx * 1.2, cy - ry * 0.3, rx * 2.4, ry * 1.3, PC.ink, rx * 0.45));
+    if (k.hair === 'pony') o.push('<ellipse cx="' + (x + rx * 1.05).toFixed(1) + '" cy="' + (cy + ry * 0.1).toFixed(1) + '" rx="' + (rx * 0.38).toFixed(1) + '" ry="' + (ry * 0.8).toFixed(1) + '" fill="' + PC.ink + '" transform="rotate(-18 ' + (x + rx).toFixed(1) + ' ' + cy.toFixed(1) + ')"/>');
+    o.push(e(x, cy - ry * 0.16, rx * 1.08, ry * 0.94, PC.ink)); // 머리 윗부분
+    o.push(r(x - rx * 0.28, cy + ry * 0.6, rx * 0.56, sh - cy - ry * 0.5, PC.skin)); // 목
+    // 다리
+    o.push(r(x - legW - gap / 2, hip, legW, G - hip, PC.ink, legW * 0.2), r(x + gap / 2, hip, legW, G - hip, PC.ink, legW * 0.2));
+    // 팔 (책을 든 아이는 팔이 책 높이까지)
+    var armEnd = hip + H * 0.05;
+    o.push(r(x - w / 2 - armW * 0.75, sh + H * 0.008, armW, armEnd - sh, sleeve, armW * 0.5), r(x + w / 2 - armW * 0.25, sh + H * 0.008, armW, armEnd - sh, sleeve, armW * 0.5));
+    // 몸통
+    if (k.top === 'dress') o.push('<path d="M' + (x - w / 2).toFixed(1) + ' ' + (sh + w * 0.2).toFixed(1) + ' Q' + (x - w / 2).toFixed(1) + ' ' + sh.toFixed(1) + ' ' + (x - w * 0.3).toFixed(1) + ' ' + sh.toFixed(1) +
+      ' L' + (x + w * 0.3).toFixed(1) + ' ' + sh.toFixed(1) + ' Q' + (x + w / 2).toFixed(1) + ' ' + sh.toFixed(1) + ' ' + (x + w / 2).toFixed(1) + ' ' + (sh + w * 0.2).toFixed(1) +
+      ' L' + (x + w * 0.62).toFixed(1) + ' ' + (hip + H * 0.13).toFixed(1) + ' L' + (x - w * 0.62).toFixed(1) + ' ' + (hip + H * 0.13).toFixed(1) + ' Z" fill="' + PC.sal + '"/>');
+    else o.push(r(x - w / 2, sh, w, tb - sh, shirt, w * 0.22));
+    if (k.top === 'jacket') o.push(r(x - w * 0.16, sh + 1, w * 0.32, tb - sh - 2, PC.sal));
+    if (k.top === 'raglan') o.push(r(x - w * 0.18, sh, w * 0.36, H * 0.02, PC.ink)); // 목 둘레
+    // 한 손에 든 책 (오른손)
+    if (k.book) {
+      var bw = w * 0.42, bh = w * 0.56, hx = x + w / 2 + armW * 0.25, by = armEnd - bh * 0.55;
+      var cover = k.top === 'jacket' || k.top === 'ink' ? PC.sal : PC.cream;
+      o.push(r(hx - bw * 0.35, by, bw, bh, cover, 1.5), r(hx - bw * 0.35, by, bw * 0.16, bh, PC.ink), r(hx - bw * 0.05, by + bh * 0.22, bw * 0.5, bh * 0.07, PC.ink));
+      o.push('<circle cx="' + hx.toFixed(1) + '" cy="' + (armEnd - armW * 0.25).toFixed(1) + '" r="' + (armW * 0.5).toFixed(1) + '" fill="' + PC.skin + '"/>');
+    }
+    // 얼굴 · 앞머리 · 눈
+    o.push(e(x, cy + ry * 0.08, rx, ry * 0.9, PC.skin));
+    o.push(e(x, cy - ry * 0.56, rx * (k.hair === 'short' ? 0.98 : 1.04), ry * 0.46, PC.ink));
+    if (k.hair === 'shag') o.push(r(x - rx * 1.06, cy - ry * 0.4, rx * 0.3, ry * 0.7, PC.ink, rx * 0.12), r(x + rx * 0.76, cy - ry * 0.4, rx * 0.3, ry * 0.7, PC.ink, rx * 0.12));
+    o.push('<circle cx="' + (x - rx * 0.36).toFixed(1) + '" cy="' + (cy + ry * 0.22).toFixed(1) + '" r="' + (rx * 0.09).toFixed(1) + '" fill="' + PC.ink + '"/>',
+      '<circle cx="' + (x + rx * 0.36).toFixed(1) + '" cy="' + (cy + ry * 0.22).toFixed(1) + '" r="' + (rx * 0.09).toFixed(1) + '" fill="' + PC.ink + '"/>');
+    return '<g class="kid" style="animation-delay:' + (i * 90) + 'ms">' + o.join('') + '</g>';
+  }
+  function renderPoster() {
+    var svg = $('#poster-kids'); if (!svg) return;
+    var n = KIDS.length, left = 95, step = (1000 - left * 2) / (n - 1);
+    svg.innerHTML = KIDS.map(function (k, i) { return kid(i, n, left + i * step, 200 + i * 30, k); }).join('');
+    var d = $('#poster-date'); if (d) d.textContent = eventLine();
+  }
+
   /* ── 첫 화면: 메뉴 블록 ── */
   var BLOCK_WHO = { about: '이야기', shelf: '모두의 서가', donate: '건네는 어른', pick: '고르는 청소년', org: '함께하기', faq: '궁금한 것' };
   function renderHome() {
@@ -681,7 +745,7 @@
   // 페이지마다 있는 부분만 그린다
   renderChrome();
   if ($('#hero-title')) renderHero();
-  renderHome();
+  renderPoster(); renderHome();
   if ($('#diff-cards')) renderDiff();
   if ($('#steps-list')) renderSteps();
   if ($('#amount-btns')) renderDonate();

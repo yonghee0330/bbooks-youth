@@ -585,3 +585,79 @@ button.cover { display: block; width: 100%; padding: 0; border: 0; cursor: point
 @media (prefers-color-scheme: dark) { .bc-pooled { color: var(--wood); } }
 
 .blk-faq { grid-column: 1 / -1; }
+
+/* ─────────────────────────────────────────────
+   첫 화면 포스터 — 하늘 · 자라는 아이들 · 땅 · 큰 제목
+   (포스터 색은 라이트/다크 모드와 상관없이 고정)
+   ───────────────────────────────────────────── */
+[data-page="home"] {
+  --p-sky: #b9c8ca; --p-ink: #4a2018; --p-sal: #e09a7a; --p-cream: #f3e6da;
+  background: var(--p-sal);
+}
+[data-page="home"] .topbar { position: absolute; left: 0; right: 0; background: transparent; border: 0; backdrop-filter: none; z-index: 5; }
+[data-page="home"] .topbar .brand, [data-page="home"] .topbar .brand span, [data-page="home"] .topnav a { color: var(--p-ink); }
+[data-page="home"] .topnav a { font-weight: 700; }
+.poster { position: relative; overflow: hidden; }
+.poster::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .22; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .25  0 0 0 0 .2  0 0 0 .45 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+.poster-sky {
+  position: relative; background: var(--p-sky);
+  height: clamp(300px, 56vh, 560px); padding-top: 64px;
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.poster-tiny { position: absolute; top: 62px; left: 20px; margin: 0; font-size: .7rem; color: var(--p-ink); opacity: .7; }
+.poster-kids { display: block; width: 100%; max-width: 1080px; height: 100%; }
+.poster-kids .kid { animation: kid-up .7s cubic-bezier(.2,.8,.3,1) both; transform-box: fill-box; transform-origin: bottom; }
+@keyframes kid-up { from { opacity: 0; transform: translateY(10px) scaleY(.96); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .poster-kids .kid { animation: none; } }
+.poster-floor { position: relative; z-index: 1; background: var(--p-sal); border-top: clamp(10px, 1.5vw, 16px) solid var(--p-ink); padding: clamp(18px, 3vw, 30px) 0 56px; text-align: center; color: var(--p-ink); }
+.poster-kicker { font-weight: 900; letter-spacing: .1em; font-size: clamp(.82rem, 2.3vw, 1.15rem); margin: 0 0 2px; }
+.poster-title {
+  font-family: "Black Han Sans", var(--font); font-weight: 400; color: var(--p-ink);
+  font-size: clamp(5.4rem, 25vw, 14.5rem); line-height: .98; letter-spacing: .03em; margin: 0 0 8px;
+}
+.poster-roles { display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 26px; margin: 0; font-weight: 900; letter-spacing: .06em; font-size: clamp(.8rem, 2.2vw, 1.05rem); }
+.poster-date { margin: 12px 0 28px; font-weight: 700; font-size: .95rem; }
+
+/* 메뉴 버튼 — 포스터 위에 */
+.poster-menu { text-align: left; grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 980px; margin: 0 auto; }
+@media (min-width: 760px) { .poster-menu { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; } }
+.poster-menu .blk-shelf, .poster-menu .blk-faq, .poster-menu .blk-org { grid-column: auto; grid-row: auto; }
+.poster-menu .blk a {
+  min-height: 104px; padding: 14px 14px 12px; border-radius: 6px;
+  background: transparent; border: 2px solid var(--p-ink); color: var(--p-ink);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.poster-menu .blk a:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--p-ink); }
+.poster-menu .blk-who { color: var(--p-ink); opacity: .7; }
+.poster-menu .blk-desc, .poster-menu .blk-go { color: var(--p-ink); opacity: .85; }
+.poster-menu .blk-title { font-size: 1.12rem; }
+.poster-menu .blk-shelf a { background: var(--p-sky); border-color: var(--p-ink); color: var(--p-ink); min-height: 104px; padding: 14px 14px 12px; }
+.poster-menu .blk-shelf .blk-title { font-size: 1.12rem; }
+.poster-menu .blk-shelf .blk-who, .poster-menu .blk-shelf .blk-desc, .poster-menu .blk-shelf .blk-go { color: var(--p-ink); }
+.poster-menu .mini-shelf { height: 34px; margin-top: 10px; border-bottom: 4px solid var(--p-ink); gap: 2px; }
+.poster-menu .mini-shelf i.e { border-color: rgba(74, 32, 24, .35); }
+.poster-menu .blk-donate a, .poster-menu .blk-pick a { background: var(--p-ink); border-color: var(--p-ink); color: var(--p-cream); }
+.poster-menu .blk-donate .blk-who, .poster-menu .blk-donate .blk-desc, .poster-menu .blk-donate .blk-go,
+.poster-menu .blk-pick .blk-who, .poster-menu .blk-pick .blk-desc, .poster-menu .blk-pick .blk-go { color: var(--p-cream); opacity: .9; }
+.poster-menu .blk-pick .blk-who, .poster-menu .blk-donate .blk-who { color: var(--p-sal); opacity: 1; }
+.poster-menu .blk a:focus-visible { outline: 3px solid var(--p-cream); outline-offset: 2px; }
+[data-page="home"] .footer { background: var(--p-ink); color: var(--p-cream); }
+[data-page="home"] .footer .muted, [data-page="home"] .footer .small { color: rgba(243, 230, 218, .7); }
+@media (max-width: 759px) {
+  .poster-sky { height: clamp(250px, 44vh, 380px); padding-top: 52px; }
+  .poster-tiny { top: 50px; left: 16px; }
+  .poster-menu .blk a { min-height: 96px; padding: 12px; }
+  .poster-menu .blk-desc { font-size: .78rem; }
+}
+@media (min-width: 760px) {
+  .poster-sky { height: clamp(300px, 46vh, 480px); }
+  .poster-title { font-size: clamp(5.4rem, 20vw, 10.5rem); }
+  .poster-date { margin-bottom: 20px; }
+}
+@media (max-width: 759px) {
+  .poster-sky { height: auto; padding-top: 78px; }
+  .poster-kids { height: auto; }
+}
