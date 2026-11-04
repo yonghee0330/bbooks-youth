@@ -708,16 +708,18 @@
   }
 
   /* ── 첫 화면: 메뉴 블록 ── */
-  var BLOCK_WHO = { about: '이야기', shelf: '모두의 서가', donate: '건네는 어른', pick: '고르는 청소년', org: '함께하기', faq: '궁금한 것' };
+  // 첫 화면 메뉴 글 (2026-11-05): 위 이야기·짧은 꼬리표는 빼고, 이름만 또렷하게
+  var HOME_TITLE = { shelf: '내일의 서재', about: '책사줄게<br>스토리', donate: '책 사줄게 참여하기', faq: '책사줄게<br>Q&amp;A' };
+  var HOME_DESC = { faq: '자주 묻는 것들' };
   function renderHome() {
     var grid = $('#menu-grid'); if (!grid) return;
-    var order = ['shelf', 'donate', 'about', 'org', 'faq'];  // '책 고르기'는 메뉴에서 빼고 위쪽 큰 버튼(renderPickCta)으로
+    var order = ['shelf', 'about', 'donate', 'faq'];  // '책 고르기'는 위쪽 큰 버튼(renderPickCta), 함께하기는 일단 뺌
     var by = {}; pages().forEach(function (p) { by[p[0]] = p; });
     grid.innerHTML = order.filter(function (k) { return by[k]; }).map(function (k) {
-      var p = by[k];
-      return '<li class="blk blk-' + k + '"><a href="' + p[1] + '"><span class="blk-who">' + BLOCK_WHO[k] + '</span>' +
-        '<strong class="blk-title">' + p[2] + '</strong><span class="blk-desc">' + p[3] + '</span>' +
-        (k === 'shelf' ? '<span class="mini-shelf" id="mini-shelf" aria-hidden="true"></span><span class="blk-stat" id="shelf-stat"></span>' : '') +
+      var p = by[k], desc = HOME_DESC[k] || p[3];
+      // 서재: 책이 버튼 밖(윗면)에 꽂혀 올라온다
+      return '<li class="blk blk-' + k + '">' + (k === 'shelf' ? '<span class="mini-shelf" id="mini-shelf" aria-hidden="true"></span>' : '') +
+        '<a href="' + p[1] + '"><strong class="blk-title">' + HOME_TITLE[k] + '</strong><span class="blk-desc">' + desc + '</span>' +
         '<span class="blk-go" aria-hidden="true">→</span></a></li>';
     }).join('');
 
@@ -729,9 +731,8 @@
       var total = Math.max(filled(r.targetBooks) ? Number(r.targetBooks) : DEFAULT_SLOTS, r.books.length);
       $('#mini-shelf').innerHTML = Array.apply(null, { length: Math.min(total, 30) }).map(function (_, i) {
         var b = r.books[i];
-        return b ? '<i style="background:' + bookFill(b) + ';height:' + (70 + hash(b.id + 'h') % 28) + '%"></i>' : '<i class="e"></i>';
+        return b ? '<i style="background:' + bookFill(b) + ';height:' + (70 + hash(b.id + 'h') % 28) + '%;--i:' + i + '"></i>' : '<i class="e" style="--i:' + i + '"></i>';
       }).join('');
-      $('#shelf-stat').textContent = '꽂힌 책 ' + real + '권' + (filled(r.targetBooks) ? ' / ' + r.targetBooks + '권' : '');
     }).catch(function () { /* 블록은 글만으로도 충분하다 */ });
   }
 
@@ -743,13 +744,12 @@
     var chip = $('.pc-chip-t', cta); if (chip) chip.textContent = closed ? '행사 날 현장에서' : '신청 받는 중';
     var sub = $('#pick-sub');
     var until = filled(C.applyDeadlineLabel) ? String(C.applyDeadlineLabel).replace(/\(.\)/, '') : '';   // 12월 12일(토) → 12월 12일
-    function setSub(main) { if (sub) sub.innerHTML = '<span>' + esc(main) + '</span>' + (!closed && until ? '<span class="pc-until">' + esc(until) + '까지</span>' : ''); }
-    setSub(closed ? '비북스에서 직접 한 권 골라요' : '한 권 골라 신청해요');
+    function setSub(main) { if (sub) sub.innerHTML = '<span>' + esc(main) + '</span>'; }
+    setSub('1st : 26.12.19');
     var box = $('#pick-covers'); if (!box) return;
     fetch(((C.pick || {}).booksSource) || 'data/books.json', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (d) {
       var all = (d.books || []).filter(function (b) { return b.cover; });
       if (!all.length) return;
-      if (!closed) setSub((d.books || []).length + '권 중 한 권 골라요');
       // 추천(featured) 책을 먼저 돌려요
       var list = all.filter(function (b) { return b.featured; }).concat(all.filter(function (b) { return !b.featured; }));
       var n = Math.min(3, list.length), pos = 0, els = [];
