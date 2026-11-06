@@ -1237,3 +1237,14 @@ button, input, select, textarea, summary { font-family: inherit; }
 .free-label { display: flex; flex-direction: column; line-height: 1.25; font-weight: 700; white-space: nowrap; }
 .free-label b { font-size: .78rem; font-weight: 800; color: var(--orange); }
 .closed-note { display: none; }
+
+/* 2026-11-07: Q&A 크게 · 참여하기 버튼 크게 · 공개 범위 */
+.qa-title { font-size: clamp(3.4rem, 14vw, 6.4rem); font-weight: 900; letter-spacing: -0.05em; line-height: 1; margin: 6px 0 26px; }
+.faq-tabs button { font-size: clamp(1.2rem, 4.4vw, 1.5rem); min-height: 64px; }
+.qa-q { font-size: clamp(1.08rem, 3.8vw, 1.2rem); padding: 18px 18px; }
+.qa-q i { font-size: 1.6rem; }
+.qa-a { font-size: clamp(1rem, 3.5vw, 1.08rem); padding: 14px 18px 6px; }
+#d-open, #donate-form button[type=submit] { font-size: clamp(1.3rem, 5vw, 1.6rem); font-weight: 800; letter-spacing: -0.03em; min-height: 68px; }
+.show-opts { border: 2px solid var(--line); border-radius: var(--round); padding: 12px 14px 4px; margin: 4px 0 14px; background: var(--paper-2); }
+.show-opts legend { padding: 0 6px; }
+.show-opts .small { margin: 0 0 10px; }

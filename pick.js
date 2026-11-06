@@ -297,7 +297,7 @@
         nick: f.nick.value, age: f.age.value, school: f.school.value, bucheon: f.bucheon.checked, phone: f.phone.value, email: f.email.value,
         book1: bookText(b1), isbn1: b1.isbn || '', book2: b2 ? bookText(b2) : '', isbn2: b2 ? (b2.isbn || '') : '',
         custom1: !!b1.custom, custom2: !!(b2 && b2.custom),
-        genrePublic: f.genrePublic.checked, consent: f.consent.checked
+        anon: f.anon.checked, hideTitle: f.hideTitle.checked, pv: 2, consent: f.consent.checked
       }, f.website.value).then(function (res) {
         if (!res.ok) throw new Error(res.error || '접수하지 못했어요.');
         var rec = { id: res.id, nick: f.nick.value, book: b1.title };

@@ -287,7 +287,8 @@
     closeCard(false);
     openBook = g; g.classList.add('is-open');
     var card = $('#book-card');
-    var youth = filled(b.youthCode) ? '청소년 ' + (String(b.youthCode).charAt(0) === '#' ? b.youthCode : '#' + b.youthCode) : '책을 받으면 연결돼요';
+    var yc = filled(b.youthCode) ? (String(b.youthCode).charAt(0) === '#' ? b.youthCode : '#' + b.youthCode) : '';
+    var youth = yc ? (filled(b.youthName) ? b.youthName : '익명 청소년') + ' ' + yc : '책을 받으면 연결돼요';
     card.innerHTML =
       '<button type="button" class="bc-close" aria-label="닫기">×</button>' +
       '<span class="bc-mind">건넨 어른' + (b.example ? ' · 예시' : '') + '</span>' +
@@ -295,7 +296,7 @@
       (b.public && filled(b.line) ? '<p class="bc-line">“' + esc(b.line) + '”</p>' : (b.public ? '' : '<p class="bc-line muted">이름 없이 건넨 책이에요.</p>')) +
       (b.pooled ? '<p class="bc-pooled">작은 후원 ' + b.pooled + '건이 모여 한 권이 됐어요.</p>' : '') +
       '<dl><dt>연결</dt><dd>' + esc(youth) + '</dd>' +
-      (filled(b.genre || isbnGenre[b.isbn]) ? '<dt>고른 분야</dt><dd>' + esc(b.genre || isbnGenre[b.isbn]) + '</dd>' : '') +
+      (filled(b.youthBook) ? '<dt>고른 책</dt><dd>' + esc(b.youthBook) + '</dd>' : '') +
       (filled(b.addedAt) ? '<dt>꽂힌 날</dt><dd>' + esc(fmtDate(b.addedAt)) + '</dd>' : '') + '</dl>';
     card.hidden = false;
     var wrap = $('#shelf-wrap'), wr = wrap.getBoundingClientRect(), br = g.getBoundingClientRect();
@@ -354,12 +355,8 @@
     if (focusTab) { var b = $('#round-tabs [aria-selected="true"]'); if (b) b.focus(); }
   }
 
-  var isbnGenre = {}; // 청소년이 분야 공개에 동의하면 시트가 ISBN을 주고, 분야는 책 목록에서 찾는다
   function initShelf() {
     bindShelf();
-    fetch(((C.pick || {}).booksSource) || 'data/books.json').then(function (r) { return r.json(); }).then(function (d) {
-      (d.books || []).forEach(function (b) { if (b.isbn && b.genre) isbnGenre[b.isbn] = b.genre; });
-    }).catch(function () {});
     loadShelfAny().then(function (rounds) {
       var meta = rounds.meta;
       if (!rounds.length) { rounds = [{ round: 1, title: '1회차', targetBooks: filled(C.targetBooks) ? Number(C.targetBooks) : null, closed: false, books: [] }]; rounds.meta = meta; }
@@ -444,7 +441,7 @@
          '쓰는 곳: 입금 확인, 현금영수증·지출증빙 발급, 서가 반영과 결과 안내']
       : ['수집 항목: 닉네임, 학년, 학교 이름, 연락처, 이메일, 고른 책',
          '쓰는 곳: 부천 지역 청소년인지 확인, 책 주문과 도착 안내',
-         '실명은 묻지 않아요. 학교 이름은 공개하지 않아요'];
+         '후원현황에는 닉네임과 고른 책 제목이 보여요(익명·제목 비공개 선택 가능). 실명은 묻지 않고, 학교·연락처는 공개하지 않아요'];
     items.push('보관 기간: ' + keep + ' 뒤 지워요');
     items.push('동의하지 않으면 접수할 수 없어요');
     return '<ul>' + items.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
@@ -572,10 +569,9 @@
   /* ── [9] FAQ · [10] 개인정보 ───────────────── */
   function privacyItems() {
     return [
-      '실명, 학교, 얼굴 사진은 공개하지 않아요.',
+      '실명, 학교, 연락처, 얼굴 사진은 공개하지 않아요.',
+      '책을 받은 청소년은 후원현황에 닉네임과 고른 책 제목이 보여요. 원하지 않으면 신청할 때 「익명으로 처리」를 체크하면 「익명 청소년」으로, 제목도 빼고 싶으면 「제목 공개 안 함」을 체크하면 돼요.',
       '책을 받는 모습 사진은 손과 책 위주로 찍어요. 얼굴은 본인이 동의할 때만 담아요.',
-      '청소년 코드는 회차별 순번(#07처럼)만 써요. 다른 정보와 합쳐도 누군지 알 수 없게요.',
-      '고른 책은 분야까지만 공개해요. 제목은 본인이 원할 때만요.',
       '모은 정보는 회차가 끝나면 정리해요. 보관 기간: ' + (filled(C.retention) ? C.retention : '정해지는 대로 알려드려요') + '.',
       '모인 금액, 전달한 권수, 남은 금액 처리는 회차가 끝난 뒤 공지해요.'
     ];
@@ -597,7 +593,7 @@
       youth: [
         ['누가 신청할 수 있나요?', [who]],
         ['정말 무료예요?', ['네, 무료예요. 책값은 어른들이 미리 냈어요. 한 사람이 한 권(정가 ' + won(price) + ' 이하)을 받아요.']],
-        ['내 이름이나 고른 책이 공개되나요?', ['실명, 학교, 얼굴 사진은 공개하지 않아요. 청소년 코드(#07처럼)와, 동의한 경우 고른 책의 분야만 보여요.']],
+        ['내 이름이나 고른 책이 공개되나요?', ['책을 받으면 후원현황에 닉네임과 고른 책 제목이 보여요.', '원하지 않으면 신청할 때 "익명으로 처리"를 체크하세요. 닉네임이 「익명 청소년」으로 보여요. 제목도 빼고 싶으면 "고른 책 제목도 공개하지 않아요"를 체크하세요.', '실명, 학교, 연락처, 얼굴 사진은 공개하지 않아요.']],
         ['어떻게 고르나요?', ['"책 고르기"에서 추천 목록을 보고 고르거나, 목록에 없는 책을 직접 적어 신청해요. ' + (((C.pick || {}).customRule) || '')]]
       ]
     };
@@ -797,9 +793,10 @@
     }).join('') : '<li class="dn-empty">첫 번째로 함께할 어른을 기다려요. <a href="donate.html">후원 참여 →</a></li>';
     var yl = $('#dash-youth');
     if (yl) yl.innerHTML = T.got.length ? T.got.map(function (y) {
-      var g = isbnGenre[y.isbn];
-      return '<li><b>' + esc(String(y.code).charAt(0) === '#' ? y.code : '#' + y.code) + '</b>' + (g ? '<span>' + esc(g) + '</span>' : '') + '</li>';
-    }).join('') : '<li class="dn-empty">청소년이 책을 받으면 채워져요. 이름 대신 #01 같은 코드와 고른 분야만 보여요.</li>';
+      var code = String(y.code).charAt(0) === '#' ? y.code : '#' + y.code;
+      return '<li><span class="dn-name">' + esc(filled(y.name) ? y.name : '익명 청소년') + ' <em>' + esc(code) + '</em></span>' +
+        (filled(y.title) ? '<span class="dn-line">“' + esc(y.title) + '”</span>' : '') + '</li>';
+    }).join('') : '<li class="dn-empty">청소년이 책을 받으면 채워져요. 닉네임과 고른 책 제목이 보여요. 익명을 원하면 「익명 청소년」으로 보여요.</li>';
     var pg = $('#dash-photos');
     if (pg) {
       var ph = (C.photos || []).filter(function (x) { return x && x.src; });
