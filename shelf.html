@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect x=%226%22 y=%224%22 width=%228%22 height=%2224%22 rx=%221%22 fill=%22%231f3b2d%22/%3E%3Crect x=%2216%22 y=%228%22 width=%228%22 height=%2220%22 rx=%221%22 fill=%22%23e0662b%22/%3E%3C/svg%3E">
-<link rel="stylesheet" href="style.css?v=20261106a">
+<link rel="stylesheet" href="style.css?v=20261106b">
 </head>
 <body data-page="shelf">
 <a class="skip" href="#content">본문으로 바로 가기</a>
@@ -24,20 +24,20 @@
 
 <main id="content" class="sub">
 <div class="wrap">
-  <p class="who">1회차 · 50권 모으는 중</p>
+  <p class="who">1회차 · 책 50권을 청소년에게 연결해요</p>
   <h1 class="page-title" id="shelf-title">후원현황</h1>
 
   <section class="dash-sum" aria-label="진행 현황">
-    <div class="ds"><em>꽂힌 책</em><b id="st-books">0</b><small id="st-books-goal">/ 50권</small></div>
-    <div class="ds"><em>모인 금액</em><b id="st-amount">0</b><small id="st-amount-goal">/ 100만 원</small></div>
+    <div class="ds ds-main"><em>청소년에게 연결된 책</em><b id="st-youth">0</b><small id="st-youth-goal">/ 50권</small></div>
+    <div class="ds"><em>서가에 마련된 책</em><b id="st-books">0</b><small>권</small></div>
+    <div class="ds"><em>모인 책값</em><b id="st-amount">0</b><small id="st-amount-goal">원</small></div>
     <div class="ds"><em>함께한 어른</em><b id="st-donors">–</b><small>명</small></div>
-    <div class="ds"><em>책을 받은 청소년</em><b id="st-youth">0</b><small>명</small></div>
-    <div class="ds-bar"><span class="lp-bar" id="st-bar-l" role="progressbar" aria-label="목표 금액 대비" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="st-bar"></i></span><span id="st-pct">0%</span></div>
+    <div class="ds-bar"><span class="lp-bar" id="st-bar-l" role="progressbar" aria-label="청소년에게 연결된 책" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="st-bar"></i></span><span id="st-pct">0%</span></div>
   </section>
 
   <section class="part dash-shelf">
     <h2>내일의 서재</h2>
-    <p class="small">책 한 권 = 2만 원. 입금이 확인되면 한 칸씩 꽂혀요. 작은 후원은 모여서 한 권이 돼요.</p>
+    <p class="small">어른들이 건넨 책값(한 권 2만 원)으로 서가에 책이 마련되고, 청소년이 골라 가면 그 책이 <b>연결</b>돼요. 어른과 청소년 사이의 다리예요.</p>
     <p class="badge pending-badge" id="dash-pending" hidden></p>
     <div class="round-tabs" id="round-tabs" role="tablist" aria-label="회차" hidden></div>
     <div class="shelf-meta" id="shelf-meta" aria-live="polite" hidden></div>
@@ -55,7 +55,7 @@
       <ul class="dash-list" id="dash-donors"></ul>
     </section>
     <section class="part">
-      <h2>책을 받은 청소년</h2>
+      <h2>책이 연결된 청소년</h2>
       <p class="small">이름 대신 #01 같은 코드와, 동의한 경우 고른 분야만 보여요.</p>
       <ul class="dash-youth" id="dash-youth"></ul>
     </section>
@@ -72,7 +72,7 @@
 
 <footer class="footer" id="site-footer"></footer>
 
-<script src="config.js?v=20261106a"></script>
-<script src="main.js?v=20261106a"></script>
+<script src="config.js?v=20261106b"></script>
+<script src="main.js?v=20261106b"></script>
 </body>
 </html>

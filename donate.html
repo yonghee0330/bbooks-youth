@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect x=%226%22 y=%224%22 width=%228%22 height=%2224%22 rx=%221%22 fill=%22%231f3b2d%22/%3E%3Crect x=%2216%22 y=%228%22 width=%228%22 height=%2220%22 rx=%221%22 fill=%22%23e0662b%22/%3E%3C/svg%3E">
-<link rel="stylesheet" href="style.css?v=20261106a">
+<link rel="stylesheet" href="style.css?v=20261106b">
 </head>
 <body data-page="donate">
 <a class="skip" href="#content">본문으로 바로 가기</a>
@@ -31,31 +31,35 @@
 
 <div class="wrap narrow">
   <section class="part" id="amount">
-    <h2>몇 권을 건넬까요?</h2>
+    <h2>몇 권을 연결할까요?</h2>
     <p class="donors-now" id="donors-now"></p>
     <fieldset class="amounts">
       <legend class="visually-hidden">후원 금액</legend>
       <div class="amount-btns" id="amount-btns"></div>
       <label class="free-amount">
-        <span>그 이상</span>
-        <input id="free-amount" type="text" inputmode="numeric" placeholder="원하는 금액 직접 입력" autocomplete="off">
+        <span>5권 이상</span>
+        <input id="free-amount" type="text" inputmode="numeric" placeholder="원하는 만큼 직접 입력" autocomplete="off">
         <span>원</span>
       </label>
       <p class="books-calc" id="books-calc" aria-live="polite" hidden></p>
-      <p class="goal" id="goal" hidden></p>
     </fieldset>
     <div class="account" id="account"></div>
-    <button type="button" class="btn btn-primary btn-wide" id="d-open">후원 신청하기</button>
+    <button type="button" class="btn btn-primary btn-wide" id="d-open">책사줄게 참여하기</button>
   </section>
 
   <form class="apply-form" id="donate-form" novalidate hidden>
-    <h2 class="form-h">후원 신청</h2>
+    <h2 class="form-h">책사줄게 참여</h2>
     <p class="small">입금과 함께 아래를 보내주세요. 입금이 확인되면 서가에 책이 꽂혀요.</p>
     <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
     <fieldset class="f-row seg"><legend>누가 함께하나요</legend>
       <label><input type="radio" name="kind" value="개인" checked><span>개인</span></label>
       <label><input type="radio" name="kind" value="기관·단체·기업·교회"><span>기관·단체·기업·교회</span></label>
     </fieldset>
+    <fieldset class="f-row seg"><legend>누구에게 건넬까요</legend>
+      <label><input type="radio" name="to" value="any" checked><span>부천 청소년 누구에게나</span></label>
+      <label><input type="radio" name="to" value="pick"><span>지정해서 건네기</span></label>
+    </fieldset>
+    <div class="f-row" id="d-target-row" hidden><label for="d-target">어디에 건넬까요 <b>*</b> <em>(학교·반·모임 등)</em></label><input id="d-target" name="target" maxlength="60" placeholder="예) ○○중학교 2학년 3반, ○○청소년 독서모임"></div>
     <div class="f-row" id="d-org-row" hidden><label for="d-org">기관·단체 이름 <b>*</b></label><input id="d-org" name="org" maxlength="40" placeholder="예) ○○교회, ○○중학교 독서동아리"></div>
     <div class="f-row"><label for="d-name">이름 또는 닉네임 <b>*</b> <em>(기관이면 담당자)</em></label><input id="d-name" name="name" maxlength="30" autocomplete="name" required></div>
     <div class="f-2">
@@ -68,18 +72,18 @@
     </div>
     <label class="check anon-check"><input type="checkbox" name="anon" id="d-anon"><span><b class="plain">키다리아저씨로 참여</b> <em>(익명 — 후원현황과 서가에 이름과 한 줄이 보이지 않아요)</em></span></label>
     <div class="f-row" id="d-line-row"><label for="d-line">청소년에게 남기는 한 줄 <em>(선택)</em> <span class="cnt" id="d-line-cnt">0/40</span></label><input id="d-line" name="line" maxlength="40" placeholder="예) 네가 고른 책이 네 편이길"></div>
-    <label class="check"><input type="checkbox" name="receipt" id="d-receipt"><span>현금영수증을 받을게요</span></label>
-    <div class="f-row" id="d-receipt-row" hidden><label for="d-receiptNo">현금영수증 발급 번호 <em>(휴대폰 번호 또는 사업자등록번호, 비우면 연락처로)</em></label><input id="d-receiptNo" name="receiptNo" inputmode="numeric" maxlength="20"></div>
+    <label class="check"><input type="checkbox" name="receipt" id="d-receipt"><span>현금영수증·지출증빙이 필요해요</span></label>
+    <div class="f-row" id="d-receipt-row" hidden><label for="d-receiptNo">발급 번호 <em>(휴대폰 번호 또는 사업자등록번호, 비우면 연락처로)</em></label><input id="d-receiptNo" name="receiptNo" inputmode="numeric" maxlength="20"></div>
     <details class="consent-box"><summary>개인정보 수집·이용 안내</summary><div data-consent="donate"></div></details>
     <label class="check"><input type="checkbox" name="consent" required><span>개인정보 수집·이용에 동의해요 <b>*</b></span></label>
     <p class="form-msg" role="alert"></p>
-    <button class="btn btn-primary btn-wide" type="submit">후원 신청하기</button>
+    <button class="btn btn-primary btn-wide" type="submit">책사줄게 참여하기</button>
   </form>
   <div class="done" id="donate-done" hidden tabindex="-1"></div>
 
   <section class="part org-box" id="org">
     <h2>기관·단체·기업·교회라면</h2>
-    <p>한 반, 한 동아리 몫을 함께 건넬 수 있어요. 후원 신청할 때 <b>기관·단체·기업·교회</b>를 고르고 이름을 적어주세요.</p>
+    <p>한 반, 한 동아리 몫을 함께 건넬 수 있어요. 참여할 때 <b>기관·단체·기업·교회</b>를 고르고 이름을 적어주세요. 특정 학교·반·모임을 <b>지정해서 건네기</b>도 돼요.</p>
     <div id="org-package"></div>
     <div id="org-contact" class="cta-row"></div>
   </section>
@@ -89,7 +93,7 @@
 
 <footer class="footer" id="site-footer"></footer>
 
-<script src="config.js?v=20261106a"></script>
-<script src="main.js?v=20261106a"></script>
+<script src="config.js?v=20261106b"></script>
+<script src="main.js?v=20261106b"></script>
 </body>
 </html>

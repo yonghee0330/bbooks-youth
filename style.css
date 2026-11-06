@@ -1148,3 +1148,19 @@ button.cover { display: block; width: 100%; padding: 0; border: 0; cursor: point
 .lp-btn strong { white-space: nowrap; }
 @media (max-width: 559px) { .lp-btn { min-height: 54px; padding: 8px 6px; } .lp-btn strong { font-size: 1.05rem; } }
 .amount-btns { grid-template-columns: repeat(3, 1fr); }
+
+/* 2026-11-06 수정: 위 문장 빼고 글자 키우기 · 연결 표시 · 1~5권 */
+.lp-titlebox { padding-top: clamp(6px, 2vh, 20px); }
+.lp-title { font-size: clamp(3.6rem, min(18vw, 14vh), 9.2rem); margin-bottom: 12px; }
+.lp-title small { font-size: .34em; }
+.lp-campaign { font-size: clamp(1.02rem, 2.5vh, 1.4rem); line-height: 1.5; }
+@media (max-width: 859px) {
+  .lp-title { font-size: clamp(3.2rem, 16vw, 4.8rem); }
+  .lp-campaign { font-size: 1.02rem; }
+}
+.lp-shelf i.bk.linked::after { content: ""; position: absolute; left: 34%; right: 34%; top: calc(100% - var(--h) - 7px); height: 9px; border-radius: 2px; background: var(--orange); }
+.shelf-svg .link-mark { fill: var(--orange); }
+.dash-list li.dn-seed { border-color: var(--ink); background: var(--paper-2); }
+.ds-main { border-color: var(--ink); }
+.amount-btns { grid-template-columns: repeat(5, 1fr); }
+@media (max-width: 559px) { .amount-btns button { min-height: 58px; padding: 0 2px; } .amount-btns button b { font-size: 1.15rem; } .amount-btns button span { font-size: .72rem; } }

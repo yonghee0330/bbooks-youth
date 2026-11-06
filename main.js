@@ -247,14 +247,15 @@
         continue;
       }
       var h = rowH * (0.7 + (hash(b.id + 'h') % 23) / 100), y = floor - h;
-      var label = displayName(b) + '님이 건넨 책' + (b.example ? ', 예시' : '');
+      var label = displayName(b) + '님이 건넨 책' + (filled(b.youthCode) ? ', 청소년에게 연결됨' : '') + (b.example ? ', 예시' : '');
       svg += '<g class="book' + (isNew(b) ? ' new' : '') + (b.example ? ' example' : '') + '" tabindex="0" role="button" aria-haspopup="dialog" data-i="' + i +
         '" aria-label="' + esc(label) + '" style="animation-delay:' + Math.round(i * delayStep) + 'ms">' +
         '<rect class="cover" x="' + x + '" y="' + y + '" width="' + bookW + '" height="' + h + '" rx="2" style="fill:' + bookFill(b) + '"/>' +
         '<rect class="spine-line" x="' + x + '" y="' + (y + h * 0.16) + '" width="' + bookW + '" height="2.5"/>' +
         '<rect class="spine-line" x="' + x + '" y="' + (y + h * 0.78) + '" width="' + bookW + '" height="1.5"/>' +
         '<rect class="glow" x="' + (x - 3) + '" y="' + (y - 3) + '" width="' + (bookW + 6) + '" height="' + (h + 6) + '" rx="4"/>' +
-        '<rect class="focus-ring" x="' + (x - 3) + '" y="' + (y - 3) + '" width="' + (bookW + 6) + '" height="' + (h + 6) + '" rx="4"/></g>';
+        '<rect class="focus-ring" x="' + (x - 3) + '" y="' + (y - 3) + '" width="' + (bookW + 6) + '" height="' + (h + 6) + '" rx="4"/>' +
+        (filled(b.youthCode) ? '<rect class="link-mark" x="' + (x + bookW * 0.3) + '" y="' + (y - 7) + '" width="' + (bookW * 0.4) + '" height="9" rx="2"/>' : '') + '</g>';
     }
     svg += '</svg>';
     wrap.insertAdjacentHTML('afterbegin', svg);
@@ -394,7 +395,7 @@
       this.value = digits ? Number(digits).toLocaleString('ko-KR') : '';
       setPressed(null); calc();
     });
-    if (filled(C.goalAmount)) { $('#goal').hidden = false; $('#goal').textContent = '1회차 목표: ' + (C.targetBooks || 50) + '권 · ' + won(C.goalAmount); }
+    if (filled(C.goalAmount) && $('#goal')) { $('#goal').hidden = false; $('#goal').textContent = '1회차 목표: ' + (C.targetBooks || 50) + '권 · ' + won(C.goalAmount); }
 
     var a = C.account || {}, box = $('#account');
     if (filled(a.bank) && filled(a.number) && filled(a.holder)) {
@@ -440,11 +441,11 @@
   function consentHtml(kind) {
     var keep = filled(C.retention) ? C.retention : '정해지는 대로 알려드려요';
     var items = kind === 'donate'
-      ? ['수집 항목: 이름·닉네임, 연락처, 이메일, 후원 금액, 입금자명, (현금영수증 신청 시) 발급 번호',
-         '쓰는 곳: 입금 확인, 현금영수증 발급, 서가 반영과 결과 안내']
+      ? ['수집 항목: 이름·닉네임, 연락처, 이메일, 후원 금액, 입금자명, 지정 대상, (현금영수증·지출증빙 신청 시) 발급 번호',
+         '쓰는 곳: 입금 확인, 현금영수증·지출증빙 발급, 서가 반영과 결과 안내']
       : ['수집 항목: 닉네임, 학년, 학교 이름, 연락처, 이메일, 고른 책',
          '쓰는 곳: 부천 지역 청소년인지 확인, 책 주문과 받는 날 안내',
-         '실명과 가정 형편은 묻지 않아요. 학교 이름은 공개하지 않아요'];
+         '실명은 묻지 않아요. 학교 이름은 공개하지 않아요'];
     items.push('보관 기간: ' + keep + ' 뒤 지워요');
     items.push('동의하지 않으면 접수할 수 없어요');
     return '<ul>' + items.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>';
@@ -471,7 +472,7 @@
     var btn = $('button[type=submit]', form), msg = $('.form-msg', form);
     if (!filled(C.api)) { btn.disabled = true; btn.textContent = '접수 준비 중'; }
     $('#d-line').addEventListener('input', function () { $('#d-line-cnt').textContent = this.value.length + '/40'; });
-    // 만화 → 금액 → '후원 신청하기'를 눌러야 폼이 열린다
+    // 만화 → 금액 → '책사줄게 참여하기'를 눌러야 폼이 열린다
     var open = $('#d-open');
     if (open) open.addEventListener('click', function () {
       form.hidden = false; open.hidden = true;
@@ -497,12 +498,16 @@
       r.addEventListener('change', function () { var org = form.elements.kind.value !== '개인'; $('#d-org-row').hidden = !org; form.elements.org.required = org; });
     });
     $('#d-anon').addEventListener('change', function () { $('#d-line-row').classList.toggle('dim', this.checked); });
+    Array.prototype.forEach.call(form.elements.to, function (r) {
+      r.addEventListener('change', function () { var pick = form.elements.to.value === 'pick'; $('#d-target-row').hidden = !pick; form.elements.target.required = pick; });
+    });
     form.addEventListener('submit', function (e) {
       e.preventDefault(); msg.textContent = '';
       var err = checkFields(form, [
         ['name', null, '이름이나 닉네임을 적어주세요.'], ['phone', isPhone, '연락처를 확인해 주세요. (예: 010-1234-5678)'],
         ['email', isEmail, '이메일을 확인해 주세요.'], ['amount', function (el) { return Number(digits(el.value)) >= 1000; }, '후원 금액을 적어주세요. (1,000원 이상)'],
         ['org', function (el) { return form.elements.kind.value === '개인' || !!el.value.trim(); }, '기관·단체 이름을 적어주세요.'],
+        ['target', function (el) { return form.elements.to.value !== 'pick' || !!el.value.trim(); }, '어느 학교·반·모임에 건넬지 적어주세요.'],
         ['payer', null, '입금자명을 적어주세요.'], ['consent', isChecked, '개인정보 수집·이용에 동의해 주세요.']
       ]);
       if (err) { msg.textContent = err; return; }
@@ -510,20 +515,20 @@
       btn.disabled = true; btn.textContent = '보내는 중…';
       post('donate', {
         name: f.name.value, phone: f.phone.value, email: f.email.value, kind: f.kind.value, amount: digits(f.amount.value),
-        org: f.org.value, payer: f.payer.value, line: f.line.value, anon: f.anon.checked,
+        org: f.org.value, payer: f.payer.value, line: f.line.value, anon: f.anon.checked, target: f.to.value === 'pick' ? f.target.value : '',
         receipt: f.receipt.checked, receiptNo: f.receiptNo.value, consent: f.consent.checked
       }, f.website.value).then(function (res) {
         if (!res.ok) throw new Error(res.error || '접수하지 못했어요.');
         var a = C.account || {}, done = $('#donate-done');
         form.hidden = true; done.hidden = false;
-        done.innerHTML = '<p class="done-h">후원 접수가 됐어요. 고맙습니다.</p><p>접수번호 <b>' + esc(res.id) + '</b></p>' +
+        done.innerHTML = '<p class="done-h">책사줄게 참여 신청이 됐어요. 고맙습니다.</p><p>접수번호 <b>' + esc(res.id) + '</b></p>' +
           '<p>아직 입금 전이라면 아래 계좌로 보내주세요. 입금이 확인되면 서가에 책이 꽂혀요.</p>' +
           (filled(a.number) ? '<p class="done-acc">' + esc(a.bank) + ' ' + esc(a.number) + ' · ' + esc(a.holder) + '<br>입금자명 ' + esc(f.payer.value) + ' · ' + won(digits(f.amount.value)) + '</p>' : '') +
           '<a class="btn btn-ghost" href="shelf.html">후원현황 보러 가기</a>';
         done.focus();
       }).catch(function (err) {
         msg.textContent = err.message === 'Failed to fetch' ? '보내지 못했어요. 인터넷 연결을 확인하고 다시 눌러주세요.' : err.message;
-        btn.disabled = false; btn.textContent = '후원 신청하기';
+        btn.disabled = false; btn.textContent = '책사줄게 참여하기';
       });
     });
   }
@@ -531,7 +536,7 @@
   /* ── [7] 신청 안내 ────────────────────────── */
   function renderYouth() {
     var date = filled(C.eventDate) ? [C.eventDate, C.eventTime].filter(filled).join(' ') : '정해지는 대로 알려드려요';
-    var who = (filled(C.regionLimit) ? C.regionLimit + ' ' : '') + (filled(C.ageRange) ? C.ageRange + ' 청소년' : '청소년') + ', 학교 밖 청소년도 괜찮아요';
+    var who = (filled(C.regionLimit) ? C.regionLimit + ' ' : '') + (filled(C.ageRange) ? C.ageRange + ' 청소년' : '청소년');
     var items = [
       ['날짜', date],
       ['장소', C.place || '비북스'],
@@ -539,7 +544,7 @@
       null,
       filled(C.applyDeadlineLabel) ? ['신청 마감', C.applyDeadlineLabel + '까지 (그 뒤엔 행사 날 비북스에서 직접 골라요)'] : null,
       ['책', '한 사람이 한 권' + (filled(C.bookPrice) ? ' (정가 ' + won(C.bookPrice) + ' 이하)' : '') + '. 추천 목록에서 고르거나, 읽고 싶은 책을 직접 골라요'],
-      ['묻지 않아요', '실명, 가정 형편 (학교 이름은 지역 확인에만 써요)'],
+      ['묻지 않아요', '실명 (학교 이름은 지역 확인에만 써요)'],
       ['신청', '실명 대신 닉네임으로']
     ].filter(Boolean);
     $('#youth-info').innerHTML = items.map(function (x) { return '<dt>' + x[0] + '</dt><dd>' + esc(x[1]) + '</dd>'; }).join('');
@@ -582,25 +587,23 @@
   function faqData() {
     var fa = C.faqAnswers || {}, price = Number(C.bookPrice) || 20000;
     var who = (filled(C.regionLimit) ? C.regionLimit + ' ' : '') + (filled(C.ageRange) ? C.ageRange + ' ' : '') +
-      '청소년이면 누구나 신청할 수 있어요. 학교에 다니지 않는 청소년도 괜찮아요. 학교 이름은 지역 확인에만 쓰고 공개하지 않아요.';
+      '청소년이면 누구나 신청할 수 있어요. 학교 이름은 지역 확인에만 쓰고 공개하지 않아요.';
     var when = [C.eventDate, C.eventTime].filter(filled).join(' ');
     return {
       adult: [
-        ['얼마부터 후원할 수 있나요?', ['책 한 권 값 ' + won(price) + '이 한 칸이에요. 1권 · 5권(' + manwon(price * 5) + ') · 50권(' + manwon(price * 50) + ') 중에서 고르거나 원하는 금액을 직접 적어도 돼요.',
-          won(price) + '보다 적은 후원은 다른 후원과 모여 한 권이 돼요.']],
+        ['얼마부터 함께할 수 있나요?', ['책 1권(' + won(price) + ')부터 5권, 그 이상은 원하는 만큼 함께할 수 있어요.']],
         ['후원금은 어디에 쓰이나요?', ['부천 청소년이 스스로 고른 책을 사는 데만 써요. 신청이 들어오면 비북스가 책을 주문해 준비해요.']],
         ['남으면 어떻게 되나요?', [filled(fa.leftover) ? fa.leftover : NOT_YET]],
         ['영수증을 받을 수 있나요?', [filled(fa.receipt) ? fa.receipt : NOT_YET]],
-        ['이름을 밝히지 않고 후원할 수 있나요?', ['네. 후원 신청할 때 "' + anonName() + '로 참여"에 체크하면 후원현황과 서가에 이름과 한 줄이 보이지 않아요. "' + anonName() + '"로만 표시돼요.']],
-        ['기관·단체·기업·교회도 함께할 수 있나요?', ['네. 후원 신청할 때 "기관·단체·기업·교회"를 고르고 이름을 적어주세요. 한 반, 한 동아리 몫처럼 여러 권을 함께 건넬 수도 있어요. 궁금한 건 아래 연락처로 물어봐 주세요.']]
+        ['이름을 밝히지 않고 후원할 수 있나요?', ['네. 참여할 때 "' + anonName() + '로 참여"에 체크하면 후원현황과 서가에 이름과 한 줄이 보이지 않아요. "' + anonName() + '"로만 표시돼요.']],
+        ['기관·단체·기업·교회도 함께할 수 있나요?', ['네. 참여할 때 "기관·단체·기업·교회"를 고르고 이름을 적어주세요. 한 반, 한 동아리 몫처럼 여러 권을 함께 건넬 수도 있어요. 궁금한 건 아래 연락처로 물어봐 주세요.']],
+        ['특정 학교나 모임에 건넬 수 있나요?', ['네. 참여할 때 "지정해서 건네기"를 고르고 학교·반·모임을 적어주세요. 그곳 청소년들이 책을 고르도록 비북스가 이어 드려요.']]
       ],
       youth: [
         ['누가 신청할 수 있나요?', [who]],
         ['정말 무료예요?', ['네, 무료예요. 책값은 어른들이 미리 냈어요. 한 사람이 한 권(정가 ' + won(price) + ' 이하)을 받아요.']],
-        ['부모님과 같이 가도 되나요?', ['같이 와도 괜찮아요. 다만 책을 고르는 동안은 청소년만 서가 구역에 들어가고, 보호자는 카페 공간에서 기다려요. 만 14세 미만은 보호자 동의가 필요해서 비북스로 먼저 연락 주세요.']],
         ['내 이름이나 고른 책이 공개되나요?', ['실명, 학교, 얼굴 사진은 공개하지 않아요. 청소년 코드(#07처럼)와, 동의한 경우 고른 책의 분야만 보여요.']],
-        ['어떻게 고르고, 언제 받나요?', ['"책 고르기"에서 추천 목록을 보고 고르거나, 목록에 없는 책을 직접 적어 신청해요. ' + (((C.pick || {}).customRule) || ''),
-          (filled(C.applyDeadlineLabel) ? '온라인 신청은 ' + C.applyDeadlineLabel + '까지예요. ' : '') + (when ? '책은 ' + when + ' 비북스에서 받아가요.' : '')]]
+        ['어떻게 고르나요?', ['"책 고르기"에서 추천 목록을 보고 고르거나, 목록에 없는 책을 직접 적어 신청해요. ' + (((C.pick || {}).customRule) || '')]]
       ]
     };
   }
@@ -657,7 +660,7 @@
           return '<li>' + l[0] + ' <a href="' + esc(l[1]) + '"' + (l[0] === '인스타그램' ? ' target="_blank" rel="noopener"' : '') + '>' + esc(l[2]) + '</a></li>';
         }).join('') : '<li class="muted">연락처 준비 중</li>') + '</ul></div>' +
         '<nav class="foot-links" aria-label="안내"><a href="faq.html#privacy-sec">개인정보와 익명 처리</a><a href="about.html#sources">출처</a></nav></div>' +
-        '<p class="small muted">청소년 책사줄게는 전국 동네서점이 함께하는 캠페인이에요. 원미동 비북스는 부천에서 두 번째로 함께해요.</p></div>';
+        '<p class="small muted">청소년 책사줄게는 전국 동네서점이 함께하는 캠페인이에요. 부천 원미동 비북스에서도 함께 시작해요.</p></div>';
     }
     // 모바일 하단 바: 첫 화면과 책 고르기에는 두지 않는다
     if (PAGE !== 'home' && PAGE !== 'pick') {
@@ -754,12 +757,12 @@
     };
   }
   function fillStats(T) {
-    var goalB = Number(C.targetBooks) || 50, goalA = Number(C.goalAmount) || goalB * (Number(C.bookPrice) || 20000);
+    var goalB = Number(C.targetBooks) || 50;
     function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
-    set('st-books', T.books); set('st-books-goal', '/ ' + goalB + '권');
-    set('st-amount', manShort(T.amount)); set('st-amount-goal', '/ ' + manShort(goalA) + ' 원');
-    set('st-donors', T.donors == null ? '–' : T.donors); set('st-youth', T.youth);
-    var pct = Math.min(100, Math.round(T.amount / goalA * 100));
+    set('st-books', T.books);
+    set('st-amount', manShort(T.amount)); set('st-amount-goal', '원 · 책 ' + Math.floor(T.amount / (Number(C.bookPrice) || 20000)) + '권');
+    set('st-donors', T.donors == null ? '–' : T.donors); set('st-youth', T.youth); set('st-youth-goal', '/ ' + goalB + '권');
+    var pct = Math.min(100, Math.round(T.youth / goalB * 100));  // 1회차 목표 = 50권을 청소년에게 연결
     var bar = document.getElementById('st-bar'); if (bar) bar.style.width = pct + '%';
     set('st-pct', pct + '%');
     var bar2 = document.getElementById('st-bar-l'); if (bar2) bar2.setAttribute('aria-valuenow', pct);
@@ -769,7 +772,7 @@
     var r = T.round, out = [];
     for (var i = 0; i < goal; i++) {
       var b = r.books[i];
-      out.push(b ? '<i class="bk' + (isNew(b) ? ' new' : '') + '" style="--c:' + bookFill(b) + ';--h:' + (72 + hash((b.id || i) + 'h') % 24) + '%;--d:' + Math.min(i * 45, 1800) + 'ms"></i>' : '<i class="em"></i>');
+      out.push(b ? '<i class="bk' + (isNew(b) ? ' new' : '') + (filled(b.youthCode) ? ' linked' : '') + '" style="--c:' + bookFill(b) + ';--h:' + (72 + hash((b.id || i) + 'h') % 24) + '%;--d:' + Math.min(i * 45, 1800) + 'ms"></i>' : '<i class="em"></i>');
     }
     return out.join('');
   }
@@ -794,7 +797,7 @@
     var dl = $('#dash-donors');
     if (dl) dl.innerHTML = T.list.length ? T.list.map(function (d) {
       var name = d.anon || !filled(d.name) ? anonName() : d.name;
-      return '<li><span class="dn-name">' + esc(name) + (d.org ? ' <em>단체</em>' : '') + '</span>' +
+      return '<li' + (d.seed ? ' class="dn-seed"' : '') + '><span class="dn-name">' + esc(name) + (d.seed ? ' <em>씨앗 펀딩 · 0.1평 점주</em>' : '') + (d.org ? ' <em>단체</em>' : '') + '</span>' +
         '<span class="dn-books">' + (d.books >= 1 ? '책 ' + d.books + '권' : '작은 후원') + '</span>' +
         (filled(d.line) ? '<span class="dn-line">“' + esc(d.line) + '”</span>' : '') + '<span class="dn-date">' + esc(fmtDate(d.at)) + '</span></li>';
     }).join('') : '<li class="dn-empty">첫 번째로 함께할 어른을 기다려요. <a href="donate.html">후원 참여 →</a></li>';
@@ -841,11 +844,11 @@
         return sv('<path d="M40 130 C90 60 150 150 200 90 S270 60 290 100" fill="none" stroke="' + INK + '" stroke-width="3" stroke-dasharray="6 6"/>' +
           pin(40, 130, '청주') + pin(120, 95, '전국') + pin(200, 92, '빛나는친구들', false) + pin(290, 100, '비북스', true) + T_(200, 150, '부천', 12) + T_(290, 150, '부천', 12));
       }, '충북 청주의 동네책방에서 시작해 전국 동네서점으로 번졌고, 부천에서는 빛나는친구들이 먼저 함께했어요.'],
-      ['부천 두 번째, 비북스', function () {
+      ['부천 원미동에서도', function () {
         var awn = ''; for (var a = 0; a < 8; a++) awn += R(70 + a * 22, 70, 22, 18, a % 2 ? CREAM : SAL);
         return sv(R(70, 88, 176, 104, CREAM) + awn + T_(158, 64, '비북스', 16) + shelfProp(84, 100, 90, 2, 16) + R(190, 120, 42, 72, INK, 3) +
           teen(40, { hair: 'short', top: 'stripe' }, 112) + teen(290, { hair: 'long', top: 'dress' }, 104));
-      }, '그리고 원미동 비북스가 부천에서 두 번째로 함께해요.']
+      }, '그리고 부천 원미동 비북스에서도 함께 시작해요.']
     ],
     donate: [
       ['어른이 건네요', function () { return sv(adult(90) + R(150, 104, 64, 34, CREAM, 4) + R(150, 104, 64, 34, 'none') + '<rect x="150" y="104" width="64" height="34" rx="4" fill="none" stroke="' + INK + '" stroke-width="3"/>' + T_(182, 127, '2만 원', 13) + T_(250, 80, '= 책 1권', 15)); },
