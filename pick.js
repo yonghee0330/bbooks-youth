@@ -156,19 +156,74 @@
     state.list = id; state.genre = ''; state.q = ''; $('#q').value = '';
     renderTabs(); if (id !== 'custom') { renderGenres(); renderGrid(); }
   }
+  /* ── 직접 고르기: 카카오 책 검색(시트 스크립트가 대신 불러줘요) → 나온 책 중에 고르기 ── */
+  var lastResults = [], searchSeq = 0;
+  function won(n) { return Number(n).toLocaleString('ko-KR') + '원'; }
+  function overLimit(b) { var lim = Number(C.bookPrice) || 0; return lim > 0 && b.price > lim; }
+  function pickedIsbn(isbn) { return !!isbn && picks.some(function (id) { return byId[id] && byId[id].isbn === isbn; }); }
+
+  function renderResults() {
+    var ul = $('#bs-results');
+    ul.innerHTML = lastResults.map(function (b, i) {
+      var over = overLimit(b), got = pickedIsbn(b.isbn);
+      var meta = [b.authors, b.publisher, b.year].filter(filled).join(' · ');
+      var tag = b.status && b.status !== '정상판매' ? '<span class="bs-tag">' + esc(b.status) + ' · 구하기 어려울 수 있어요</span>' : '';
+      var btn = got ? '<button type="button" class="pick-btn on" data-rs="' + i + '" disabled>✓ 골랐어요</button>'
+        : over ? '<button type="button" class="pick-btn" data-rs="' + i + '" disabled>정가 ' + won(C.bookPrice) + ' 초과</button>'
+        : '<button type="button" class="pick-btn" data-rs="' + i + '" aria-label="' + esc(b.title) + ' 고르기">고르기</button>';
+      return '<li class="bs-item' + (over ? ' over' : '') + '"><span class="bs-cover">' + (b.thumb ? '<img src="' + esc(b.thumb) + '" alt="" loading="lazy">' : '') + '</span>' +
+        '<div class="bs-info"><strong>' + esc(b.title) + '</strong><span>' + esc(meta) + '</span><span class="bs-price">' + (b.price > 0 ? '정가 ' + won(b.price) : '정가를 확인 중이에요') + '</span>' + tag + '</div>' + btn + '</li>';
+    }).join('');
+  }
+  function setStatus(msg, bad) { var el = $('#bs-status'); el.textContent = msg; el.classList.toggle('bad', !!bad); }
+  function doSearch(q) {
+    var seq = ++searchSeq, form = $('#bsearch-form'), btn = $('button', form);
+    $('#bs-manual').hidden = true; lastResults = []; renderResults();
+    if (q.length < 2) { setStatus('책 제목을 두 글자 이상 적어주세요.', true); return; }
+    setStatus('「' + q + '」 찾는 중…'); btn.disabled = true;
+    fetch(P.searchApi + (P.searchApi.indexOf('?') < 0 ? '?' : '&') + 'action=search&q=' + encodeURIComponent(q), { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (res) {
+        if (seq !== searchSeq) return;
+        if (!res.ok) throw new Error(res.error || '검색하지 못했어요.');
+        lastResults = res.books || []; renderResults();
+        if (lastResults.length) setStatus('「' + q + '」로 찾은 책 ' + lastResults.length + '권이에요. 읽고 싶은 책을 골라주세요.');
+        else { setStatus('「' + q + '」로 찾은 책이 없어요. 제목을 바꿔 다시 찾아보거나, 아래에서 직접 적어주세요.', true); $('#bs-manual').hidden = false; $('#bs-manual').open = true; }
+      })
+      .catch(function (err) {
+        if (seq !== searchSeq) return;
+        console.warn('책 검색 실패:', err);
+        setStatus('책 검색을 지금 쓸 수 없어요. 아래에서 책 제목을 직접 적어주세요.', true); $('#bs-manual').hidden = false; $('#bs-manual').open = true;
+      })
+      .then(function () { if (seq === searchSeq) btn.disabled = false; });
+  }
+  function addCustom(b) {
+    if (picks.length >= MAX) { toast(MAX > 1 ? '두 권까지 고를 수 있어요. 내 선택에서 하나를 빼고 다시 골라주세요.' : '한 권만 고를 수 있어요. 고른 책을 빼고 다시 골라주세요.'); return false; }
+    var id = 'c' + Date.now().toString(36);
+    custom[id] = byId[id] = { id: id, custom: true, title: b.title, author: b.authors || '', publisher: b.publisher || '', isbn: b.isbn || '', price: b.price || 0, cover: b.thumb || '' };
+    picks.push(id); savePicks(); renderGrid(); renderTray(); return true;
+  }
   function initCustom() {
     $('#custom-rule').innerHTML = '<p><strong>목록에 없는 책도 골라도 돼요.</strong></p><p>' + esc(P.customRule || '') + '</p>';
+    // 직접 적기(검색을 못 쓰거나 책이 안 나올 때만 열려요)
     var form = $('#custom-form'), msg = $('.form-msg', form);
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       var f = form.elements, title = f.title.value.trim();
       if (!title) { msg.textContent = '책 제목을 적어주세요.'; f.title.focus(); return; }
-      if (picks.length >= MAX) { msg.textContent = MAX > 1 ? '두 권까지 고를 수 있어요. 내 선택에서 하나를 빼고 다시 골라주세요.' : '한 권만 고를 수 있어요. 고른 책을 빼고 다시 골라주세요.'; return; }
-      var id = 'c' + Date.now().toString(36);
-      custom[id] = byId[id] = { id: id, custom: true, title: title, author: f.author.value.trim(), publisher: f.publisher.value.trim() };
-      picks.push(id); savePicks(); renderGrid(); renderTray(); form.reset();
-      msg.textContent = '';
-      toast('「' + title + '」을 골랐어요. 아래 신청하기에서 마무리해요.');
+      if (addCustom({ title: title, authors: f.author.value.trim(), publisher: f.publisher.value.trim() })) { form.reset(); msg.textContent = ''; toast('「' + title + '」을 골랐어요. 아래 신청하기에서 마무리해요.'); }
+    });
+    var sf = $('#bsearch-form');
+    if (!filled(P.searchApi)) {   // 검색 주소가 없으면 직접 적기만
+      sf.hidden = true; $('#bs-manual').hidden = false; $('#bs-manual').open = true; setStatus('');
+      return;
+    }
+    setStatus('책 제목을 적으면 카카오 책 검색에서 찾아줘요. 나온 책 중에 골라요.');
+    sf.addEventListener('submit', function (e) { e.preventDefault(); doSearch($('#bq').value.replace(/\s+/g, ' ').trim()); });
+    $('#bs-results').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-rs]'); if (!b || b.disabled) return;
+      var book = lastResults[Number(b.getAttribute('data-rs'))]; if (!book) return;
+      if (addCustom(book)) { renderResults(); toast('「' + book.title + '」을 골랐어요. 아래 신청하기에서 마무리해요.'); }
     });
   }
 
@@ -183,7 +238,7 @@
     if (at >= 0) picks.splice(at, 1);
     else if (picks.length >= MAX) { toast(MAX > 1 ? '두 권까지 고를 수 있어요. 하나를 빼고 다시 골라주세요.' : '한 권만 고를 수 있어요. 고른 책을 빼고 다시 골라주세요.'); return; }
     else picks.push(id);
-    savePicks(); renderGrid(); renderTray();
+    savePicks(); renderGrid(); renderTray(); if (lastResults.length) renderResults();
   }
 
   /* ── 내 선택 · 신청 ── */
@@ -206,7 +261,7 @@
     $('#tray-list').innerHTML = n ? picks.map(function (id, i) {
       var b = byId[id];
       return '<li><span class="tl-n">' + label(i) + '</span><div class="tl-book"><b>' + esc(b.title) + '</b><span>' + esc([b.author, b.publisher].filter(filled).join(' · ')) +
-        (b.custom ? ' <em class="tag-custom">직접 고름 · 확인 후 주문</em>' : '') + '</span></div>' +
+        (b.custom ? ' <em class="tag-custom">직접 고름 · 확인 후 주문' + (b.price > 0 ? ' · 정가 ' + won(b.price) : '') + '</em>' : '') + '</span></div>' +
         '<div class="tl-act">' + (n > 1 && i === 1 ? '<button type="button" data-up="' + esc(id) + '">먼저 받기</button>' : '') +
         '<button type="button" data-del="' + esc(id) + '">빼기</button></div></li>';
     }).join('') : (done ? '' : '<li class="tl-empty">아직 고른 책이 없어요. 목록에서 골라주세요.</li>');
@@ -294,7 +349,7 @@
     $('#tray').addEventListener('click', function (e) {
       if (e.target === this) { closeTray(); return; } // 바깥(배경) 누르면 닫기
       var del = e.target.getAttribute('data-del'), up = e.target.getAttribute('data-up');
-      if (del) { picks.splice(picks.indexOf(del), 1); savePicks(); renderGrid(); renderTray(); }
+      if (del) { picks.splice(picks.indexOf(del), 1); savePicks(); renderGrid(); renderTray(); if (lastResults.length) renderResults(); }
       if (up) { picks = [up].concat(picks.filter(function (x) { return x !== up; })); savePicks(); renderGrid(); renderTray(); }
     });
     // 다른 탭에서 바꾼 선택도 따라간다

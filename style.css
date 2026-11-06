@@ -1208,3 +1208,29 @@ h1, h2, h3, h4 { font-family: var(--font); }
   .lp-pick { margin-top: 8px; }
 }
 button, input, select, textarea, summary { font-family: inherit; }
+
+/* 직접 고르기: 책 검색 */
+.bsearch-form { display: flex; gap: 8px; margin: 14px 0 6px; }
+.bsearch-form input { flex: 1; min-width: 0; min-height: 50px; padding: 0 14px; font: inherit; font-size: 1rem; border: 2px solid var(--ink); border-radius: var(--round); background: var(--card); color: var(--ink); }
+.bsearch-form input:focus { outline: 3px solid var(--focus); outline-offset: 2px; }
+.bsearch-form .btn { min-height: 50px; padding: 0 22px; }
+.bs-status { min-height: 1.5em; margin: 6px 2px 10px; font-size: .92rem; font-weight: 500; color: var(--ink-2); }
+.bs-status.bad { color: var(--orange); font-weight: 700; }
+.bs-results { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 8px; }
+.bs-item { display: grid; grid-template-columns: 56px 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; border: 2px solid var(--line); border-radius: var(--round); background: var(--card); }
+.bs-item.over { opacity: .6; }
+.bs-cover { width: 56px; aspect-ratio: 3 / 4; border-radius: 4px; overflow: hidden; background: var(--paper-2); box-shadow: 0 1px 0 var(--line); }
+.bs-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bs-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.bs-info strong { font-weight: 800; font-size: .98rem; letter-spacing: -0.01em; line-height: 1.35; }
+.bs-info span { font-size: .82rem; color: var(--ink-2); font-weight: 500; }
+.bs-price { color: var(--ink) !important; font-weight: 700 !important; }
+.bs-tag { color: var(--orange) !important; font-weight: 700 !important; }
+.bs-item .pick-btn { margin: 0; min-width: 84px; padding: 0 12px; }
+.bs-manual { margin: 4px 0 14px; border: 2px dashed var(--line); border-radius: var(--round); padding: 0 14px; }
+.bs-manual summary { cursor: pointer; padding: 12px 0; font-weight: 700; }
+@media (max-width: 559px) {
+  .bs-item { grid-template-columns: 48px 1fr; }
+  .bs-cover { width: 48px; }
+  .bs-item .pick-btn { grid-column: 1 / -1; min-height: 42px; }
+}
