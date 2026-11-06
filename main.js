@@ -820,7 +820,7 @@
   var INK = PC.ink, SAL = PC.sal, CREAM = PC.cream, SKY = '#b9c8ca';
   function sv(inner) { return '<svg viewBox="0 0 320 220" role="img" aria-hidden="true"><rect width="320" height="220" fill="' + SKY + '"/>' + inner + '<rect y="196" width="320" height="24" fill="' + SAL + '"/><rect y="192" width="320" height="5" fill="' + INK + '"/></svg>'; }
   function R(x, y, w, h, f, r) { return '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '"' + (r ? ' rx="' + r + '"' : '') + ' fill="' + f + '"/>'; }
-  function T_(x, y, t, size, f, anchor) { return '<text x="' + x + '" y="' + y + '" font-size="' + (size || 13) + '" font-weight="900" fill="' + (f || INK) + '" text-anchor="' + (anchor || 'middle') + '" font-family="Noto Sans KR, sans-serif">' + t + '</text>'; }
+  function T_(x, y, t, size, f, anchor) { return '<text x="' + x + '" y="' + y + '" font-size="' + (size || 13) + '" font-weight="900" fill="' + (f || INK) + '" text-anchor="' + (anchor || 'middle') + '" font-family="Pretendard Variable, Pretendard, sans-serif">' + t + '</text>'; }
   function shelfProp(x, y, w, rows, filledN) {
     var o = R(x, y, w, rows * 30 + 6, CREAM, 3), k = 0;
     for (var r = 0; r < rows; r++) {
@@ -864,11 +864,22 @@
         '빌리지 않고, 내 이름으로 갖는 책이 돼요. 후원현황 서가에도 한 칸이 채워져요.']
     ]
   };
+  // 그린 그림이 있는 컷은 그림으로 (없으면 위의 SVG 그림)
+  var COMIC_ART = {
+    story: [
+      ['images/story/1.webp', '0.1평 서가 앞에서 한 어른이 책을 꽂고 있어요.'],
+      ['images/story/2.webp', '어른이 상자에 책값을 넣고, 옆에서 청소년이 서가의 책을 골라요.'],
+      ['images/story/3.webp', '작은 책방에서 서가를 지나 큰 서점까지 점선 길이 이어지고, 사람들이 책을 들고 걸어가요.'],
+      ['images/story/4.webp', '비북스 가게 문 앞에서 점주가 책을 든 청소년을 맞이해요.']
+    ]
+  };
   function renderComics() {
     Array.prototype.forEach.call(document.querySelectorAll('[data-comic]'), function (box) {
       var set = COMICS[box.getAttribute('data-comic')]; if (!set) return;
+      var art = COMIC_ART[box.getAttribute('data-comic')] || [];
       box.innerHTML = set.map(function (c, i) {
-        return '<li class="cm"><div class="cm-pic">' + c[1]() + '<span class="cm-n">' + (i + 1) + '</span></div><h3>' + esc(c[0]) + '</h3><p>' + esc(c[2]) + '</p></li>';
+        var pic = art[i] ? '<img src="' + art[i][0] + '" alt="' + esc(art[i][1]) + '" width="1499" height="1049" loading="' + (i ? 'lazy' : 'eager') + '" decoding="async">' : c[1]();
+        return '<li class="cm"><div class="cm-pic' + (art[i] ? ' cm-art' : '') + '">' + pic + '<span class="cm-n">' + (i + 1) + '</span></div><h3>' + esc(c[0]) + '</h3><p>' + esc(c[2]) + '</p></li>';
       }).join('');
     });
   }
