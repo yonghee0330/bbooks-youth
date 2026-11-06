@@ -22,7 +22,7 @@
   /* ── [1] 히어로 ───────────────────────────── */
   var HERO = {
     A: { title: '책 한 권을 갖는 경험이,<br><em>더 나은 내일</em>을 당깁니다.', sub: '원미동 비북스의 청소년 책사줄게' },
-    B: { title: '어른이 건네고,<br>청소년이 고릅니다.<br><em>비북스가 잇습니다.</em>', sub: '' },
+    B: { title: '어른이 건네고,<br>청소년이 고릅니다.<br><em>비북스가 연결합니다.</em>', sub: '' },
     C: { title: '빌리는 책 말고,<br><em>갖는 책</em>', sub: '책값은 어른들이 낼게요. 고르는 건 너의 몫.' }
   };
   function eventLine() {
@@ -566,10 +566,10 @@
     if (typeof pkg === 'string') pkg = filled(pkg) ? [pkg] : [];
     $('#org-package').innerHTML = pkg.length
       ? '<ul class="pkg">' + pkg.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>'
-      : '<p class="lead">학교, 동아리, 회사에서 함께 건네고 싶다면 편하게 물어봐 주세요.</p><span class="soon">패키지 준비 중</span>';
+      : '<p class="lead">학교, 동아리, 회사에서 함께 건네고 싶다면 편하게 물어봐 주세요.</p>';
     var links = contactLinks();
     $('#org-contact').innerHTML = links.length
-      ? links.map(function (l, i) { return '<a class="btn ' + (i ? 'btn-ghost' : 'btn-primary') + '" href="' + esc(l[1]) + '"' + (l[0] === '인스타그램' ? ' target="_blank" rel="noopener"' : '') + '>' + l[0] + '로 문의</a>'; }).join('')
+      ? links.map(function (l, i) { return '<a class="btn ' + (i ? 'btn-ghost' : 'btn-primary') + '" href="' + esc(l[1]) + '"' + (l[0] === '인스타그램' ? ' target="_blank" rel="noopener"' : '') + '>' + l[0] + (l[0] === '인스타그램' ? '으로' : '로') + ' 문의</a>'; }).join('')
       : '<span class="soon">문의처 준비 중</span>';
   }
 
