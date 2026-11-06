@@ -26,8 +26,7 @@
     C: { title: '빌리는 책 말고,<br><em>갖는 책</em>', sub: '책값은 어른들이 낼게요. 고르는 건 너의 몫.' }
   };
   function eventLine() {
-    if (!filled(C.eventDate)) return '11월 말 토요일, 비북스에서 (날짜 결정 필요)';
-    return [C.eventDate, C.eventTime].filter(filled).join(' ') + (filled(C.place) ? ' · ' + C.place : '');
+    return '';   // 날짜 없음: 런칭하면 바로 고르고, 책이 도착하면 안내를 받아 방문해서 받아가요
   }
   function renderHero() {
     var v = HERO[String(C.heroVariant || 'A').toUpperCase()] || HERO.A;
@@ -82,7 +81,7 @@
   var STEPS = [
     ['후원', '어른이 책 한 권 값부터 건네요. 입금이 확인되면 서가에 책이 꽂혀요.'],
     ['신청', (C.pick || {}).enabled === false ? '청소년은 닉네임으로 신청해요.' : '청소년은 읽고 싶은 책을 고르고 닉네임으로 신청해요. 비북스가 책을 주문해 준비해요.'],
-    ['받는 날', '정해진 토요일, 비북스에서 고른 책을 받아가요. 신청을 못 했으면 그날 서가에서 골라요.'],
+    ['받기', '책이 도착하면 안내가 가요. 비북스에 방문해서 받아가요.'],
     ['내일의 서재', '고른 책과 어른들의 한 줄이 회차마다 서가로 쌓여요.']
   ];
   function renderSteps() {
@@ -288,7 +287,7 @@
     closeCard(false);
     openBook = g; g.classList.add('is-open');
     var card = $('#book-card');
-    var youth = filled(b.youthCode) ? '청소년 ' + (String(b.youthCode).charAt(0) === '#' ? b.youthCode : '#' + b.youthCode) : '받는 날 이후 연결돼요';
+    var youth = filled(b.youthCode) ? '청소년 ' + (String(b.youthCode).charAt(0) === '#' ? b.youthCode : '#' + b.youthCode) : '책을 받으면 연결돼요';
     card.innerHTML =
       '<button type="button" class="bc-close" aria-label="닫기">×</button>' +
       '<span class="bc-mind">건넨 어른' + (b.example ? ' · 예시' : '') + '</span>' +
@@ -444,7 +443,7 @@
       ? ['수집 항목: 이름·닉네임, 연락처, 이메일, 후원 금액, 입금자명, 지정 대상, (현금영수증·지출증빙 신청 시) 발급 번호',
          '쓰는 곳: 입금 확인, 현금영수증·지출증빙 발급, 서가 반영과 결과 안내']
       : ['수집 항목: 닉네임, 학년, 학교 이름, 연락처, 이메일, 고른 책',
-         '쓰는 곳: 부천 지역 청소년인지 확인, 책 주문과 받는 날 안내',
+         '쓰는 곳: 부천 지역 청소년인지 확인, 책 주문과 도착 안내',
          '실명은 묻지 않아요. 학교 이름은 공개하지 않아요'];
     items.push('보관 기간: ' + keep + ' 뒤 지워요');
     items.push('동의하지 않으면 접수할 수 없어요');
@@ -535,14 +534,11 @@
 
   /* ── [7] 신청 안내 ────────────────────────── */
   function renderYouth() {
-    var date = filled(C.eventDate) ? [C.eventDate, C.eventTime].filter(filled).join(' ') : '정해지는 대로 알려드려요';
     var who = (filled(C.regionLimit) ? C.regionLimit + ' ' : '') + (filled(C.ageRange) ? C.ageRange + ' 청소년' : '청소년');
     var items = [
-      ['날짜', date],
-      ['장소', C.place || '비북스'],
+      ['받기', '책이 도착하면 안내가 가요. ' + (C.place || '비북스') + '에 방문해서 받아가요'],
       ['대상', who],
       null,
-      filled(C.applyDeadlineLabel) ? ['신청 마감', C.applyDeadlineLabel + '까지 (그 뒤엔 행사 날 비북스에서 직접 골라요)'] : null,
       ['책', '한 사람이 한 권' + (filled(C.bookPrice) ? ' (정가 ' + won(C.bookPrice) + ' 이하)' : '') + '. 추천 목록에서 고르거나, 읽고 싶은 책을 직접 골라요'],
       ['묻지 않아요', '실명 (학교 이름은 지역 확인에만 써요)'],
       ['신청', '실명 대신 닉네임으로']
@@ -577,7 +573,7 @@
   function privacyItems() {
     return [
       '실명, 학교, 얼굴 사진은 공개하지 않아요.',
-      '행사 사진은 손과 책 위주로 찍어요. 얼굴은 본인이 동의할 때만 담아요.',
+      '책을 받는 모습 사진은 손과 책 위주로 찍어요. 얼굴은 본인이 동의할 때만 담아요.',
       '청소년 코드는 회차별 순번(#07처럼)만 써요. 다른 정보와 합쳐도 누군지 알 수 없게요.',
       '고른 책은 분야까지만 공개해요. 제목은 본인이 원할 때만요.',
       '모은 정보는 회차가 끝나면 정리해요. 보관 기간: ' + (filled(C.retention) ? C.retention : '정해지는 대로 알려드려요') + '.',
@@ -588,7 +584,6 @@
     var fa = C.faqAnswers || {}, price = Number(C.bookPrice) || 20000;
     var who = (filled(C.regionLimit) ? C.regionLimit + ' ' : '') + (filled(C.ageRange) ? C.ageRange + ' ' : '') +
       '청소년이면 누구나 신청할 수 있어요. 학교 이름은 지역 확인에만 쓰고 공개하지 않아요.';
-    var when = [C.eventDate, C.eventTime].filter(filled).join(' ');
     return {
       adult: [
         ['얼마부터 함께할 수 있나요?', ['책 1권(' + won(price) + ')부터 5권, 그 이상은 원하는 만큼 함께할 수 있어요.']],
@@ -782,7 +777,6 @@
     box.innerHTML = slotsHtml({ round: { books: [] } }, goal);
     var cp = C.copy || {};
     ['seedTitle', 'seed', 'campaign'].forEach(function (k) { var el = document.getElementById('lp-' + k); if (el && filled(cp[k])) el.textContent = cp[k]; });
-    var d = $('#lp-date'); if (d) d.textContent = (C.eventDate ? '책 고르는 날 ' + C.eventDate : '');
     loadShelfAny().then(function (rounds) {
       var T = shelfTotals(rounds);
       box.innerHTML = slotsHtml(T, goal);
@@ -805,12 +799,12 @@
     if (yl) yl.innerHTML = T.got.length ? T.got.map(function (y) {
       var g = isbnGenre[y.isbn];
       return '<li><b>' + esc(String(y.code).charAt(0) === '#' ? y.code : '#' + y.code) + '</b>' + (g ? '<span>' + esc(g) + '</span>' : '') + '</li>';
-    }).join('') : '<li class="dn-empty">책 받는 날' + (C.eventDate ? ' ' + esc(C.eventDate) : '') + ' 이후에 채워져요. 이름 대신 #01 같은 코드와 고른 분야만 보여요.</li>';
+    }).join('') : '<li class="dn-empty">청소년이 책을 받으면 채워져요. 이름 대신 #01 같은 코드와 고른 분야만 보여요.</li>';
     var pg = $('#dash-photos');
     if (pg) {
       var ph = (C.photos || []).filter(function (x) { return x && x.src; });
       pg.innerHTML = ph.length ? ph.map(function (x) { return '<figure><img src="' + esc(x.src) + '" alt="' + esc(x.alt || '책을 받은 날') + '" loading="lazy"></figure>'; }).join('')
-        : [0, 1, 2].map(function () { return '<figure class="ph-empty"><span>책 받은 날 사진</span></figure>'; }).join('');
+        : [0, 1, 2].map(function () { return '<figure class="ph-empty"><span>책을 받은 모습</span></figure>'; }).join('');
     }
     var pd = $('#dash-pending');
     if (pd) { pd.hidden = !T.pending; pd.textContent = T.pending ? '작은 후원이 모이는 중 · 다음 한 권까지 ' + won(T.pending) : ''; }

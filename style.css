@@ -1234,3 +1234,6 @@ button, input, select, textarea, summary { font-family: inherit; }
   .bs-cover { width: 48px; }
   .bs-item .pick-btn { grid-column: 1 / -1; min-height: 42px; }
 }
+.free-label { display: flex; flex-direction: column; line-height: 1.25; font-weight: 700; white-space: nowrap; }
+.free-label b { font-size: .78rem; font-weight: 800; color: var(--orange); }
+.closed-note { display: none; }

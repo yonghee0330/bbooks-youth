@@ -5,8 +5,6 @@
   var P = C.pick || {};
   var MAX = Math.max(1, Math.min(2, Number(P.maxPicks) || 2)); // 1지망 + 대신 받을 책
   var KEY = 'ybg-picks', DONE_KEY = 'ybg-applied', CUSTOM_KEY = 'ybg-custom';
-  // 온라인 신청 마감: 마감일 밤 12시(한국 시간)까지
-  var CLOSED = !!C.applyDeadline && Date.now() > new Date(C.applyDeadline + 'T23:59:59+09:00').getTime();
 
   function $(s, el) { return (el || document).querySelector(s); }
   function esc(s) {
@@ -43,13 +41,8 @@
     items.push('신청하면 비북스가 책을 주문해 준비해요.');
     items.splice(0, 0, (filled(C.regionLimit) ? C.regionLimit + ' ' : '') + (filled(C.ageRange) ? C.ageRange + ' ' : '') + '청소년이면 누구나 신청할 수 있어요.');
     items.push('실명 대신 닉네임으로 신청해요. 학교 이름은 지역 확인에만 써요.');
-    var when = [C.eventDate, C.eventTime].filter(filled).join(' ');
-    items.push('받는 날: ' + (when || '정해지는 대로 알려드려요') + (filled(C.place) ? ' · ' + C.place : ''));
+    items.push('책이 도착하면 연락처로 안내해 드려요. 안내를 받고 비북스에 방문해서 받아가요.');
     $('#pick-rules').innerHTML = items.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('');
-    if (CLOSED) {
-      var note = $('#closed-note'); note.hidden = false;
-      note.textContent = '온라인 신청은 ' + (C.applyDeadlineLabel || '') + '에 마감됐어요. ' + (C.eventDate || '행사 날') + ' 비북스에 와서 직접 골라주세요. 목록은 둘러보기용으로 남겨둘게요.';
-    }
   }
 
   /* ── 목록 ── */
@@ -267,19 +260,16 @@
         '<button type="button" data-del="' + esc(id) + '">빼기</button></div></li>';
     }).join('') : (done ? '' : '<li class="tl-empty">아직 고른 책이 없어요. 목록에서 골라주세요.</li>');
 
-    var when = [C.eventDate, C.eventTime].filter(filled).join(' ');
-    $('#tray-pickup').innerHTML = '<p class="acc-label">받는 날</p><p>' + esc(when || '정해지는 대로 알려드려요') +
-      (filled(C.place) ? ' · ' + esc(C.place) : '') + '<br><span class="small">신청할 때 적은 닉네임으로 받아가요.</span></p>';
+    $('#tray-pickup').innerHTML = '<p class="acc-label">책 받기</p><p>책이 도착하면 안내가 가요.<br><span class="small">신청할 때 적은 연락처로 연락드려요.</span></p>';
 
-    $('#youth-form').hidden = !n || CLOSED;
+    $('#youth-form').hidden = !n;
     $('#tray-note').hidden = !n;
-    if (CLOSED) $('#tray-note').textContent = '온라인 신청은 마감됐어요. 행사 날 비북스에 와서 직접 골라주세요.';
     var dn = $('#youth-done');
     if (!n && done) { dn.hidden = false; dn.innerHTML = doneHtml(done); } else if (n) dn.hidden = true;
   }
   function doneHtml(d) {
     return '<p class="done-h">신청이 됐어요.</p><p>접수번호 <b>' + esc(d.id) + '</b> · ' + esc(d.nick) + '</p>' +
-      '<p>고른 책: ' + esc(d.book) + '</p><p>비북스가 책을 주문해 준비하고, 받는 날 안내를 연락처와 이메일로 보내드려요. 책을 바꾸고 싶으면 비북스에 연락해 주세요.</p>';
+      '<p>고른 책: ' + esc(d.book) + '</p><p>비북스가 책을 주문해 준비해요. 책이 도착하면 연락처와 이메일로 안내해 드려요. 책을 바꾸고 싶으면 비북스에 연락해 주세요.</p>';
   }
 
   function initYouthForm() {
