@@ -1260,50 +1260,6 @@ button, input, select, textarea, summary { font-family: inherit; }
   .bs-cover img { width: 100%; height: auto; object-fit: contain; display: block; }
 }
 
-/* 2026-11-07: 첫 화면 장면 — 어른 → 비북스 → 청소년 → 읽기 (15초 반복) */
+/* 2026-11-07: 첫 화면 일러스트 */
 .lp-scene { display: block; width: 100%; height: clamp(150px, 31vh, 340px); }
 @media (max-width: 859px) { .lp-scene { height: auto; aspect-ratio: 1500 / 932; max-height: 168px; margin-top: 0; } }
-.lp-scene .sc-anim * { transform-box: view-box; }
-.sc-spot, .sc-env, .sc-book, .sc-burst, .sc-read, .sc-cap > g { opacity: 0; animation: 15s ease-in-out infinite both; }
-.sc-spot { animation-name: sc-spot; mix-blend-mode: soft-light; }
-.sc-env { animation-name: sc-env; }
-.sc-book { animation-name: sc-book; }
-.sc-burst { animation-name: sc-burst; transform-origin: 1290px 240px; }
-.sc-read { animation-name: sc-read; }
-.sc-cap .c1 { animation-name: sc-c1; } .sc-cap .c2 { animation-name: sc-c2; } .sc-cap .c3 { animation-name: sc-c3; } .sc-cap .c4 { animation-name: sc-c4; }
-@keyframes sc-spot {
-  0% { opacity: 0; transform: translate(300px, 220px); } 4% { opacity: 1; transform: translate(300px, 220px); }
-  22% { transform: translate(300px, 220px); } 28% { transform: translate(690px, 180px); }
-  44% { transform: translate(690px, 180px); } 52% { transform: translate(1130px, 170px); }
-  64% { opacity: 1; transform: translate(1130px, 170px); } 68%, 100% { opacity: 0; transform: translate(1130px, 170px); } }
-@keyframes sc-env {
-  0%, 8% { opacity: 0; transform: translate(440px, 545px) scale(.3); }
-  11% { opacity: 1; transform: translate(455px, 440px) scale(1); }
-  17% { transform: translate(560px, 330px) rotate(12deg); }
-  23% { opacity: 1; transform: translate(668px, 470px) scale(.9); }
-  26%, 100% { opacity: 0; transform: translate(668px, 470px) scale(0); } }
-@keyframes sc-book {
-  0%, 24% { opacity: 0; transform: translate(690px, 470px) scale(0); }
-  28% { opacity: 1; transform: translate(690px, 470px) scale(1.15); }
-  31%, 36% { transform: translate(700px, 462px) scale(1); }
-  41% { transform: translate(960px, 260px) rotate(-10deg); }
-  47% { opacity: 1; transform: translate(1252px, 236px) scale(.85); }
-  50%, 100% { opacity: 0; transform: translate(1270px, 236px) scale(.6); } }
-@keyframes sc-burst { 0%, 47% { opacity: 0; transform: scale(.4); } 51% { opacity: 1; transform: scale(1); } 60%, 100% { opacity: 0; transform: scale(1.3); } }
-@keyframes sc-read { 0%, 66% { opacity: 0; } 70%, 95% { opacity: 1; } 99%, 100% { opacity: 0; } }
-@keyframes sc-c1 { 0%, 1% { opacity: 0; } 3%, 22% { opacity: 1; } 24%, 100% { opacity: 0; } }
-@keyframes sc-c2 { 0%, 25% { opacity: 0; } 27%, 44% { opacity: 1; } 46%, 100% { opacity: 0; } }
-@keyframes sc-c3 { 0%, 47% { opacity: 0; } 49%, 64% { opacity: 1; } 66%, 100% { opacity: 0; } }
-@keyframes sc-c4 { 0%, 69% { opacity: 0; } 71%, 94% { opacity: 1; } 97%, 100% { opacity: 0; } }
-.sc-head { transform-origin: 750px 540px; animation: sc-nod 3s ease-in-out infinite alternate; }
-@keyframes sc-nod { from { transform: rotate(-4deg); } to { transform: rotate(2deg); } }
-.sc-openbook { transform-origin: 750px 740px; animation: sc-hold 3s ease-in-out infinite alternate; }
-@keyframes sc-hold { from { transform: translateY(0); } to { transform: translateY(-8px); } }
-.sc-page { transform-origin: 750px 700px; animation: sc-flip 3.2s ease-in-out infinite; }
-@keyframes sc-flip { 0%, 55% { transform: scaleX(1); } 80%, 100% { transform: scaleX(-1); } }
-.sc-tw { transform-origin: center; transform-box: fill-box !important; animation: sc-tw 1.8s ease-in-out infinite; }
-.sc-tw.t2 { animation-delay: .6s; } .sc-tw.t3 { animation-delay: 1.2s; }
-@keyframes sc-tw { 0%, 100% { opacity: .2; transform: scale(.6); } 50% { opacity: 1; transform: scale(1.1); } }
-.sc-heart { animation: sc-heart 2.6s ease-out infinite; }
-@keyframes sc-heart { 0% { opacity: 0; transform: translateY(0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-150px); } }
-@media (prefers-reduced-motion: reduce) { .lp-scene .sc-anim { display: none; } }
