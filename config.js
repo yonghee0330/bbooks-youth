@@ -80,8 +80,8 @@ window.CONFIG = {
     maxPicks: 2,                   // 2 = 고른 책 + 대신 받을 책(구하기 어려울 때), 1 = 한 권만
     // 목록에 없는 책 직접 고르기 — 비북스가 검수 후 주문. 기준은 느슨하게
     custom: true,
-    // 직접 고르기에서 카카오 책 검색을 대신 불러주는 시트 스크립트 주소 (키는 스크립트 안에만 있어요). 비어 있으면 직접 적기만 보여요
-    searchApi: 'https://script.google.com/macros/s/AKfycbyoNqnhatej_AtyoFvicw_MRNH7z6YXPx5g-7Au-_sq9EKxc-0CLRIiAg2PLLnv-EEz/exec',
+    // 직접 고르기 책 검색은 접수 시트 주소(api)로 불러요. 다른 주소를 쓰려면 여기에 (비우면 api)
+    searchApi: '',
     customRule: '읽고 싶은 책이면 무엇이든 괜찮아요. 정가 2만 원 이하이고, 청소년이 읽기에 알맞지 않은 책(성인용 등)만 아니면 돼요. 비북스가 한번 확인하고 주문해요. 구하기 어려우면 연락드릴게요.'
   },
 

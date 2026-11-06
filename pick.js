@@ -214,6 +214,7 @@
       if (addCustom({ title: title, authors: f.author.value.trim(), publisher: f.publisher.value.trim() })) { form.reset(); msg.textContent = ''; toast('「' + title + '」을 골랐어요. 아래 신청하기에서 마무리해요.'); }
     });
     var sf = $('#bsearch-form');
+    P.searchApi = filled(P.searchApi) ? P.searchApi : C.api;   // 책 검색도 접수 시트 주소 하나로
     if (!filled(P.searchApi)) {   // 검색 주소가 없으면 직접 적기만
       sf.hidden = true; $('#bs-manual').hidden = false; $('#bs-manual').open = true; setStatus('');
       return;
