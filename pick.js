@@ -15,7 +15,7 @@
   function filled(v) { return v !== null && v !== undefined && String(v).trim() !== ''; }
   function hash(s) { var h = 0; s = String(s); for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return Math.abs(h); }
 
-  var books = [], byId = {}, picks = [], lists = [], custom = {}, state = { q: '', genre: '', sort: '', list: '' };
+  var books = [], byId = {}, picks = [], lists = [], custom = {}, state = { q: '', genre: '', sort: '', list: '', group: '' };
 
   /* ── 저장 (이 기기에만) ── */
   function loadPicks() {
@@ -56,10 +56,26 @@
     return '<span class="gen-cover" style="background:hsl(' + hue + ' 32% ' + l + '%)"><span class="gc-t">' + esc(b.title) +
       '</span><span class="gc-a">' + esc(b.author) + '</span></span>';
   }
+  function listCount(l) {
+    if (!l) return 0;
+    if (l.groups && l.groups.length) {
+      return l.groups.reduce(function (n, g) { return n + ((g.books && g.books.length) || 0); }, 0);
+    }
+    return (l.books && l.books.length) || 0;
+  }
+  function currentGroup() {
+    var cur = currentList(); if (!cur || !cur.groups || !cur.groups.length) return null;
+    return cur.groups.filter(function (g) { return g.id === state.group; })[0] || cur.groups[0];
+  }
+  function currentBookIds() {
+    var cur = currentList();
+    if (!cur) return books.map(function (b) { return b.id; });
+    var g = currentGroup();
+    return g ? (g.books || []) : (cur.books || []);
+  }
   function visible() {
-    var q = state.q.trim().toLowerCase(), cur = currentList();
-    var ids = cur ? cur.books : books.map(function (b) { return b.id; });
-    var list = ids.map(function (id) { return byId[id]; }).filter(function (b) {
+    var q = state.q.trim().toLowerCase();
+    var list = currentBookIds().map(function (id) { return byId[id]; }).filter(function (b) {
       if (!b || b.custom) return false;
       if (state.genre && b.genre !== state.genre) return false;
       if (!q) return true;
@@ -122,8 +138,10 @@
   }
   function closeDetail() { var d = $('#detail'); if (d.close) d.close(); else d.removeAttribute('open'); }
   function renderGenres() {
-    var gs = [], cur = currentList();
-    (cur ? cur.books.map(function (id) { return byId[id]; }) : books).forEach(function (b) { if (b && filled(b.genre) && gs.indexOf(b.genre) < 0) gs.push(b.genre); });
+    var gs = [];
+    currentBookIds().map(function (id) { return byId[id]; }).forEach(function (b) {
+      if (b && filled(b.genre) && gs.indexOf(b.genre) < 0) gs.push(b.genre);
+    });
     $('#genres').innerHTML = [''].concat(gs).map(function (g) {
       return '<button type="button" class="chip" aria-pressed="' + (state.genre === g) + '" data-genre="' + esc(g) + '">' + (g ? esc(g) : '전체') + '</button>';
     }).join('');
@@ -131,23 +149,44 @@
 
   /* ── 고르는 방법: 큐레이션 목록 탭 + 직접 고르기 ── */
   function currentList() { return lists.filter(function (l) { return l.id === state.list; })[0] || null; }
+  function renderGroupTabs() {
+    var el = $('#group-tabs'), cur = currentList();
+    if (!cur || !cur.groups || !cur.groups.length || state.list === 'custom') {
+      el.hidden = true; el.innerHTML = ''; return;
+    }
+    if (!state.group || !cur.groups.some(function (g) { return g.id === state.group; })) state.group = cur.groups[0].id;
+    el.hidden = false;
+    el.innerHTML = cur.groups.map(function (g, i) {
+      var n = (g.books || []).length;
+      return (i ? '<span class="group-sep" aria-hidden="true">|</span>' : '') +
+        '<button type="button" role="tab" data-group="' + esc(g.id) + '" aria-selected="' + (state.group === g.id) + '">' +
+        esc(g.title) + '<span>' + n + '권</span></button>';
+    }).join('');
+  }
   function renderTabs() {
     var tabs = lists.map(function (l) {
-      var n = (l.books || []).length;
+      var n = listCount(l);
       return '<button type="button" role="tab" data-list="' + esc(l.id) + '" aria-selected="' + (state.list === l.id) + '"' + (n ? '' : ' class="soon-tab"') + '>' +
         esc(l.title) + '<span>' + (n ? n + '권' : '준비 중') + '</span></button>';
     });
     if (P.custom !== false) tabs.push('<button type="button" role="tab" data-list="custom" aria-selected="' + (state.list === 'custom') + '" class="custom-tab">직접 고르기<span>목록에 없는 책</span></button>');
     $('#list-tabs').innerHTML = tabs.join('');
-    var cur = currentList(), isCustom = state.list === 'custom';
+    var cur = currentList(), isCustom = state.list === 'custom', n = listCount(cur);
     $('#list-desc').textContent = isCustom ? '' : cur ? (cur.desc || '') + (filled(cur.by) && cur.desc.indexOf(cur.by) < 0 ? ' — ' + cur.by : '') : '';
-    $('#list-panel').hidden = isCustom || (cur && !(cur.books || []).length);
+    $('#list-panel').hidden = isCustom || (cur && !n);
     $('#custom-panel').hidden = !isCustom;
-    if (cur && !(cur.books || []).length) $('#list-desc').textContent = (cur.desc || '') + ' 곧 채워질 거예요.';
+    if (cur && !n) $('#list-desc').textContent = (cur.desc || '') + ' 곧 채워질 거예요.';
+    renderGroupTabs();
   }
   function selectList(id) {
-    state.list = id; state.genre = ''; state.q = ''; $('#q').value = '';
+    state.list = id; state.genre = ''; state.q = ''; state.group = ''; $('#q').value = '';
+    var cur = currentList();
+    if (cur && cur.groups && cur.groups.length) state.group = cur.groups[0].id;
     renderTabs(); if (id !== 'custom') { renderGenres(); renderGrid(); }
+  }
+  function selectGroup(id) {
+    state.group = id; state.genre = ''; state.q = ''; $('#q').value = '';
+    renderGroupTabs(); renderGenres(); renderGrid();
   }
   /* ── 직접 고르기: 카카오 책 검색(시트 스크립트가 대신 불러줘요) → 나온 책 중에 고르기 ── */
   var lastResults = [], searchSeq = 0;
@@ -328,6 +367,9 @@
     $('#list-tabs').addEventListener('click', function (e) {
       var b = e.target.closest('[data-list]'); if (b) selectList(b.getAttribute('data-list'));
     });
+    $('#group-tabs').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-group]'); if (b) selectGroup(b.getAttribute('data-group'));
+    });
     $('#genres').addEventListener('click', function (e) {
       var b = e.target.closest('.chip'); if (!b) return;
       state.genre = b.getAttribute('data-genre'); renderGenres(); renderGrid();
@@ -362,9 +404,19 @@
       books.forEach(function (b) { byId[b.id] = b; });
       // 큐레이션 목록이 없으면 전체를 한 목록으로
       lists = (data.lists && data.lists.length ? data.lists : [{ id: 'all', title: '추천 목록', books: books.map(function (b) { return b.id; }) }])
-        .map(function (l) { l.books = (l.books || []).filter(function (id) { return byId[id]; }); return l; });
-      var first = lists.filter(function (l) { return l.books.length; })[0];
+        .map(function (l) {
+          l.books = (l.books || []).filter(function (id) { return byId[id]; });
+          if (l.groups && l.groups.length) {
+            l.groups = l.groups.map(function (g) {
+              g.books = (g.books || []).filter(function (id) { return byId[id]; });
+              return g;
+            }).filter(function (g) { return g.books.length; });
+          }
+          return l;
+        });
+      var first = lists.filter(function (l) { return listCount(l); })[0];
       state.list = first ? first.id : (P.custom !== false ? 'custom' : lists[0].id);
+      if (first && first.groups && first.groups.length) state.group = first.groups[0].id;
       loadCustom();
       var hasStock = books.some(function (b) { return b.stock !== null && b.stock !== undefined; });
       if (filled(data.updatedAt)) $('#updated').textContent = (hasStock ? '목록과 남은 권수는 ' : '목록은 ') + data.updatedAt + ' 기준이에요.';

@@ -565,8 +565,23 @@ button.cover { display: block; width: 100%; padding: 0; border: 0; cursor: point
 .list-tabs .soon-tab { border-style: dashed; color: var(--ink-2); }
 .list-tabs .custom-tab { border-color: var(--orange); }
 .list-tabs .custom-tab[aria-selected="true"] { background: var(--orange); border-color: var(--orange); color: #fff; }
-.list-desc { font-size: .9rem; color: var(--ink-2); margin: 4px 0 14px; }
+.list-desc { font-size: .9rem; color: var(--ink-2); margin: 4px 0 10px; }
 .list-desc:empty { display: none; }
+/* 청출협 등: 메뉴 안 학년 하위 탭 (예비 중학생 | 중학생 | 고등학생) */
+.group-tabs {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 0;
+  margin: 0 0 16px; padding: 4px; border-radius: 12px; background: var(--paper-2); border: 1px solid var(--line);
+}
+.group-tabs[hidden] { display: none !important; }
+.group-tabs button {
+  flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 1px;
+  font: inherit; font-weight: 800; font-size: .95rem; letter-spacing: -0.02em; cursor: pointer;
+  padding: 10px 8px; border: 0; border-radius: 8px; background: transparent; color: var(--ink-2);
+}
+.group-tabs button span { font-size: .72rem; font-weight: 600; color: var(--muted); }
+.group-tabs button[aria-selected="true"] { background: var(--ink); color: var(--paper); }
+.group-tabs button[aria-selected="true"] span { color: color-mix(in srgb, var(--paper) 72%, transparent); }
+.group-sep { flex: none; width: 1px; height: 1.4em; margin: 0 2px; background: var(--line); align-self: center; }
 .custom-rule { padding: 16px 18px; border-radius: var(--radius); background: var(--card); border: 1px solid var(--line); font-size: .92rem; color: var(--ink-2); }
 .custom-rule p:last-child { margin: 0; }
 .custom-rule strong { color: var(--ink); }
@@ -576,6 +591,7 @@ button.cover { display: block; width: 100%; padding: 0; border: 0; cursor: point
 @media (max-width: 639px) {
   .list-tabs { display: grid; grid-template-columns: 1fr 1fr; overflow: visible; margin: 0 0 6px; padding: 0; }
   .list-tabs button { flex: initial; min-width: 0; padding: 9px 12px; font-size: .9rem; line-height: 1.35; }
+  .group-tabs button { font-size: .86rem; padding: 9px 4px; }
 }
 .pending-badge { border-style: solid; border-color: var(--orange); color: var(--orange); }
 .bc-pooled { font-size: .82rem; color: var(--wood-d); margin: -4px 0 8px; }
