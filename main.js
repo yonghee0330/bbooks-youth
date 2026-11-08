@@ -372,25 +372,34 @@
   }
 
   /* ── [6] 후원 ─────────────────────────────── */
-  var amount = 0;
+  var amount = 0, moreMode = false;
+  function moreMin() { return (Number(C.bookPrice) || 20000) * 6; }
   function renderDonate() {
     var steps = (C.donationSteps || []).map(function (x) { return typeof x === 'number' ? { amount: x, label: manwon(x) } : x; })
       .filter(function (x) { return x && x.amount > 0; });
     $('#amount-btns').innerHTML = steps.map(function (x) {
       return '<button type="button" aria-pressed="false" data-amount="' + x.amount + '"><b>' + esc(x.label || manwon(x.amount)) + '</b><span>' + manwon(x.amount) + '</span></button>';
-    }).join('');
+    }).join('') + '<button type="button" aria-pressed="false" data-more="1"><b>6권 이상</b><span>직접 입력</span></button>';
+    $('#free-min').textContent = manwon(moreMin()) + ' 이상';
     $('#amount-btns').addEventListener('click', function (e) {
       var b = e.target.closest('button'); if (!b) return;
-      amount = Number(b.getAttribute('data-amount'));
-      $('#free-amount').value = '';
-      setPressed(b); calc();
+      if (b.getAttribute('data-more')) {
+        moreMode = true; $('#free-row').hidden = false;
+        amount = Number(String($('#free-amount').value).replace(/[^\d]/g, '')) || 0;
+        setPressed(b); calc(); $('#free-amount').focus({ preventScroll: true });
+      } else {
+        moreMode = false; $('#free-row').hidden = true; $('#free-amount').value = '';
+        amount = Number(b.getAttribute('data-amount'));
+        setPressed(b); calc();
+      }
     });
     $('#free-amount').addEventListener('input', function () {
       var digits = this.value.replace(/[^\d]/g, '').slice(0, 9);
       amount = Number(digits) || 0;
       this.value = digits ? Number(digits).toLocaleString('ko-KR') : '';
-      setPressed(null); calc();
+      calc();
     });
+    var first = $('#amount-btns button'); if (first) first.click();  // 처음엔 1권이 골라져 있어요
     if (filled(C.goalAmount) && $('#goal')) { $('#goal').hidden = false; $('#goal').textContent = '1회차 목표: ' + (C.targetBooks || 50) + '권 · ' + won(C.goalAmount); }
 
     var a = C.account || {}, box = $('#account');
@@ -406,13 +415,13 @@
     Array.prototype.forEach.call(document.querySelectorAll('#amount-btns button'), function (b) { b.setAttribute('aria-pressed', String(b === btn)); });
   }
   function calc() {
-    var da = $('#d-amount'); if (da) da.value = amount ? amount.toLocaleString('ko-KR') : '';
+    var da = $('#d-amount'); if (da) { da.value = amount ? amount.toLocaleString('ko-KR') : ''; da.readOnly = true; }  // 금액은 권수에 맞춰 자동 — 직접 못 고쳐요
     var el = $('#books-calc'), price = Number(C.bookPrice);
-    if (!price || !amount) { el.hidden = true; return; }
+    if (!price || !amount) { el.hidden = !moreMode; if (moreMode) el.innerHTML = '6권 이상 후원할 금액을 적어주세요. (' + won(moreMin()) + ' 이상)'; return; }
     var n = Math.floor(amount / price);
     el.hidden = false;
-    el.innerHTML = n >= 1 ? '책 <b>' + n + '권</b>이 서가에 꽂혀요.'
-      : '책 한 권 값은 ' + won(price) + '이에요. 이 마음은 다른 후원과 모여 한 권이 돼요.';
+    el.innerHTML = moreMode && amount < moreMin() ? '6권 이상은 ' + won(moreMin()) + ' 이상부터 적을 수 있어요. 5권까지는 위 버튼을 눌러 주세요.'
+      : '책 <b>' + n + '권</b>이 서가에 꽂혀요.';
   }
   function copyAccount() {
     var num = (C.account.number || '').trim(), msg = $('#copy-msg');
@@ -481,13 +490,6 @@
       var n = shelfTotals(rounds).donors;
       now.innerHTML = n ? '지금 <b>' + n + '명</b>의 어른이 함께해요.' : '첫 번째로 함께할 어른을 기다려요.';
     }).catch(function () {});
-    $('#d-amount').addEventListener('input', function () {
-      var d = digits(this.value).slice(0, 9); amount = Number(d) || 0;
-      this.value = d ? Number(d).toLocaleString('ko-KR') : ''; setPressed(null);
-      var fa = $('#free-amount'); if (fa) fa.value = this.value;
-      var el = $('#books-calc'), price = Number(C.bookPrice), n = price ? Math.floor(amount / price) : 0;
-      if (price && amount) { el.hidden = false; el.innerHTML = n >= 1 ? '책 <b>' + n + '권</b>이 서가에 꽂혀요.' : '책 한 권 값은 ' + won(price) + '이에요. 이 마음은 다른 후원과 모여 한 권이 돼요.'; } else el.hidden = true;
-    });
     $('#d-receipt').addEventListener('change', function () { $('#d-receipt-row').hidden = !this.checked; });
     Array.prototype.forEach.call(form.elements.kind, function (r) {
       r.addEventListener('change', function () { var org = form.elements.kind.value !== '개인'; $('#d-org-row').hidden = !org; form.elements.org.required = org; });
@@ -500,7 +502,7 @@
       e.preventDefault(); msg.textContent = '';
       var err = checkFields(form, [
         ['name', null, '이름이나 닉네임을 적어주세요.'], ['phone', isPhone, '연락처를 확인해 주세요. (예: 010-1234-5678)'],
-        ['email', isEmail, '이메일을 확인해 주세요.'], ['amount', function (el) { return Number(digits(el.value)) >= 1000; }, '후원 금액을 적어주세요. (1,000원 이상)'],
+        ['email', isEmail, '이메일을 확인해 주세요.'], ['amount', function (el) { var v = Number(digits(el.value)); return moreMode ? v >= moreMin() : v >= 1000; }, moreMode ? '6권 이상은 ' + won(moreMin()) + ' 이상으로 적어주세요. 5권까지는 권수 버튼을 눌러 주세요.' : '몇 권을 후원할지 위에서 골라주세요.'],
         ['org', function (el) { return form.elements.kind.value === '개인' || !!el.value.trim(); }, '기관·단체 이름을 적어주세요.'],
         ['target', function (el) { return form.elements.to.value !== 'pick' || !!el.value.trim(); }, '어느 학교·반·모임에 건넬지 적어주세요.'],
         ['payer', null, '입금자명을 적어주세요.'], ['consent', isChecked, '개인정보 수집·이용에 동의해 주세요.']

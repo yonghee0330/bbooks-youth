@@ -1341,3 +1341,9 @@ button, input, select, textarea, summary { font-family: inherit; }
 .dt-pick-label { margin: 0 0 4px; font-size: .78rem; font-weight: 800; letter-spacing: .04em; color: #f1b79c; }
 .dt-pick p:last-child { margin: 0; font-size: .92rem; line-height: 1.7; }
 .group-tabs button span { text-align: center; line-height: 1.25; }
+
+/* 2026-11-08: 후원 권수 — 1~5권은 금액 자동, 6권 이상만 직접 입력 */
+.amount-btns { grid-template-columns: repeat(3, 1fr) !important; }
+.free-amount[hidden] { display: none !important; }
+#d-amount[readonly] { background: var(--paper-2); color: var(--ink); cursor: default; }
+#d-amount-hint { font-style: normal; font-size: .78rem; font-weight: 500; color: var(--muted); }
