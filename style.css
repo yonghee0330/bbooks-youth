@@ -1350,3 +1350,21 @@ button, input, select, textarea, summary { font-family: inherit; }
 
 /* 2026-11-08: 목표 권수 없음 — 서가 칸 20열 */
 @media (min-width: 760px) { .lp-shelf { grid-template-columns: repeat(20, 1fr); } }
+
+/* 2026-11-09: 청소년 홈 — 이번 주 책 고르기 현황 */
+.teen-week { display: block; cursor: default; }
+.teen-week:hover { transform: none; box-shadow: none; }
+.tw-big { display: flex; align-items: baseline; gap: 6px; margin: 4px 0 8px; }
+.tw-big b { font-family: var(--font); font-weight: 900; font-size: clamp(2.6rem, 9vw, 3.6rem); line-height: 1; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.tw-big small { font-size: 1.05rem; font-weight: 800; }
+.tw-big em { margin-left: auto; font-style: normal; font-size: .82rem; font-weight: 800; padding: 4px 12px; border-radius: 999px; background: #4a2018; color: #fff6ec; }
+.teen-week.closed .tw-big em { background: var(--orange); }
+.tw-msg { margin: 10px 0 14px; font-weight: 700; line-height: 1.55; }
+.tw-stats { grid-template-columns: repeat(2, 1fr); gap: 12px 8px; }
+.tw-stats b { font-size: 1.6rem; }
+.tw-bar2 { display: block; margin-top: 12px; }
+.tw-cap { display: block; margin-top: 4px; font-size: .72rem; font-weight: 600; opacity: .7; }
+.week-banner { margin: 12px 0 0; padding: 10px 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--paper-2); font-size: .92rem; font-weight: 700; line-height: 1.5; }
+.week-banner b { font-weight: 900; }
+.week-banner.closed { border-color: var(--orange); }
+.week-banner[hidden] { display: none; }

@@ -299,6 +299,19 @@
   }
   function applied() { try { return JSON.parse(localStorage.getItem(DONE_KEY) || 'null'); } catch (e) { return null; } }
 
+  /* ── 이번 주 신청 현황: 한 주(월~일)에 10명까지. 다 차면 일요일 자정 이후 새로 신청 ── */
+  var week = null;
+  function weekClosed() { return !!week && !week.open; }
+  function renderWeek() {
+    var el = $('#week-banner'); if (!el) return;
+    if (!week) { el.hidden = true; return; }
+    el.hidden = false; el.classList.toggle('closed', !week.open);
+    el.innerHTML = '<b>이번 주 ' + week.used + ' / ' + week.limit + '권</b> · ' + esc(window.ybgWeekMsg ? window.ybgWeekMsg(week) : '');
+  }
+  function loadWeekState() {
+    if (!window.ybgWeek) return;
+    window.ybgWeek().then(function (w) { week = w; renderWeek(); renderTray(); }).catch(function () { /* 현황을 못 불러와도 신청은 서버가 판단해요 */ });
+  }
   function renderTray() {
     var n = picks.length, done = applied();
     $('#nav-count').textContent = n;
@@ -306,8 +319,9 @@
       $('#tray-sum').innerHTML = done && !n ? '신청 완료 · 접수번호 <b>' + esc(done.id) + '</b>'
         : n ? '<b>' + esc(byId[picks[0]].title) + '</b>' + (n > 1 ? ' 외 예비 도서 1권' : '') : '아직 고른 책이 없어요';
     }
-    $('#tray-go').disabled = !n && !done;
-    $('#tray-go').textContent = !n && done ? '신청 내역' : '신청하기';
+    $('#tray-go').disabled = (!n && !done) || (n && weekClosed());
+    $('#tray-go').textContent = n && weekClosed() ? '이번 주 마감' : !n && done ? '신청 내역' : '신청하기';
+    var sb = $('#youth-form button[type=submit]'); if (sb) { sb.disabled = weekClosed(); if (weekClosed()) sb.textContent = '이번 주 마감'; }
 
     $('#tray-list').innerHTML = n ? picks.map(function (id, i) {
       var b = byId[id];
@@ -363,7 +377,7 @@
         $('#youth-done').focus();
       }).catch(function (err) {
         msg.textContent = err.message === 'Failed to fetch' ? '보내지 못했어요. 인터넷 연결을 확인하고 다시 눌러주세요.' : err.message;
-      }).then(function () { if (filled(C.api)) { btn.disabled = false; btn.textContent = '이 책으로 신청하기'; } });
+      }).then(function () { if (filled(C.api)) { btn.disabled = false; btn.textContent = '이 책으로 신청하기'; } loadWeekState(); });
     });
   }
 
@@ -438,7 +452,7 @@
       loadCustom();
       var hasStock = books.some(function (b) { return b.stock !== null && b.stock !== undefined; });
       if (filled(data.updatedAt)) $('#updated').textContent = (hasStock ? '목록과 남은 권수는 ' : '목록은 ') + data.updatedAt + ' 기준이에요.';
-      loadPicks(); renderTabs(); renderGenres(); renderGrid(); renderTray();
+      loadPicks(); renderTabs(); renderGenres(); renderGrid(); renderTray(); loadWeekState();
     }).catch(function (err) {
       console.warn('책 목록을 읽지 못했어요:', err);
       $('#book-grid').innerHTML = '<li class="empty-list">책 목록을 불러오지 못했어요. 잠시 뒤 다시 열어주세요.</li>';

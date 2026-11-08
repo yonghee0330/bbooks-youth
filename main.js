@@ -805,6 +805,34 @@
     var d = $('#poster-date'); if (d) d.textContent = eventLine();
   }
 
+  /* ── 이번 주 책 고르기 현황 (청소년) ──
+   * 한 주(월~일)에 10명까지. 서버(action=week)가 센 숫자를 그대로 보여준다. */
+  function loadWeek() {
+    if (!filled(C.api)) return Promise.reject(new Error('no api'));
+    return fetch(C.api + (C.api.indexOf('?') < 0 ? '?' : '&') + 'action=week', { cache: 'no-store' })
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (j) { if (!j || !j.ok) throw new Error('bad'); return j; });
+  }
+  function fmtMD(iso) { var k = new Date(new Date(iso).getTime() + 9 * 3600 * 1000); return (k.getUTCMonth() + 1) + '.' + k.getUTCDate(); }
+  function weekMsg(w) {
+    return w.open ? '이번 주 ' + w.remaining + '명 더 신청할 수 있어요. 일요일 자정까지 받아요.'
+      : '이번 주 책사줄게는 마감됐어요. 일요일 자정이 지나면(' + fmtMD(w.resetAt) + ' 월요일 0시부터) 새로 신청할 수 있어요.';
+  }
+  window.ybgWeek = loadWeek; window.ybgWeekMsg = weekMsg;
+  function renderTeenWeek() {
+    var card = $('#teen-week'); if (!card) return;
+    function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
+    loadWeek().then(function (w) {
+      set('tw-used', w.used); set('tw-limit', '/ ' + w.limit + '권');
+      set('tw-state', w.open ? '신청 중' : '이번 주 마감');
+      card.classList.toggle('closed', !w.open);
+      var bar = $('#tw-bar'); if (bar) { bar.firstElementChild.style.width = Math.min(100, Math.round(w.used / w.limit * 100)) + '%'; bar.setAttribute('aria-valuenow', w.used); bar.setAttribute('aria-valuemax', w.limit); }
+      set('tw-msg', weekMsg(w));
+      set('tw-books', w.books); set('tw-applied', w.applied); set('tw-left', w.left); set('tw-recv', w.received);
+      var tot = Math.max(1, w.books), bar2 = $('#tw-bar2'); if (bar2) { bar2.firstElementChild.style.width = Math.min(100, Math.round(w.left / tot * 100)) + '%'; bar2.setAttribute('aria-valuenow', w.left); bar2.setAttribute('aria-valuemax', w.books); }
+    }).catch(function () { set('tw-msg', '현황을 불러오지 못했어요. 잠시 뒤 다시 열어주세요.'); });
+  }
+
   /* ── 후원현황: 첫 화면 히어로 + shelf.html 대시보드가 같이 쓰는 숫자 ── */
   function manShort(n) { n = Number(n) || 0; return n >= 10000 ? (Math.round(n / 1000) / 10).toString().replace(/\.0$/, '') + '만' : n.toLocaleString('ko-KR'); }
   function shelfTotals(rounds) {
@@ -963,4 +991,5 @@
   if ($('#privacy')) renderPrivacy();
   if ($('#shelf-wrap')) initShelf();
   renderTeenStatus(); renderTeenContact(); fillHowtoPlace();
+  renderTeenWeek();
 })();
