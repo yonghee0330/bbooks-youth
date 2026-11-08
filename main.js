@@ -373,6 +373,8 @@
 
   /* ── [6] 후원 ─────────────────────────────── */
   var amount = 0, moreMode = false;
+  // 책 권수는 0.5권(1만 원) 단위: 5만 원 = 2.5권
+  function halfBooks(amt) { var h = Math.floor((Number(amt) || 0) / ((Number(C.bookPrice) || 20000) / 2)) / 2; return String(h).replace(/\.0$/, ''); }
   function moreMin() { return (Number(C.bookPrice) || 20000) * 6; }
   function renderDonate() {
     var steps = (C.donationSteps || []).map(function (x) { return typeof x === 'number' ? { amount: x, label: manwon(x) } : x; })
@@ -418,10 +420,12 @@
     var da = $('#d-amount'); if (da) { da.value = amount ? amount.toLocaleString('ko-KR') : ''; da.readOnly = true; }  // 금액은 권수에 맞춰 자동 — 직접 못 고쳐요
     var el = $('#books-calc'), price = Number(C.bookPrice);
     if (!price || !amount) { el.hidden = !moreMode; if (moreMode) el.innerHTML = '6권 이상 후원할 금액을 적어주세요. (' + won(moreMin()) + ' 이상)'; return; }
-    var n = Math.floor(amount / price);
+    var half = price / 2, n = halfBooks(amount);
     el.hidden = false;
     el.innerHTML = moreMode && amount < moreMin() ? '6권 이상은 ' + won(moreMin()) + ' 이상부터 적을 수 있어요. 5권까지는 위 버튼을 눌러 주세요.'
-      : '책 <b>' + n + '권</b>이 서가에 꽂혀요.';
+      : moreMode && amount % half ? '금액은 ' + won(half) + ' 단위로 적어주세요. (' + won(half) + ' = 책 0.5권)'
+      : n.indexOf('.') < 0 ? '책 <b>' + n + '권</b>이 서가에 꽂혀요.'
+      : '책 <b>' + n + '권</b> 몫이에요. 남는 반 권은 다른 후원과 모여 서가에 꽂혀요.';
   }
   function copyAccount() {
     var num = (C.account.number || '').trim(), msg = $('#copy-msg');
@@ -502,7 +506,7 @@
       e.preventDefault(); msg.textContent = '';
       var err = checkFields(form, [
         ['name', null, '이름이나 닉네임을 적어주세요.'], ['phone', isPhone, '연락처를 확인해 주세요. (예: 010-1234-5678)'],
-        ['email', isEmail, '이메일을 확인해 주세요.'], ['amount', function (el) { var v = Number(digits(el.value)); return moreMode ? v >= moreMin() : v >= 1000; }, moreMode ? '6권 이상은 ' + won(moreMin()) + ' 이상으로 적어주세요. 5권까지는 권수 버튼을 눌러 주세요.' : '몇 권을 후원할지 위에서 골라주세요.'],
+        ['email', isEmail, '이메일을 확인해 주세요.'], ['amount', function (el) { var v = Number(digits(el.value)); return moreMode ? v >= moreMin() && v % ((Number(C.bookPrice) || 20000) / 2) === 0 : v >= 1000; }, moreMode ? '6권 이상은 ' + won(moreMin()) + ' 이상, ' + won((Number(C.bookPrice) || 20000) / 2) + ' 단위로 적어주세요. 5권까지는 권수 버튼을 눌러 주세요.' : '몇 권을 후원할지 위에서 골라주세요.'],
         ['org', function (el) { return form.elements.kind.value === '개인' || !!el.value.trim(); }, '기관·단체 이름을 적어주세요.'],
         ['target', function (el) { return form.elements.to.value !== 'pick' || !!el.value.trim(); }, '어느 학교·반·모임에 건넬지 적어주세요.'],
         ['payer', null, '입금자명을 적어주세요.'], ['consent', isChecked, '개인정보 수집·이용에 동의해 주세요.']
@@ -820,7 +824,7 @@
     var goalB = Number(C.targetBooks) || 50;
     function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
     set('st-books', T.books);
-    set('st-amount', manShort(T.amount)); set('st-amount-goal', '원 · 책 ' + Math.floor(T.amount / (Number(C.bookPrice) || 20000)) + '권');
+    set('st-amount', manShort(T.amount)); set('st-amount-goal', '원 · 책 ' + halfBooks(T.amount) + '권');
     set('st-donors', T.donors == null ? '–' : T.donors); set('st-youth', T.youth); set('st-youth-goal', '/ ' + goalB + '권');
     var pct = Math.min(100, Math.round(T.youth / goalB * 100));  // 1회차 목표 = 50권을 청소년에게 연결
     var bar = document.getElementById('st-bar'); if (bar) bar.style.width = pct + '%';
