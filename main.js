@@ -852,7 +852,7 @@
     if (dl) dl.innerHTML = T.list.length ? T.list.map(function (d) {
       var name = d.anon || !filled(d.name) ? anonName() : d.name;
       return '<li' + (d.seed ? ' class="dn-seed"' : '') + '><span class="dn-name">' + esc(name) + (d.seed ? ' <em>' + (SIDE === 'teen' ? '씨앗 · 0.1평 점주' : '씨앗 펀딩 · 0.1평 점주') + '</em>' : '') + (d.org ? ' <em>단체</em>' : '') + '</span>' +
-        '<span class="dn-books">' + (d.books >= 1 ? '책 ' + d.books + '권' : (SIDE === 'teen' ? '작은 마음' : '작은 후원')) + '</span>' +
+        (d.people > 1 ? '<span class="dn-books">' + d.people + '명</span>' : '') +
         (filled(d.line) ? '<span class="dn-line">“' + esc(d.line) + '”</span>' : '') + '<span class="dn-date">' + esc(fmtDate(d.at)) + '</span></li>';
     }).join('') : '<li class="dn-empty">첫 번째로 함께할 어른을 기다려요.' + (SIDE === 'teen' ? '' : ' <a href="' + href('donate.html') + '">후원 참여 →</a>') + '</li>';
     var yl = $('#dash-youth');
