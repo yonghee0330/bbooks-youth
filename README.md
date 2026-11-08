@@ -3,26 +3,31 @@
 빌드 없는 정적 페이지예요. 파일을 그대로 GitHub Pages에 올리면 돼요.
 
 ```
-index.html        첫 화면 — 히어로 + 메뉴 블록
-about.html        책사줄게 이야기 (원조 · 원미동에서는 · 진행 4단계 · 출처)
-shelf.html        내일의 서재
-donate.html       후원하기
-pick.html         책 고르기(예약) — 큐레이션 목록에서 골라 신청 폼으로
-youth.html        (예전 주소) → 책 고르기로 넘겨줌
-org.html          기관·기업 함께하기
-faq.html          자주 묻는 질문 + 개인정보와 익명 처리
-pick.js           책 고르기 동작 (고르기 · 책 소개 · 내 선택 · 폼 미리 채우기)
-tools/kakao_books.py  카카오 책 검색으로 표지·소개 채우기 (내 컴퓨터에서 실행)
-style.css         디자인 (라이트·다크 모드)
-main.js           공통 머리말·꼬리말·하단 바·이전/다음 + 각 페이지 그리기 + 서가 로더
-config.js         ★ 바뀌는 값은 전부 여기
-data/shelf.json   서가 데이터 (지금은 예시 3권)
-data/books.json   큐레이션 목록 (1회차 11권)
-images/           hero.jpg · step-1~4.png · og.jpg (없어도 대체 그래픽이 나와요)
-SHEET.md          접수 시트(후원·신청) 주소·권한 승인·운영 흐름
-apps-script/      접수 시트 코드 (Apps Script)
-_v1/              10/26 이전 버전 (GitHub Pages에 올라가지 않아요)
+index.html        입구 — 「책을 사주고 싶어요」/「책을 고르고 싶어요」
+adult.html        어른 허브 — 후원현황 서가 + 스토리·후원·Q&A
+teen/             청소년
+  index.html      QR 짧은 주소(/teen) → 바로 책 고르기
+  home.html       청소년 허브 — 서가 + 고르기·내신청·받는법·문의
+  status.html     내 신청 (이 기기 접수번호)
+  howto.html      책 받는 방법 (비북스 방문)
+  ask.html        문의 + 청소년 Q&A
+about.html        스토리 (어른)
+shelf.html        후원현황·서가 (side=teen 이면 청소년 메뉴)
+donate.html       후원 참여 (어른)
+pick.html         책 고르기·신청
+faq.html          Q&A (어른/청소년 탭, ?side=teen 이면 청소년 탭부터)
+youth.html        (예전 주소) → /teen/ 으로 넘김
+org.html          기관·기업 → 후원으로 넘김
+main.js / style.css / config.js / pick.js
+data/             books.json · shelf.json
+SHEET.md          접수 시트(후원·신청 탭 분리·상태 필터) — 비공개
+apps-script/      접수 시트 코드 — 비공개
 ```
+
+공유 주소
+- 어른(SNS·후원 요청): `https://youth.bbooks.co.kr/` → 「책을 사주고 싶어요」또는 `…/adult.html`
+- 청소년 QR(학교·도서관·매장): `https://youth.bbooks.co.kr/teen` → 바로 책 고르기
+
 
 ## 1. 내 컴퓨터에서 열어보기
 

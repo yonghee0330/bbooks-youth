@@ -71,7 +71,10 @@ p { margin: 0 0 12px; }
 .topnav { display: flex; gap: 16px; font-size: .92rem; }
 .topnav a { text-decoration: none; color: var(--ink-2); }
 .topnav a:hover { color: var(--ink); }
-@media (max-width: 520px) { .topnav { display: none; } }
+@media (max-width: 520px) {
+  .topnav { display: none; }
+  .topnav-teen { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 1.05rem; }
+}
 
 /* 버튼 */
 .btn {
@@ -1061,8 +1064,51 @@ button.cover { display: block; width: 100%; padding: 0; border: 0; cursor: point
 .lp-stats b, .ds b { font-family: var(--font); font-weight: 800; font-size: clamp(1.5rem, 3.6vh, 2.2rem); line-height: 1.1; }
 .lp-stats small, .ds small { font-size: .8rem; font-weight: 700; opacity: .8; }
 
-/* 메뉴: 둥근 네모 버튼 3개 */
+/* 게이트: 어른 / 청소년 큰 입구 두 개 */
+.gate-menu {
+  display: grid; grid-template-columns: 1fr; gap: clamp(12px, 2vh, 18px);
+  margin-top: clamp(8px, 2vh, 20px);
+}
+@media (min-width: 640px) { .gate-menu { grid-template-columns: 1fr 1fr; } }
+.gate-btn {
+  display: flex; flex-direction: column; justify-content: center; gap: 6px; text-decoration: none; color: #4a2018;
+  min-height: clamp(96px, 16vh, 140px); padding: 18px clamp(14px, 2vw, 28px);
+  border: 3px solid #4a2018; border-radius: var(--round); background: rgba(243, 230, 218, .4);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.gate-btn strong { font-family: var(--font); font-weight: 800; font-size: clamp(1.35rem, 3.4vh, 1.85rem); letter-spacing: -0.02em; line-height: 1.25; }
+.gate-btn span { font-size: clamp(.85rem, 1.8vh, 1rem); font-weight: 700; opacity: .8; }
+.gate-btn.adult { background: #4a2018; color: var(--cream); }
+.gate-btn.teen { background: rgba(243, 230, 218, .55); }
+.gate-btn:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 #4a2018; }
+.gate-btn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.gate-hint { margin: clamp(14px, 2.2vh, 22px) 0 0; text-align: center; font-size: .88rem; font-weight: 600; color: #4a2018; opacity: .85; }
+.gate-hint a { color: inherit; font-weight: 800; }
+[data-page="gate"] .topbar { position: absolute; left: 0; right: 0; background: transparent; border: 0; backdrop-filter: none; z-index: 5; }
+[data-page="gate"] .topbar .brand, [data-page="gate"] .topbar .brand span { color: var(--p-ink); }
+
+/* 메뉴: 둥근 네모 버튼 3개 (어른) · 4개 (청소년) */
 .lp-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(8px, 1.4vw, 14px); margin-top: clamp(10px, 2vh, 18px); }
+.lp-menu.teen-menu,
+[data-page="home"] #menu.lp-menu.teen-menu { grid-template-columns: repeat(2, 1fr); }
+@media (min-width: 720px) {
+  .lp-menu.teen-menu,
+  [data-page="home"] #menu.lp-menu.teen-menu { grid-template-columns: repeat(4, 1fr); }
+}
+.topnav-teen { gap: 10px; font-size: clamp(1rem, 2.4vw, 1.15rem); font-weight: 800; }
+.topnav-teen a { font-weight: 800; }
+.side-switch { font-size: .82rem; font-weight: 700; color: var(--ink-2); text-decoration: none; white-space: nowrap; margin-left: 4px; }
+.side-switch:hover { color: var(--ink); }
+.teen-panel { padding: 18px 20px; border: 2px solid var(--line); border-radius: var(--round); background: var(--card); margin: 16px 0 24px; }
+.teen-panel h2 { font-size: 1.15rem; margin: 0 0 10px; }
+.teen-dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; margin: 12px 0; }
+.teen-dl dt { font-weight: 700; color: var(--ink-2); }
+.teen-dl dd { margin: 0; font-weight: 800; }
+.teen-steps { list-style: none; margin: 0 0 24px; padding: 0; counter-reset: ts; }
+.teen-steps li { counter-increment: ts; position: relative; padding: 16px 16px 16px 56px; margin-bottom: 10px; border: 2px solid var(--line); border-radius: var(--round); background: var(--card); }
+.teen-steps li::before { content: counter(ts); position: absolute; left: 14px; top: 16px; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #4a2018; color: var(--cream); font-weight: 900; font-size: .9rem; }
+.teen-steps strong { display: block; font-size: 1.1rem; margin-bottom: 4px; }
+.teen-steps p { margin: 0; color: var(--ink-2); }
 .lp-btn {
   display: flex; flex-direction: column; justify-content: center; gap: 2px; text-decoration: none; color: #4a2018;
   min-height: clamp(64px, 10vh, 96px); padding: 10px clamp(10px, 1.6vw, 18px);

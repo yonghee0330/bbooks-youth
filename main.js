@@ -590,81 +590,151 @@
       ],
       youth: [
         ['누가 신청할 수 있나요?', [who]],
-        ['정말 무료예요?', ['네, 무료예요. 책값은 어른들이 미리 냈어요. 한 사람이 한 권(정가 ' + won(price) + ' 이하)을 받아요.']],
-        ['어떻게 고르나요?', ['"책 고르기"에서 추천 목록을 보고 고르거나, 목록에 없는 책을 직접 적어 신청해요. ' + (((C.pick || {}).customRule) || '')]]
+        ['정말 무료예요?', ['네, 무료예요. 어른들이 미리 책값을 내 두셨어요. 한 사람이 한 권(정가 ' + won(price) + ' 이하)을 받아요.']],
+        ['어떻게 고르나요?', ['「책 고르기」에서 추천 목록을 보고 골라도 되고, 목록에 없는 책을 직접 골라도 돼요. ' + (((C.pick || {}).customRule) || '')]],
+        ['책은 어떻게 받나요?', ['신청하면 비북스가 책을 주문해요. 책이 도착하면 연락이 오고, 부천 원미동 비북스에 방문해서 받아가요. 택배는 없어요.']],
+        ['내 신청을 어디서 봐요?', ['같은 폰·컴퓨터에서 「내 신청」을 열면 접수번호가 보여요. 다른 기기에서 신청했다면 안 보일 수 있어요. 그때는 비북스에 물어봐 주세요.']]
       ]
     };
   }
+  function faqStartKey() {
+    if (SIDE === 'teen') return 'youth';
+    if (location.hash === '#youth' || location.hash === '#teen') return 'youth';
+    if (location.hash === '#adult') return 'adult';
+    try {
+      var q = new URLSearchParams(location.search).get('side');
+      if (q === 'teen') return 'youth';
+      if (q === 'adult') return 'adult';
+    } catch (e) { /* URLSearchParams 없는 옛 브라우저 */ }
+    return 'adult';
+  }
   function renderFaq() {
     var data = faqData(), tabs = $('#faq-tabs'), list = $('#faq-list');
+    if (!list) return;
     function draw(k) {
-      Array.prototype.forEach.call(tabs.querySelectorAll('button'), function (b) { b.setAttribute('aria-selected', String(b.getAttribute('data-k') === k)); });
-      list.innerHTML = data[k].map(function (q, i) {
+      if (tabs) Array.prototype.forEach.call(tabs.querySelectorAll('button'), function (b) {
+        b.setAttribute('aria-selected', String(b.getAttribute('data-k') === k));
+      });
+      list.innerHTML = (data[k] || []).map(function (q, i) {
         var id = 'qa-' + k + '-' + i;
         return '<div class="qa"><button type="button" class="qa-q" aria-expanded="false" aria-controls="' + id + '">' + esc(q[0]) + '<i aria-hidden="true">+</i></button>' +
           '<div class="qa-a" id="' + id + '" hidden>' + q[1].filter(filled).map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') + '</div></div>';
       }).join('');
     }
-    tabs.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) draw(b.getAttribute('data-k')); });
+    if (tabs && !tabs.hidden) {
+      tabs.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) draw(b.getAttribute('data-k')); });
+    }
     list.addEventListener('click', function (e) {
       var q = e.target.closest('.qa-q'); if (!q) return;
       var open = q.getAttribute('aria-expanded') !== 'true';
       q.setAttribute('aria-expanded', String(open)); $('#' + q.getAttribute('aria-controls')).hidden = !open;
     });
-    draw(location.hash === '#youth' ? 'youth' : 'adult');
+    draw(faqStartKey());
   }
   function renderPrivacy() {
     $('#privacy').innerHTML = privacyItems().map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('');
   }
 
   /* ── 공통: 머리말 · 꼬리말 · 하단 바 · 이전/다음 ── */
-  // [id, 주소, 메뉴 이름, 블록 설명]
-  var PAGES = [
-    ['shelf', 'shelf.html', '후원현황', '지금까지 모인 책과 금액이에요.'],
-    ['about', 'about.html', '스토리', '한 사람으로부터 시작된 이야기예요.'],
-    ['donate', 'donate.html', '후원 참여', '책 한 권 값부터 함께해요.'],
-    ['faq', 'faq.html', 'Q&A', '어른과 청소년이 자주 묻는 것들이에요.'],
-    ['pick', 'pick.html', '책 고르기', '부천 청소년이면 누구나 한 권을 골라요.']
-  ];
-  var NAV = { shelf: '후원현황', about: '스토리', donate: '후원 참여', faq: 'Q&A', pick: '책 고르기' };
+  // data-root: teen/ 아래 페이지는 "../" — 링크·스크립트 기준 경로
+  var ROOT = document.body.getAttribute('data-root') || '';
+  try {
+    var sideQ = new URLSearchParams(location.search).get('side');
+    if (sideQ === 'teen' || sideQ === 'adult') document.body.setAttribute('data-side', sideQ);
+  } catch (e) { /* ignore */ }
   var PAGE = document.body.getAttribute('data-page') || 'home';
-  function pickOff(id) { return id === 'pick' && (C.pick || {}).enabled === false; }
-  function pages() { return PAGES.filter(function (p) { return !pickOff(p[0]); }); }
+  var SIDE = document.body.getAttribute('data-side') || (PAGE === 'pick' || PAGE.indexOf('teen') === 0 ? 'teen' : (PAGE === 'gate' ? 'gate' : 'adult'));
+  function href(path) { return ROOT + path; }
+  // [id, 주소(루트 기준), 메뉴 이름]
+  var ADULT_PAGES = [
+    ['shelf', 'shelf.html', '후원현황'],
+    ['about', 'about.html', '스토리'],
+    ['donate', 'donate.html', '후원 참여'],
+    ['faq', 'faq.html', 'Q&A']
+  ];
+  var TEEN_PAGES = [
+    ['pick', 'pick.html', '고르기'],
+    ['teen-status', 'teen/status.html', '내 신청'],
+    ['teen-howto', 'teen/howto.html', '받는 법'],
+    ['teen-ask', 'teen/ask.html', '문의']
+  ];
+  function pages() { return SIDE === 'teen' ? TEEN_PAGES : ADULT_PAGES; }
+  function hubHref() {
+    if (SIDE === 'teen') return href('teen/home.html');
+    if (SIDE === 'adult') return href('adult.html');
+    return href('index.html');
+  }
+  function brandHref() { return SIDE === 'gate' ? href('index.html') : hubHref(); }
 
   function renderChrome() {
     var head = $('#site-header');
     if (head) {
-      head.innerHTML = '<a class="brand" href="index.html">비북스 <span>청소년 책사줄게</span></a>' +
-        '<nav class="topnav" aria-label="메뉴">' + pages().filter(function (p) { return NAV[p[0]]; }).map(function (p) {
-          return '<a href="' + p[1] + '"' + (p[0] === PAGE ? ' aria-current="page"' : '') + '>' + NAV[p[0]] + '</a>';
-        }).join('') + '</nav>' +
-        (PAGE === 'home' ? '' : '<a class="menu-link" href="index.html#menu">전체 메뉴</a>');
+      var navHtml = '';
+      if (SIDE === 'adult' || SIDE === 'teen') {
+        navHtml = '<nav class="topnav' + (SIDE === 'teen' ? ' topnav-teen' : '') + '" aria-label="메뉴">' +
+          pages().map(function (p) {
+            return '<a href="' + href(p[1]) + '"' + (p[0] === PAGE ? ' aria-current="page"' : '') + '>' + p[2] + '</a>';
+          }).join('') + '</nav>';
+      }
+      head.innerHTML = '<a class="brand" href="' + brandHref() + '">비북스 <span>청소년 책사줄게</span></a>' + navHtml +
+        (PAGE === 'home' || PAGE === 'gate' ? '' : '<a class="menu-link" href="' + hubHref() + '#menu">전체 메뉴</a>') +
+        (SIDE === 'adult' || SIDE === 'teen' ? '<a class="side-switch" href="' + href('index.html') + '">입구</a>' : '');
     }
     var foot = $('#site-footer');
     if (foot) {
       var links = contactLinks();
+      var footExtra = SIDE === 'teen'
+        ? '<nav class="foot-links" aria-label="안내"><a href="' + href('teen/ask.html') + '">문의</a><a href="' + href('faq.html') + '?side=teen#privacy-sec">개인정보</a></nav>'
+        : '<nav class="foot-links" aria-label="안내"><a href="' + href('faq.html') + '#privacy-sec">개인정보와 익명 처리</a><a href="' + href('about.html') + '#sources">출처</a></nav>';
       foot.innerHTML = '<div class="wrap"><div class="foot-row"><div><p class="foot-brand">운영 비북스 · 부천 원미동</p>' +
         '<ul class="foot-contact">' + (links.length ? links.map(function (l) {
           return '<li>' + l[0] + ' <a href="' + esc(l[1]) + '"' + (l[0] === '인스타그램' ? ' target="_blank" rel="noopener"' : '') + '>' + esc(l[2]) + '</a></li>';
-        }).join('') : '<li class="muted">연락처 준비 중</li>') + '</ul></div>' +
-        '<nav class="foot-links" aria-label="안내"><a href="faq.html#privacy-sec">개인정보와 익명 처리</a><a href="about.html#sources">출처</a></nav></div>' +
+        }).join('') : '<li class="muted">연락처 준비 중</li>') + '</ul></div>' + footExtra + '</div>' +
         '<p class="small muted">청소년 책사줄게는 전국 동네서점이 함께하는 캠페인이에요. 부천 원미동 비북스에서도 함께 시작해요.</p></div>';
     }
-    // 모바일 하단 바: 첫 화면과 책 고르기에는 두지 않는다
-    if (PAGE !== 'home' && PAGE !== 'pick') {
-      var btns = [['donate', 'donate.html', '후원 참여', 'btn-primary'], ['pick', 'pick.html', '책 고르기', 'btn-accent']]
-        .filter(function (b) { return b[0] !== PAGE && !pickOff(b[0]); });
-      if (btns.length) document.body.insertAdjacentHTML('beforeend', '<div class="dock show" aria-label="빠른 이동">' + btns.map(function (b) {
-        return '<a class="btn ' + b[3] + '" href="' + b[1] + '">' + b[2] + '</a>';
-      }).join('') + '</div>');
+    // 모바일 하단 바: 게이트·허브·고르기에는 두지 않음. 사이드별로 한 버튼만
+    if (PAGE !== 'home' && PAGE !== 'gate' && PAGE !== 'pick') {
+      var dockBtn = SIDE === 'teen'
+        ? '<a class="btn btn-accent" href="' + href('pick.html') + '">책 고르기</a>'
+        : '<a class="btn btn-primary" href="' + href('donate.html') + '">후원 참여</a>';
+      if ((SIDE === 'teen' && PAGE !== 'pick') || (SIDE === 'adult' && PAGE !== 'donate')) {
+        document.body.insertAdjacentHTML('beforeend', '<div class="dock show" aria-label="빠른 이동">' + dockBtn + '</div>');
+      }
     }
     var nav = $('#page-nav');
     if (nav) {
       var ps = pages(), i = ps.map(function (p) { return p[0]; }).indexOf(PAGE);
-      var prev = ps[i - 1], next = ps[i + 1];
-      nav.innerHTML = (prev ? '<a class="pn prev" href="' + prev[1] + '"><span>이전</span>' + prev[2] + '</a>' : '<a class="pn prev" href="index.html"><span>처음으로</span>전체 메뉴</a>') +
-        (next ? '<a class="pn next" href="' + next[1] + '"><span>다음</span>' + next[2] + '</a>' : '<a class="pn next" href="index.html"><span>처음으로</span>전체 메뉴</a>');
+      var prev = i > 0 ? ps[i - 1] : null, next = i >= 0 && i < ps.length - 1 ? ps[i + 1] : null;
+      nav.innerHTML = (prev ? '<a class="pn prev" href="' + href(prev[1]) + '"><span>이전</span>' + prev[2] + '</a>' : '<a class="pn prev" href="' + hubHref() + '"><span>처음으로</span>메뉴</a>') +
+        (next ? '<a class="pn next" href="' + href(next[1]) + '"><span>다음</span>' + next[2] + '</a>' : '<a class="pn next" href="' + hubHref() + '"><span>처음으로</span>메뉴</a>');
     }
+  }
+
+  function renderTeenStatus() {
+    var box = $('#my-apply'); if (!box) return;
+    var done = null;
+    try { done = JSON.parse(localStorage.getItem('ybg-applied') || 'null'); } catch (e) { done = null; }
+    if (done && done.id) {
+      box.innerHTML = '<p class="done-h">신청이 기록돼 있어요.</p>' +
+        '<dl class="teen-dl"><dt>접수번호</dt><dd><b>' + esc(done.id) + '</b></dd>' +
+        (filled(done.nick) ? '<dt>닉네임</dt><dd>' + esc(done.nick) + '</dd>' : '') +
+        (filled(done.book) ? '<dt>고른 책</dt><dd>' + esc(done.book) + '</dd>' : '') + '</dl>' +
+        '<p class="small muted">책이 도착하면 연락처로 안내가 가요. <a href="' + href('teen/howto.html') + '">받는 법 보기</a></p>';
+    } else {
+      box.innerHTML = '<p>아직 이 기기에서 신청한 기록이 없어요.</p>' +
+        '<p><a class="btn btn-accent" href="' + href('pick.html') + '">책 고르러 가기</a></p>';
+    }
+  }
+  function renderTeenContact() {
+    var box = $('#teen-contact'); if (!box) return;
+    var links = contactLinks();
+    box.innerHTML = '<h2>비북스에 묻기</h2><ul class="foot-contact">' +
+      (links.length ? links.map(function (l) {
+        return '<li>' + l[0] + ' <a href="' + esc(l[1]) + '"' + (l[0] === '인스타그램' ? ' target="_blank" rel="noopener"' : '') + '>' + esc(l[2]) + '</a></li>';
+      }).join('') : '<li class="muted">연락처 준비 중</li>') + '</ul>';
+  }
+  function fillHowtoPlace() {
+    var el = $('#howto-place'); if (el && filled(C.place)) el.textContent = C.place;
   }
 
   /* ── 첫 화면: 포스터 — 키가 자라는 아이들 (남·여 섞어서) ── */
@@ -784,10 +854,10 @@
     var dl = $('#dash-donors');
     if (dl) dl.innerHTML = T.list.length ? T.list.map(function (d) {
       var name = d.anon || !filled(d.name) ? anonName() : d.name;
-      return '<li' + (d.seed ? ' class="dn-seed"' : '') + '><span class="dn-name">' + esc(name) + (d.seed ? ' <em>씨앗 펀딩 · 0.1평 점주</em>' : '') + (d.org ? ' <em>단체</em>' : '') + '</span>' +
-        '<span class="dn-books">' + (d.books >= 1 ? '책 ' + d.books + '권' : '작은 후원') + '</span>' +
+      return '<li' + (d.seed ? ' class="dn-seed"' : '') + '><span class="dn-name">' + esc(name) + (d.seed ? ' <em>' + (SIDE === 'teen' ? '씨앗 · 0.1평 점주' : '씨앗 펀딩 · 0.1평 점주') + '</em>' : '') + (d.org ? ' <em>단체</em>' : '') + '</span>' +
+        '<span class="dn-books">' + (d.books >= 1 ? '책 ' + d.books + '권' : (SIDE === 'teen' ? '작은 마음' : '작은 후원')) + '</span>' +
         (filled(d.line) ? '<span class="dn-line">“' + esc(d.line) + '”</span>' : '') + '<span class="dn-date">' + esc(fmtDate(d.at)) + '</span></li>';
-    }).join('') : '<li class="dn-empty">첫 번째로 함께할 어른을 기다려요. <a href="donate.html">후원 참여 →</a></li>';
+    }).join('') : '<li class="dn-empty">첫 번째로 함께할 어른을 기다려요.' + (SIDE === 'teen' ? '' : ' <a href="' + href('donate.html') + '">후원 참여 →</a>') + '</li>';
     var yl = $('#dash-youth');
     if (yl) yl.innerHTML = T.got.length ? T.got.map(function (y) {
       var code = String(y.code).charAt(0) === '#' ? y.code : '#' + y.code;
@@ -895,4 +965,5 @@
   if ($('#faq-list')) renderFaq();
   if ($('#privacy')) renderPrivacy();
   if ($('#shelf-wrap')) initShelf();
+  renderTeenStatus(); renderTeenContact(); fillHowtoPlace();
 })();
