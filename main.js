@@ -58,7 +58,7 @@
   /* ── [3] 차별점 ───────────────────────────── */
   var DIFF = {
     event: ['행사형', '정해진 토요일 하루, 책방 전체가 청소년 서가가 돼요.'],
-    archive: ['내일의 서재 아카이브', '회차마다 쌓이는 서가와 어른들의 한 줄을 남겨요.'],
+    archive: ['내일의 서재 아카이브', '계속 쌓여 가는 서가와 어른들의 한 줄을 남겨요.'],
     neighborhood: ['원미동 동네 기반', '골목과 공간에서, 동네 어른들이 동네 청소년에게 건네요.'],
     curation: ['0.1평 점주 큐레이션', '여러 점주가 한 칸씩 고른 서가에서 골라요.'],
     bmoim: ['비모임 후속 경험', '책을 고른 뒤 이어지는 모임과 글쓰기에 초대해요.']
@@ -82,7 +82,7 @@
     ['후원', '어른이 책 한 권 값부터 건네요. 입금이 확인되면 서가에 책이 꽂혀요.'],
     ['신청', (C.pick || {}).enabled === false ? '청소년은 닉네임으로 신청해요.' : '청소년은 읽고 싶은 책을 고르고 닉네임으로 신청해요. 비북스가 책을 주문해 준비해요.'],
     ['받기', '책이 도착하면 안내가 가요. 비북스에 방문해서 받아가요.'],
-    ['내일의 서재', '고른 책과 어른들의 한 줄이 회차마다 서가로 쌓여요.']
+    ['내일의 서재', '고른 책과 어른들의 한 줄이 서가로 계속 쌓여요.']
   ];
   function renderSteps() {
     $('#steps-list').innerHTML = STEPS.map(function (s, i) {
@@ -204,8 +204,7 @@
   function renderMeta(r) {
     var real = r.books.filter(function (b) { return !b.example; }).length;
     var ex = r.books.length - real, html = '';
-    if (filled(r.targetBooks)) html += '<span class="shelf-count">꽂힌 책 <b>' + real + '</b> / ' + r.targetBooks + '권</span>';
-    else html += '<span class="shelf-count">꽂힌 책 <b>' + real + '</b>권</span>' + (r.closed ? '' : '<span class="badge">목표 권수 준비 중</span>');
+    html += '<span class="shelf-count">꽂힌 책 <b>' + real + '</b>권</span>';
     if (r.closed) html += '<span class="badge">아카이브 · 고정된 서가</span>';
     if (ex) html += '<span class="badge">예시 ' + ex + '권 — 실제 후원이 아니에요</span>';
     if (!r.closed && Number(r.pending) > 0) html += '<span class="badge pending-badge">작은 후원이 모이는 중 · 다음 한 권까지 ' + won(r.pending) + '</span>';
@@ -223,7 +222,7 @@
     var perRow = Math.max(7, Math.min(20, Math.floor(cw / 44)));
     var slotW = cw / perRow, bookW = Math.min(slotW * 0.78, 30);
     var rowH = cw < 500 ? 78 : 96, boardH = 8, pad = 30; // 위쪽 여백은 떨어지는 책 자리
-    var total = Math.max(filled(r.targetBooks) ? Number(r.targetBooks) : (r.closed ? 0 : DEFAULT_SLOTS), r.books.length);
+    var total = r.closed ? r.books.length : Math.max(DEFAULT_SLOTS, Math.ceil((r.books.length + 1) / perRow) * perRow);
     var rows = Math.max(1, Math.ceil(total / perRow));
     var H = pad + rows * (rowH + boardH);
 
@@ -402,7 +401,6 @@
       calc();
     });
     var first = $('#amount-btns button'); if (first) first.click();  // 처음엔 1권이 골라져 있어요
-    if (filled(C.goalAmount) && $('#goal')) { $('#goal').hidden = false; $('#goal').textContent = '1회차 목표: ' + (C.targetBooks || 50) + '권 · ' + won(C.goalAmount); }
 
     var a = C.account || {}, box = $('#account');
     if (filled(a.bank) && filled(a.number) && filled(a.holder)) {
@@ -576,7 +574,7 @@
       '받은 정보는 청소년 책사줄게를 진행하는 데만 써요. 다른 용도로 따로 보관하지 않아요.',
       '실명, 학교, 연락처는 공개하지 않아요.',
       '책을 받은 청소년은 후원현황에 닉네임과 고른 책 제목이 보여요. 실명, 학교, 연락처, 이메일은 어디에도 공개하지 않아요.',
-      '모인 금액, 전달한 권수, 남은 금액 처리는 회차가 끝난 뒤 공지해요.'
+      '모인 금액, 전달한 권수, 남은 금액 처리는 정기적으로 공지해요.'
     ];
   }
   function faqData() {
@@ -820,17 +818,12 @@
     };
   }
   function fillStats(T) {
-    var goalB = Number(C.targetBooks) || 50;
     function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
     set('st-books', T.books);
     set('st-amount', manShort(T.amount)); set('st-amount-goal', '원 · 책 ' + halfBooks(T.amount) + '권');
-    set('st-donors', T.donors == null ? '–' : T.donors); set('st-youth', T.youth); set('st-youth-goal', '/ ' + goalB + '권');
-    var pct = Math.min(100, Math.round(T.youth / goalB * 100));  // 1회차 목표 = 50권을 청소년에게 연결
-    var bar = document.getElementById('st-bar'); if (bar) bar.style.width = pct + '%';
-    set('st-pct', pct + '%');
-    var bar2 = document.getElementById('st-bar-l'); if (bar2) bar2.setAttribute('aria-valuenow', pct);
+    set('st-donors', T.donors == null ? '–' : T.donors); set('st-youth', T.youth);
   }
-  // 50칸 서가: 칸마다 책이 위에서 내려와 꽂힌다 (새 책은 반짝)
+  // 서가: 책이 늘면 칸도 늘어요(20칸 단위). 칸마다 책이 위에서 내려와 꽂힌다 (새 책은 반짝)
   function slotsHtml(T, goal) {
     var r = T.round, out = [];
     for (var i = 0; i < goal; i++) {
@@ -841,13 +834,12 @@
   }
   function renderStatusHero() {
     var box = $('#lp-shelf'); if (!box) return;
-    var goal = Number(C.targetBooks) || 50;
-    box.innerHTML = slotsHtml({ round: { books: [] } }, goal);
+    box.innerHTML = slotsHtml({ round: { books: [] } }, 20);
     var cp = C.copy || {};
     ['seedTitle', 'seed', 'campaign'].forEach(function (k) { var el = document.getElementById('lp-' + k); if (el && filled(cp[k])) el.textContent = cp[k]; });
     loadShelfAny().then(function (rounds) {
       var T = shelfTotals(rounds);
-      box.innerHTML = slotsHtml(T, goal);
+      box.innerHTML = slotsHtml(T, Math.max(20, Math.ceil((T.round.books.length + 1) / 20) * 20));
       fillStats(T);
       setTimeout(function () { box.classList.add('go'); }, REDUCED ? 0 : 40);
     }).catch(function () { fillStats({ books: 0, amount: 0, donors: null, youth: 0 }); box.classList.add('go'); });

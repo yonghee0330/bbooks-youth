@@ -1347,3 +1347,6 @@ button, input, select, textarea, summary { font-family: inherit; }
 .free-amount[hidden] { display: none !important; }
 #d-amount[readonly] { background: var(--paper-2); color: var(--ink); cursor: default; }
 #d-amount-hint { font-style: normal; font-size: .78rem; font-weight: 500; color: var(--muted); }
+
+/* 2026-11-08: 목표 권수 없음 — 서가 칸 20열 */
+@media (min-width: 760px) { .lp-shelf { grid-template-columns: repeat(20, 1fr); } }
