@@ -1328,3 +1328,19 @@ button, input, select, textarea, summary { font-family: inherit; }
 /* 2026-11-07: 첫 화면 일러스트 */
 .lp-scene { display: block; width: 100%; height: clamp(150px, 31vh, 340px); }
 @media (max-width: 859px) { .lp-scene { height: auto; aspect-ratio: 1500 / 932; max-height: 168px; margin-top: 0; } }
+
+/* 2026-11-08: 비북스 추천도서 — 추천의 변 · 큐레이션 소개 · 책 픽 */
+.list-intro { margin: 6px 0 16px; padding: 16px 18px; border-radius: var(--round); background: var(--paper-2); border: 2px solid var(--line); font-size: .95rem; line-height: 1.75; }
+.list-intro[hidden], .group-desc[hidden] { display: none !important; }
+.li-label { margin: 0 0 8px; font-size: .8rem; font-weight: 800; letter-spacing: .12em; color: var(--orange); }
+.list-intro p { margin: 0 0 10px; }
+.li-sign { text-align: right; font-weight: 700; margin: 4px 0 0 !important; }
+.group-desc { margin: 0 0 16px; padding: 2px 4px 0; }
+.gd-kicker { margin: 0; font-size: .78rem; font-weight: 800; letter-spacing: .12em; color: var(--orange); }
+.gd-name { margin: 2px 0 2px; font-size: 1.5rem; font-weight: 900; letter-spacing: -0.04em; line-height: 1.2; }
+.gd-tags { margin: 0 0 8px; font-size: .84rem; font-weight: 700; color: var(--muted); }
+.gd-text { margin: 0; font-size: .95rem; line-height: 1.75; }
+.dt-pick { margin: 12px 0; padding: 12px 14px; border-radius: 12px; background: #4a2018; color: var(--cream); }
+.dt-pick-label { margin: 0 0 4px; font-size: .78rem; font-weight: 800; letter-spacing: .04em; color: #f1b79c; }
+.dt-pick p:last-child { margin: 0; font-size: .92rem; line-height: 1.7; }
+.group-tabs button span { text-align: center; line-height: 1.25; }

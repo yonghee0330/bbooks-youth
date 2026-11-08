@@ -127,6 +127,7 @@
       '<h2 id="detail-title">' + esc(b.title) + '</h2>' + (filled(b.edition) ? '<p class="bi-ed">' + esc(b.edition) + '</p>' : '') +
       '<p class="bi-by">' + esc(by) + '</p><p class="bi-by">' + esc(pub) + '</p>' +
       '<p class="bi-tags">' + (filled(b.genre) ? '<span class="tag">' + esc(b.genre) + '</span>' : '') + stockTag(b) + '</p></div></div>' +
+      (filled(b.pick) ? '<div class="dt-pick"><p class="dt-pick-label">' + esc(b.pickBy || '비북스') + '\u2019s b.books pick</p><p>' + esc(b.pick) + '</p></div>' : '') +
       (filled(b.note) ? '<p class="dt-note">' + esc(b.note) + (filled(b.curator) ? ' — ' + esc(b.curator) : '') + '</p>' : '') +
       intro +
       (filled(b.link) ? '<a class="dt-link" href="' + esc(b.link) + '" target="_blank" rel="noopener">책 정보 더 보기 ↗</a>' : '') +
@@ -161,8 +162,23 @@
       var n = (g.books || []).length;
       return (i ? '<span class="group-sep" aria-hidden="true">|</span>' : '') +
         '<button type="button" role="tab" data-group="' + esc(g.id) + '" aria-selected="' + (state.group === g.id) + '">' +
-        esc(g.title) + '<span>' + n + '권</span></button>';
+        esc(g.title) + '<span>' + (filled(g.name) ? esc(g.name) + ' · ' : '') + n + '권</span></button>';
     }).join('');
+  }
+  function renderListIntro() {
+    var el = $('#list-intro'), cur = currentList(), it = cur && state.list !== 'custom' ? cur.intro : null;
+    if (!it || !it.paragraphs || !it.paragraphs.length) { el.hidden = true; el.innerHTML = ''; return; }
+    el.hidden = false;
+    el.innerHTML = '<h3 class="li-label">' + esc(it.label || '소개') + '</h3>' +
+      it.paragraphs.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') +
+      (filled(it.sign) ? '<p class="li-sign">— ' + esc(it.sign) + '</p>' : '');
+  }
+  function renderGroupDesc() {
+    var el = $('#group-desc'), g = state.list === 'custom' ? null : currentGroup();
+    if (!g || !filled(g.desc)) { el.hidden = true; el.innerHTML = ''; return; }
+    el.hidden = false;
+    el.innerHTML = '<p class="gd-kicker">' + esc(g.title) + '</p><h3 class="gd-name">' + esc(g.name || '') + '</h3>' +
+      (filled(g.tags) ? '<p class="gd-tags">' + esc(g.tags) + '</p>' : '') + '<p class="gd-text">' + esc(g.desc) + '</p>';
   }
   function renderTabs() {
     var tabs = lists.map(function (l) {
@@ -177,7 +193,7 @@
     $('#list-panel').hidden = isCustom || (cur && !n);
     $('#custom-panel').hidden = !isCustom;
     if (cur && !n) $('#list-desc').textContent = (cur.desc || '') + ' 곧 채워질 거예요.';
-    renderGroupTabs();
+    renderListIntro(); renderGroupTabs(); renderGroupDesc();
   }
   function selectList(id) {
     state.list = id; state.genre = ''; state.q = ''; state.group = ''; $('#q').value = '';
@@ -187,7 +203,7 @@
   }
   function selectGroup(id) {
     state.group = id; state.genre = ''; state.q = ''; $('#q').value = '';
-    renderGroupTabs(); renderGenres(); renderGrid();
+    renderGroupTabs(); renderGroupDesc(); renderGenres(); renderGrid();
   }
   /* ── 직접 고르기: 카카오 책 검색(시트 스크립트가 대신 불러줘요) → 나온 책 중에 고르기 ── */
   var lastResults = [], searchSeq = 0;
