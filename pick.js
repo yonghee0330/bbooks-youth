@@ -3,7 +3,7 @@
   'use strict';
   var C = window.CONFIG || {};
   var P = C.pick || {};
-  var MAX = Math.max(1, Math.min(2, Number(P.maxPicks) || 2)); // 1지망 + 대신 받을 책
+  var MAX = Math.max(1, Math.min(2, Number(P.maxPicks) || 2)); // 신청 도서 + 예비 도서
   var KEY = 'ybg-picks', DONE_KEY = 'ybg-applied', CUSTOM_KEY = 'ybg-custom';
 
   function $(s, el) { return (el || document).querySelector(s); }
@@ -33,12 +33,13 @@
   }
 
   function soldOut(b) { return b.stock !== null && b.stock !== undefined && Number(b.stock) <= 0; }
-  function label(i) { return i === 0 ? '고른 책' : '대신 받을 책'; }
+  function label(i) { return i === 0 ? '신청 도서' : '예비 도서'; }
 
   /* ── 안내 ── */
   function renderRules() {
     var items = ['한 사람이 한 권' + (filled(C.bookPrice) ? ', 정가 ' + Number(C.bookPrice).toLocaleString('ko-KR') + '원 이하 책' : '') + '을 받아요. 참고서·문제집은 제외예요.'];
-    items.push('신청하면 비북스가 책을 주문해 준비해요. 책에 문제가 있으면 따로 연락드려서 다시 정해요.');
+    items.push('신청하면 비북스가 책을 주문해 준비해요.');
+    if (MAX > 1) items.push('예비 도서를 한 권 더 고를 수 있어요(선택). 신청 도서를 구하기 어려우면 예비 도서로 구해 드려요.');
     items.splice(0, 0, (filled(C.regionLimit) ? C.regionLimit + ' ' : '') + (filled(C.ageRange) ? C.ageRange + ' ' : '') + '청소년이면 누구나 신청할 수 있어요.');
     items.push('실명 대신 닉네임으로 신청해요. 학교 이름은 지역 확인에만 써요.');
     items.push('책이 도착하면 연락처로 안내해 드려요. 안내를 받고 비북스에 방문해서 받아가요.');
@@ -247,7 +248,7 @@
       .then(function () { if (seq === searchSeq) btn.disabled = false; });
   }
   function addCustom(b) {
-    if (picks.length >= MAX) { toast(MAX > 1 ? '두 권까지 고를 수 있어요. 내 선택에서 하나를 빼고 다시 골라주세요.' : '한 권만 고를 수 있어요. 고른 책을 빼고 다시 골라주세요.'); return false; }
+    if (picks.length >= MAX) { toast(MAX > 1 ? '신청 도서 1권과 예비 도서 1권, 두 권까지 고를 수 있어요. 내 선택에서 하나를 빼고 다시 골라주세요.' : '한 권만 고를 수 있어요. 고른 책을 빼고 다시 골라주세요.'); return false; }
     var id = 'c' + Date.now().toString(36);
     custom[id] = byId[id] = { id: id, custom: true, title: b.title, author: b.authors || '', publisher: b.publisher || '', isbn: b.isbn || '', price: b.price || 0, cover: b.thumb || '' };
     picks.push(id); savePicks(); renderGrid(); renderTray(); return true;
@@ -286,7 +287,7 @@
   function toggle(id) {
     var at = picks.indexOf(id);
     if (at >= 0) picks.splice(at, 1);
-    else if (picks.length >= MAX) { toast(MAX > 1 ? '두 권까지 고를 수 있어요. 하나를 빼고 다시 골라주세요.' : '한 권만 고를 수 있어요. 고른 책을 빼고 다시 골라주세요.'); return; }
+    else if (picks.length >= MAX) { toast(MAX > 1 ? '신청 도서 1권과 예비 도서 1권, 두 권까지 고를 수 있어요. 하나를 빼고 다시 골라주세요.' : '한 권만 고를 수 있어요. 고른 책을 빼고 다시 골라주세요.'); return; }
     else picks.push(id);
     savePicks(); renderGrid(); renderTray(); if (lastResults.length) renderResults();
   }
@@ -303,7 +304,7 @@
     $('#nav-count').textContent = n;
     if (!$('#tray-sum').classList.contains('warn')) {
       $('#tray-sum').innerHTML = done && !n ? '신청 완료 · 접수번호 <b>' + esc(done.id) + '</b>'
-        : n ? '<b>' + esc(byId[picks[0]].title) + '</b>' + (n > 1 ? ' 외 대신 받을 책 1권' : '') : '아직 고른 책이 없어요';
+        : n ? '<b>' + esc(byId[picks[0]].title) + '</b>' + (n > 1 ? ' 외 예비 도서 1권' : '') : '아직 고른 책이 없어요';
     }
     $('#tray-go').disabled = !n && !done;
     $('#tray-go').textContent = !n && done ? '신청 내역' : '신청하기';
@@ -325,7 +326,7 @@
   }
   function doneHtml(d) {
     return '<p class="done-h">신청이 됐어요.</p><p>접수번호 <b>' + esc(d.id) + '</b> · ' + esc(d.nick) + '</p>' +
-      '<p>고른 책: ' + esc(d.book) + '</p><p>비북스가 책을 주문해 준비해요. 책이 도착하면 연락처와 이메일로 안내해 드려요. 책을 구하기 어렵거나 문제가 있으면 비북스가 따로 연락드려서 다시 정해요.</p>';
+      '<p>신청 도서: ' + esc(d.book) + '</p>' + (d.book2 ? '<p>예비 도서: ' + esc(d.book2) + '</p>' : '') + '<p>비북스가 책을 주문해 준비해요. 책이 도착하면 연락처와 이메일로 안내해 드려요.' + (d.book2 ? ' 신청 도서를 구하기 어려우면 예비 도서로 구해 드려요.' : ' 책을 구하기 어렵거나 문제가 있으면 따로 연락드려요.') + '</p>';
   }
 
   function initYouthForm() {
@@ -356,7 +357,7 @@
         anon: f.anon.checked, hideTitle: f.hideTitle.checked, pv: 2, consent: f.consent.checked
       }, f.website.value).then(function (res) {
         if (!res.ok) throw new Error(res.error || '접수하지 못했어요.');
-        var rec = { id: res.id, nick: f.nick.value, book: b1.title };
+        var rec = { id: res.id, nick: f.nick.value, book: b1.title, book2: b2 ? b2.title : '' };
         try { localStorage.setItem(DONE_KEY, JSON.stringify(rec)); } catch (x) { /* 저장 못 해도 접수는 됐다 */ }
         picks = []; savePicks(); form.reset(); renderGrid(); renderTray();
         $('#youth-done').focus();
