@@ -1315,7 +1315,9 @@ button, input, select, textarea, summary { font-family: inherit; }
 .show-opts .small { margin: 0 0 10px; }
 
 /* 2026-11-08: 표지 크기 통일 — 모든 화면에서 같은 칸(5:7), 표지는 잘리지 않게 칸 안에 전부 보이기 */
-.book-item .cover, .dt-cover, .bs-cover { aspect-ratio: 5 / 7; background: var(--paper-2); }
+.book-item .cover, .dt-cover, .bs-cover { aspect-ratio: 5 / 7; background: transparent; box-shadow: none; border-radius: 0; }
+.book-item .cover img, .dt-cover img, .bs-cover img { filter: drop-shadow(0 4px 10px rgba(0,0,0,.14)); }
+.book-item .cover:has(.gen-cover), .dt-cover:has(.gen-cover) { border-radius: 6px; }
 .book-item .cover img, .dt-cover img, .bs-cover img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .book-item .cover { display: block; }
 .show-note { margin: 4px 0 12px; padding: 10px 12px; border-radius: 10px; background: var(--paper-2); }
