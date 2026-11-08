@@ -1314,16 +1314,11 @@ button, input, select, textarea, summary { font-family: inherit; }
 .show-opts legend { padding: 0 6px; }
 .show-opts .small { margin: 0 0 10px; }
 
-/* 2026-11-07: 웹에서 카카오 표지가 3:4 칸보다 세로로 길어 위아래가 잘림.
-   760px 미만(모바일)은 그대로 두고, 웹에서는 표지 원본 비율로 전체를 보여준다. */
-@media (min-width: 760px) {
-  .book-item .cover:has(img) { aspect-ratio: auto; height: auto; line-height: 0; }
-  .dt-cover:has(img),
-  .bs-cover:has(img) { aspect-ratio: auto; height: auto; }
-  .book-item .cover img,
-  .dt-cover img,
-  .bs-cover img { width: 100%; height: auto; object-fit: contain; display: block; }
-}
+/* 2026-11-08: 표지 크기 통일 — 모든 화면에서 같은 칸(5:7), 표지는 잘리지 않게 칸 안에 전부 보이기 */
+.book-item .cover, .dt-cover, .bs-cover { aspect-ratio: 5 / 7; background: var(--paper-2); }
+.book-item .cover img, .dt-cover img, .bs-cover img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.book-item .cover { display: block; }
+.show-note { margin: 4px 0 12px; padding: 10px 12px; border-radius: 10px; background: var(--paper-2); }
 
 /* 2026-11-07: 첫 화면 일러스트 */
 .lp-scene { display: block; width: 100%; height: clamp(150px, 31vh, 340px); }

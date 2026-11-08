@@ -354,7 +354,7 @@
         nick: f.nick.value, age: f.age.value, school: f.school.value, bucheon: f.bucheon.checked, phone: f.phone.value, email: f.email.value,
         book1: bookText(b1), isbn1: b1.isbn || '', book2: b2 ? bookText(b2) : '', isbn2: b2 ? (b2.isbn || '') : '',
         custom1: !!b1.custom, custom2: !!(b2 && b2.custom),
-        anon: f.anon.checked, hideTitle: f.hideTitle.checked, pv: 2, consent: f.consent.checked
+        anon: false, hideTitle: false, pv: 2, consent: f.consent.checked
       }, f.website.value).then(function (res) {
         if (!res.ok) throw new Error(res.error || '접수하지 못했어요.');
         var rec = { id: res.id, nick: f.nick.value, book: b1.title, book2: b2 ? b2.title : '' };
@@ -380,7 +380,7 @@
     });
     $('#detail').addEventListener('click', function (e) {
       if (e.target === this || e.target.id === 'detail-close') { closeDetail(); return; }
-      var b = e.target.closest('.pick-btn'); if (b && !b.disabled) { toggle(b.getAttribute('data-id')); renderDetail(); }
+      var b = e.target.closest('.pick-btn'); if (b && !b.disabled) { var id = b.getAttribute('data-id'), had = picks.indexOf(id) >= 0; toggle(id); if (had) renderDetail(); else closeDetail(); }
     });
     $('#list-tabs').addEventListener('click', function (e) {
       var b = e.target.closest('[data-list]'); if (b) selectList(b.getAttribute('data-list'));
