@@ -37,7 +37,7 @@
 
   /* ── 안내 ── */
   function renderRules() {
-    var items = ['한 사람이 한 권' + (filled(C.bookPrice) ? ', 정가 ' + Number(C.bookPrice).toLocaleString('ko-KR') + '원 이하 책' : '') + '을 받아요.'];
+    var items = ['한 사람이 한 권' + (filled(C.bookPrice) ? ', 정가 ' + Number(C.bookPrice).toLocaleString('ko-KR') + '원 이하 책' : '') + '을 받아요. 참고서·문제집은 제외예요.'];
     items.push('신청하면 비북스가 책을 주문해 준비해요.');
     items.splice(0, 0, (filled(C.regionLimit) ? C.regionLimit + ' ' : '') + (filled(C.ageRange) ? C.ageRange + ' ' : '') + '청소년이면 누구나 신청할 수 있어요.');
     items.push('실명 대신 닉네임으로 신청해요. 학교 이름은 지역 확인에만 써요.');
@@ -118,7 +118,8 @@
     var b = byId[detailId]; if (!b) return;
     var by = [b.author, filled(b.translators) ? b.translators + ' 옮김' : ''].filter(filled).join(' · ');
     var pub = [b.publisher, filled(b.published) ? b.published.slice(0, 4) : '', b.price ? '정가 ' + Number(b.price).toLocaleString('ko-KR') + '원' : ''].filter(filled).join(' · ');
-    var intro = filled(b.intro) ? '<p class="dt-intro">' + esc(b.intro) + (/[.!?。…"”]$/.test(b.intro) ? '' : '…') + '</p>'
+    var intro = filled(b.intro)
+      ? '<div class="dt-blurb"><p class="dt-blurb-label">이런 책이에요</p><p class="dt-intro">' + esc(b.intro) + '</p></div>'
       : '<p class="dt-intro muted">책 소개를 준비하고 있어요.</p>';
     $('#detail-body').innerHTML =
       '<div class="dt-top"><div class="dt-cover">' + cover(b, true) + '</div><div class="dt-meta">' +
@@ -128,9 +129,9 @@
       '<p class="bi-tags">' + (filled(b.genre) ? '<span class="tag">' + esc(b.genre) + '</span>' : '') + stockTag(b) + '</p></div></div>' +
       (filled(b.note) ? '<p class="dt-note">' + esc(b.note) + (filled(b.curator) ? ' — ' + esc(b.curator) : '') + '</p>' : '') +
       intro +
-      (filled(b.link) ? '<a class="dt-link" href="' + esc(b.link) + '" target="_blank" rel="noopener">책 소개 더 보기 (다음 책) ↗</a>' : '') +
+      (filled(b.link) ? '<a class="dt-link" href="' + esc(b.link) + '" target="_blank" rel="noopener">책 정보 더 보기 ↗</a>' : '') +
       pickBtn(b, true) +
-      (b.coverSource === 'kakao' || filled(b.intro) ? '<p class="small muted dt-src">도서 정보: 카카오 책 검색</p>' : '');
+      '<p class="small muted dt-src">표지·서지: 카카오 책 검색' + (b.introSource === 'youth' ? ' · 소개: 비북스' : '') + '</p>';
   }
   function openDetail(id) {
     detailId = id; renderDetail();

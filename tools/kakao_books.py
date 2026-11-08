@@ -101,7 +101,13 @@ def apply(book, doc):
         book['cover'] = doc.get('thumbnail') or ''
         book['coverLarge'] = large_cover(doc.get('thumbnail'))
         book['coverSource'] = 'kakao'
-    book['intro'] = (doc.get('contents') or '').strip()
+    # 청소년용 소개(introSource=youth)는 덮어쓰지 않는다. 카카오 원문은 introKakao에만 둔다.
+    kakao_intro = (doc.get('contents') or '').strip()
+    if kakao_intro:
+        book['introKakao'] = kakao_intro
+    if book.get('introSource') != 'youth':
+        book['intro'] = kakao_intro
+        book['introSource'] = 'kakao'
     book['link'] = doc.get('url') or ''
     book['published'] = (doc.get('datetime') or '')[:10]
     book['translators'] = '·'.join(doc.get('translators') or [])
