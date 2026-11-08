@@ -38,7 +38,7 @@
   /* ── 안내 ── */
   function renderRules() {
     var items = ['한 사람이 한 권' + (filled(C.bookPrice) ? ', 정가 ' + Number(C.bookPrice).toLocaleString('ko-KR') + '원 이하 책' : '') + '을 받아요. 참고서·문제집은 제외예요.'];
-    items.push('신청하면 비북스가 책을 주문해 준비해요.');
+    items.push('신청하면 비북스가 책을 주문해 준비해요. 책에 문제가 있으면 따로 연락드려서 다시 정해요.');
     items.splice(0, 0, (filled(C.regionLimit) ? C.regionLimit + ' ' : '') + (filled(C.ageRange) ? C.ageRange + ' ' : '') + '청소년이면 누구나 신청할 수 있어요.');
     items.push('실명 대신 닉네임으로 신청해요. 학교 이름은 지역 확인에만 써요.');
     items.push('책이 도착하면 연락처로 안내해 드려요. 안내를 받고 비북스에 방문해서 받아가요.');
@@ -325,7 +325,7 @@
   }
   function doneHtml(d) {
     return '<p class="done-h">신청이 됐어요.</p><p>접수번호 <b>' + esc(d.id) + '</b> · ' + esc(d.nick) + '</p>' +
-      '<p>고른 책: ' + esc(d.book) + '</p><p>비북스가 책을 주문해 준비해요. 책이 도착하면 연락처와 이메일로 안내해 드려요. 책을 바꾸고 싶으면 비북스에 연락해 주세요.</p>';
+      '<p>고른 책: ' + esc(d.book) + '</p><p>비북스가 책을 주문해 준비해요. 책이 도착하면 연락처와 이메일로 안내해 드려요. 책을 구하기 어렵거나 문제가 있으면 비북스가 따로 연락드려서 다시 정해요.</p>';
   }
 
   function initYouthForm() {
