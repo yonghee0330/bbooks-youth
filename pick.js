@@ -42,7 +42,7 @@
     items.push('책은 2개월에 한 권씩, 한 해 최대 6권까지 받을 수 있어요. 1월에 신청했다면 3월에 다시 신청할 수 있어요(달 기준).');
     items.push('신청하면 비북스가 책을 주문해 준비해요.');
     if (MAX > 1) items.push('예비 도서를 한 권 더 고를 수 있어요(선택). 신청 도서를 구하기 어려우면 예비 도서로 구해 드려요.');
-    items.splice(0, 0, (filled(C.regionLimit) ? C.regionLimit + ' ' : '') + (filled(C.ageRange) ? C.ageRange + ' ' : '') + '청소년이면 누구나 신청할 수 있어요. 학교 밖 청소년도 신청할 수 있어요.');
+    items.splice(0, 0, (filled(C.regionLimit) ? C.regionLimit + ' ' : '') + (filled(C.ageRange) ? C.ageRange + ' ' : '') + '청소년이면 누구나 신청할 수 있어요. ' + (filled(C.gradeNote) ? '**' + C.gradeNote + '** ' : '') + '학교 밖 청소년도 신청할 수 있어요.');
     items.push('실명 대신 닉네임으로 신청해요. 학교 이름은 지역 확인에만 써요.');
     items.push('**온라인으로 고르는 것 말고도, 비북스에 직접 와서 책을 눈으로 보고 고를 수 있어요. 현장에서 고르면 비북스 키링을 선물로 드려요.** 방법은 문의로 물어봐 주세요.');
     items.push('책이 도착하면 연락처로 안내해 드려요. 안내를 받고 비북스에 방문해서 받아가요.');
@@ -348,6 +348,9 @@
 
   function initYouthForm() {
     var form = $('#youth-form'), Y = window.YBG, btn = $('button[type=submit]', form), msg = $('.form-msg', form);
+    form.elements.route.addEventListener('change', function () {
+      var etc = this.value === '기타'; $('#y-route-etc-row').hidden = !etc; if (!etc) form.elements.routeEtc.value = '';
+    });
     form.elements.age.addEventListener('change', function () {
       var out = this.value === '학교 밖 청소년';
       $('#y-school-row').hidden = out; form.elements.school.required = !out;
@@ -361,7 +364,7 @@
         ['school', function (el) { return form.elements.age.value === '학교 밖 청소년' || !!el.value.trim(); }, '학교 이름을 적어주세요.'],
         ['bucheon', Y.isChecked, '부천에 살거나 부천에 있는 학교에 다니는 청소년만 신청할 수 있어요.'],
         ['phone', Y.isPhone, '연락처를 확인해 주세요. (예: 010-1234-5678)'], ['email', Y.isEmail, '이메일을 확인해 주세요.'],
-        ['over14', Y.isChecked, '만 14세 미만은 보호자 동의가 필요해요. 비북스로 연락 주세요.'],
+        ['over14', Y.isChecked, '중학교 1학년부터 신청할 수 있어요.'], ['route', null, '비북스 책사줄게를 어떻게 알게 됐는지 골라주세요.'],
         ['consent', Y.isChecked, '개인정보 수집·이용에 동의해 주세요.']
       ]);
       if (err) { msg.textContent = err; return; }
@@ -371,6 +374,7 @@
         nick: f.nick.value, age: f.age.value, school: f.school.value, bucheon: f.bucheon.checked, phone: f.phone.value, email: f.email.value,
         book1: bookText(b1), isbn1: b1.isbn || '', book2: b2 ? bookText(b2) : '', isbn2: b2 ? (b2.isbn || '') : '',
         custom1: !!b1.custom, custom2: !!(b2 && b2.custom),
+        route: f.route.value, routeEtc: f.route.value === '기타' ? f.routeEtc.value : '',
         anon: false, hideTitle: false, pv: 2, consent: f.consent.checked
       }, f.website.value).then(function (res) {
         if (!res.ok) throw new Error(res.error || '접수하지 못했어요.');
