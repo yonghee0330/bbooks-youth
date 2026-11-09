@@ -43,6 +43,7 @@
     if (MAX > 1) items.push('예비 도서를 한 권 더 고를 수 있어요(선택). 신청 도서를 구하기 어려우면 예비 도서로 구해 드려요.');
     items.splice(0, 0, (filled(C.regionLimit) ? C.regionLimit + ' ' : '') + (filled(C.ageRange) ? C.ageRange + ' ' : '') + '청소년이면 누구나 신청할 수 있어요.');
     items.push('실명 대신 닉네임으로 신청해요. 학교 이름은 지역 확인에만 써요.');
+    items.push('온라인으로 고르는 것 말고도, 비북스에 직접 와서 책을 눈으로 보고 고를 수 있어요. 방법은 문의로 물어봐 주세요.');
     items.push('책이 도착하면 연락처로 안내해 드려요. 안내를 받고 비북스에 방문해서 받아가요.');
     $('#pick-rules').innerHTML = items.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('');
   }
