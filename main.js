@@ -890,7 +890,7 @@
       set('tw-dn-count', T.donors == null ? '' : '모두 ' + T.donors + '명');
       ul.innerHTML = T.list.length ? T.list.map(function (d) {
         var name = d.anon || !filled(d.name) ? anonName() : d.name;
-        return '<li><span class="tw-dn-name">' + esc(name) + (d.people > 1 ? ' <em>' + d.people + '명</em>' : '') + '</span>' +
+        return '<li><span class="tw-dn-name">' + esc(name) + '</span>' +
           (filled(d.line) ? '<span class="tw-dn-line">“' + esc(d.line) + '”</span>' : '') + '</li>';
       }).join('') : '<li class="tw-dn-empty">첫 번째로 함께할 어른을 기다려요.</li>';
     }).catch(function () { var ul = $('#tw-dn-list'); if (ul) ul.innerHTML = '<li class="tw-dn-empty">불러오지 못했어요.</li>'; });
@@ -952,7 +952,6 @@
     if (dl) dl.innerHTML = T.list.length ? T.list.map(function (d) {
       var name = d.anon || !filled(d.name) ? anonName() : d.name;
       return '<li' + (d.seed ? ' class="dn-seed"' : '') + '><span class="dn-name">' + esc(name) + (d.seed ? ' <em>' + (SIDE === 'teen' ? '씨앗 · 0.1평 점주' : '씨앗 펀딩 · 0.1평 점주') + '</em>' : '') + (d.org ? ' <em>단체</em>' : '') + '</span>' +
-        (d.people > 1 ? '<span class="dn-books">' + d.people + '명</span>' : '') +
         (filled(d.line) ? '<span class="dn-line">“' + esc(d.line) + '”</span>' : '') + '<span class="dn-date">' + esc(fmtDate(d.at)) + '</span></li>';
     }).join('') : '<li class="dn-empty">첫 번째로 함께할 어른을 기다려요.' + (SIDE === 'teen' ? '' : ' <a href="' + href('donate.html') + '">책 사줄게 참여 →</a>') + '</li>';
     var yl = $('#dash-youth');
