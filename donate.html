@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>후원 참여 · 청소년 책사줄게</title>
+<title>선결제 참여 · 청소년 책사줄게</title>
 <meta name="description" content="책 한 권 값(2만 원)부터 함께해요. 1만 원부터 자유롭게, 익명(키다리아저씨)·기관 참여도 돼요.">
 <meta name="color-scheme" content="light dark">
 <meta property="og:type" content="website">
-<meta property="og:title" content="후원 참여 · 청소년 책사줄게">
+<meta property="og:title" content="선결제 참여 · 청소년 책사줄게">
 <meta property="og:description" content="책 한 권 값(2만 원)부터 함께해요. 1만 원부터 자유롭게, 익명(키다리아저씨)·기관 참여도 돼요.">
 <!-- 배포 후 절대 주소로 바꾸기: 예) https://yonghee0330.github.io/youth-book-gift/images/og.jpg -->
 <meta property="og:image" content="https://youth.bbooks.co.kr/images/og.jpg">
@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect x=%226%22 y=%224%22 width=%228%22 height=%2224%22 rx=%221%22 fill=%22%231f3b2d%22/%3E%3Crect x=%2216%22 y=%228%22 width=%228%22 height=%2220%22 rx=%221%22 fill=%22%23e0662b%22/%3E%3C/svg%3E">
-<link rel="stylesheet" href="style.css?v=20261109g">
+<link rel="stylesheet" href="style.css?v=20261109h">
 </head>
 <body data-page="donate" data-side="adult">
 <a class="skip" href="#content">본문으로 바로 가기</a>
@@ -23,19 +23,19 @@
 
 <main id="content" class="sub">
 <div class="wrap">
-  <p class="who">후원 참여</p>
+  <p class="who">선결제 참여</p>
   <h1 class="page-title" id="donate-title">책 한 권 값부터 함께해요</h1>
-  <ol class="comic" data-comic="donate" aria-label="후원금이 어떻게 쓰이는지 네 컷"></ol>
+  <ol class="comic" data-comic="donate" aria-label="선결제금이 어떻게 쓰이는지 네 컷"></ol>
 </div>
 
 <div class="wrap narrow">
   <section class="part" id="amount">
     <h2>몇 권을 연결할까요?</h2>
     <p class="donors-now" id="donors-now"></p>
-    <p class="share-rule">후원한 책은 부천 청소년에게 <b>2개월에 한 권씩, 한 해 최대 6권</b>까지 나눠 건네요. 더 많은 청소년이 책을 만날 수 있게, 한 번에 한 권씩이에요.</p>
+    <p class="share-rule">선결제한 책은 부천 청소년에게 <b>2개월에 한 권씩, 한 해 최대 6권</b>까지 나눠 건네요. 더 많은 청소년이 책을 만날 수 있게, 한 번에 한 권씩이에요.</p>
     <p class="share-rule">청소년은 온라인으로 책을 고르고 비북스에서 받아가거나, <b>비북스에 직접 와서 책을 눈으로 보고 고를 수도 있어요. 현장에서 고르는 청소년에게는 비북스 키링을 선물로 드려요.</b></p>
     <fieldset class="amounts">
-      <legend class="visually-hidden">후원 금액</legend>
+      <legend class="visually-hidden">선결제 금액</legend>
       <div class="amount-btns" id="amount-btns"></div>
       <label class="free-amount" id="free-row" hidden>
         <span class="free-label">자유 입력<b id="free-min">1만 원 단위</b></span>
@@ -68,10 +68,10 @@
       <div class="f-row"><label for="d-email">이메일 <b>*</b></label><input id="d-email" name="email" type="email" maxlength="80" autocomplete="email" required></div>
     </div>
     <div class="f-2">
-      <div class="f-row"><label for="d-amount">후원 금액 <b>*</b> <em id="d-amount-hint">(위에서 고른 권수·금액이 자동으로 들어가요)</em></label><div class="f-unit"><input id="d-amount" name="amount" inputmode="numeric" maxlength="12" required readonly><span>원</span></div></div>
+      <div class="f-row"><label for="d-amount">선결제 금액 <b>*</b> <em id="d-amount-hint">(위에서 고른 권수·금액이 자동으로 들어가요)</em></label><div class="f-unit"><input id="d-amount" name="amount" inputmode="numeric" maxlength="12" required readonly><span>원</span></div></div>
       <div class="f-row"><label for="d-payer">입금자명 <b>*</b></label><input id="d-payer" name="payer" maxlength="30" required></div>
     </div>
-    <label class="check anon-check"><input type="checkbox" name="anon" id="d-anon"><span><b class="plain">키다리아저씨로 참여</b> <em>(익명 — 후원현황과 서가에 이름과 한 줄이 보이지 않아요)</em></span></label>
+    <label class="check anon-check"><input type="checkbox" name="anon" id="d-anon"><span><b class="plain">키다리아저씨로 참여</b> <em>(익명 — 선결제 현황과 서가에 이름과 한 줄이 보이지 않아요)</em></span></label>
     <div class="f-row" id="d-line-row"><label for="d-line">청소년에게 남기는 한 줄 <em>(선택)</em> <span class="cnt" id="d-line-cnt">0/40</span></label><input id="d-line" name="line" maxlength="40" placeholder="예) 네가 고른 책이 네 편이길"></div>
     <label class="check"><input type="checkbox" name="receipt" id="d-receipt"><span>현금영수증·지출증빙이 필요해요</span></label>
     <div class="f-row" id="d-receipt-row" hidden><label for="d-receiptNo">발급 번호 <em>(휴대폰 번호 또는 사업자등록번호, 비우면 연락처로)</em></label><input id="d-receiptNo" name="receiptNo" inputmode="numeric" maxlength="20"></div>
@@ -94,7 +94,7 @@
 
 <footer class="footer" id="site-footer"></footer>
 
-<script src="config.js?v=20261109g"></script>
-<script src="main.js?v=20261109g"></script>
+<script src="config.js?v=20261109h"></script>
+<script src="main.js?v=20261109h"></script>
 </body>
 </html>
