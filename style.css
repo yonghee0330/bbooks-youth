@@ -1372,3 +1372,21 @@ button, input, select, textarea, summary { font-family: inherit; }
 /* 2026-11-09: 2개월에 한 권 안내 */
 .share-rule { margin: 6px 0 14px; padding: 10px 14px; border-radius: 12px; background: var(--paper-2); border: 2px solid var(--line); font-size: .95rem; line-height: 1.6; }
 .share-rule b { font-weight: 800; }
+
+/* 2026-11-09: 선결제 폼 — 내가 추천하고 싶은 책 */
+.rec-box { border: 2px solid var(--line); border-radius: var(--round); padding: 12px 14px 14px; margin: 4px 0 14px; background: var(--paper-2); }
+.rec-box legend { padding: 0 6px; font-weight: 800; }
+.rec-box legend em { font-style: normal; font-weight: 600; font-size: .82rem; color: var(--muted); }
+.rec-box > .small { margin: 0 0 10px; }
+.rec-search { display: flex; gap: 8px; }
+.rec-search input { flex: 1; min-width: 0; }
+.rec-search .btn { flex: none; padding: 0 18px; }
+.rec-status { margin: 8px 0 !important; min-height: 1.2em; }
+.rec-status.bad { color: var(--orange); font-weight: 700; }
+.rec-count { margin: 10px 0 6px; font-weight: 800; font-size: .92rem; }
+.rec-count:empty { display: none; }
+.rec-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.rec-list li { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 10px; background: var(--paper); border: 1px solid var(--line); }
+.rec-list .rl-t { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.rec-list .rl-t small { color: var(--ink-2); font-size: .8rem; }
+.rec-list button { flex: none; font: inherit; font-weight: 700; font-size: .82rem; padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; }

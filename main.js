@@ -447,7 +447,7 @@
   }
   function consentHtml(kind) {
     var items = kind === 'donate'
-      ? ['수집 항목: 이름·닉네임, 연락처, 이메일, 선결제 금액, 입금자명, 지정 대상, (현금영수증·지출증빙 신청 시) 발급 번호',
+      ? ['수집 항목: 이름·닉네임, 연락처, 이메일, 선결제 금액, 입금자명, 지정 대상, (입력 시) 추천 도서, (현금영수증·지출증빙 신청 시) 발급 번호',
          '쓰는 곳: 청소년 책사줄게 입금 확인, 현금영수증·지출증빙 발급, 서가 반영과 결과 안내']
       : ['수집 항목: 닉네임, 학년, 학교 이름, 연락처, 이메일, 고른 책',
          '쓰는 곳: 청소년 책사줄게 진행(부천 지역 확인, 책 주문·도착 안내, 2개월에 한 권 기준 확인)',
@@ -473,6 +473,61 @@
   var isChecked = function (el) { return el.checked; };
   window.YBG = { post: post, checkFields: checkFields, isPhone: isPhone, isEmail: isEmail, isChecked: isChecked, filled: filled };
 
+  /* ── 선결제 폼: 내가 추천하고 싶은 책(최대 5권) — 카카오 책 검색에서 골라 시트로 보내요 ── */
+  var recs = [], recResults = [], REC_MAX = 5;
+  function recSame(a, b) { return (a.isbn && a.isbn === b.isbn) || (!a.isbn && !b.isbn && a.title === b.title); }
+  function initRecs() {
+    var qEl = $('#rec-q'); if (!qEl) return;
+    var seq = 0;
+    function status(m, bad) { var el = $('#rec-status'); el.textContent = m || ''; el.classList.toggle('bad', !!bad); }
+    function renderResults() {
+      $('#rec-results').innerHTML = recResults.map(function (b, i) {
+        var has = recs.some(function (x) { return recSame(x, b); }), full = recs.length >= REC_MAX && !has;
+        return '<li class="bs-item"><span class="bs-cover">' + (b.thumb ? '<img src="' + esc(b.thumb) + '" alt="" loading="lazy">' : '') + '</span>' +
+          '<div class="bs-info"><strong>' + esc(b.title) + '</strong><span>' + esc([b.authors, b.publisher, b.year].filter(filled).join(' · ')) + '</span></div>' +
+          '<button type="button" class="pick-btn' + (has ? ' on' : '') + '" data-rec="' + i + '"' + (has || full ? ' disabled' : '') + ' aria-label="' + esc(b.title) + ' 추천하기">' +
+          (has ? '✓ 추천했어요' : full ? '5권을 채웠어요' : '추천하기') + '</button></li>';
+      }).join('');
+    }
+    function renderList() {
+      $('#rec-count').textContent = recs.length ? '내가 추천한 책 ' + recs.length + '권 (최대 ' + REC_MAX + '권)' : '';
+      $('#rec-list').innerHTML = recs.map(function (b, i) {
+        return '<li><span class="rl-t"><b>' + esc(b.title) + '</b><small>' + esc([b.authors, b.publisher].filter(filled).join(' · ')) + '</small></span>' +
+          '<button type="button" data-del="' + i + '" aria-label="' + esc(b.title) + ' 빼기">빼기</button></li>';
+      }).join('');
+      renderResults();
+    }
+    function search() {
+      var q = qEl.value.replace(/\s+/g, ' ').trim(), my = ++seq;
+      recResults = []; renderResults();
+      if (q.length < 2) { status('책 제목을 두 글자 이상 적어주세요.', true); return; }
+      if (!filled(C.api)) { status('책 검색을 지금 쓸 수 없어요.', true); return; }
+      status('「' + q + '」 찾는 중…'); $('#rec-go').disabled = true;
+      fetch(C.api + (C.api.indexOf('?') < 0 ? '?' : '&') + 'action=search&q=' + encodeURIComponent(q), { cache: 'no-store' })
+        .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(function (res) {
+          if (my !== seq) return;
+          if (!res.ok) throw new Error(res.error || '검색하지 못했어요.');
+          recResults = res.books || []; renderResults();
+          status(recResults.length ? '「' + q + '」로 찾은 책 ' + recResults.length + '권이에요. 추천할 책을 눌러 주세요.' : '「' + q + '」로 찾은 책이 없어요. 제목을 바꿔 다시 찾아보세요.', !recResults.length);
+        })
+        .catch(function () { if (my === seq) status('책 검색을 지금 쓸 수 없어요. 잠시 뒤 다시 해 주세요.', true); })
+        .then(function () { if (my === seq) $('#rec-go').disabled = false; });
+    }
+    $('#rec-go').addEventListener('click', search);
+    qEl.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); search(); } });
+    $('#rec-results').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-rec]'); if (!b || b.disabled) return;
+      var x = recResults[Number(b.getAttribute('data-rec'))]; if (!x) return;
+      if (recs.length >= REC_MAX) { status('추천은 최대 ' + REC_MAX + '권까지예요.', true); return; }
+      if (!recs.some(function (r) { return recSame(r, x); })) recs.push({ title: x.title, authors: x.authors || '', publisher: x.publisher || '', isbn: x.isbn || '' });
+      renderList();
+    });
+    $('#rec-list').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-del]'); if (!b) return;
+      recs.splice(Number(b.getAttribute('data-del')), 1); renderList();
+    });
+  }
   function initDonateForm() {
     var form = $('#donate-form'); if (!form) return;
     var btn = $('button[type=submit]', form), msg = $('.form-msg', form);
@@ -515,7 +570,7 @@
       post('donate', {
         name: f.name.value, phone: f.phone.value, email: f.email.value, kind: f.kind.value, amount: digits(f.amount.value),
         org: f.org.value, payer: f.payer.value, line: f.line.value, anon: f.anon.checked, target: f.to.value === 'pick' ? f.target.value : '',
-        receipt: f.receipt.checked, receiptNo: f.receiptNo.value, consent: f.consent.checked
+        receipt: f.receipt.checked, receiptNo: f.receiptNo.value, consent: f.consent.checked, recs: recs.slice(0, REC_MAX)
       }, f.website.value).then(function (res) {
         if (!res.ok) throw new Error(res.error || '접수하지 못했어요.');
         var a = C.account || {}, done = $('#donate-done');
@@ -991,7 +1046,7 @@
   if ($('#diff-cards')) renderDiff();
   if ($('#steps-list')) renderSteps();
   if ($('#amount-btns')) renderDonate();
-  fillConsent(); initDonateForm();
+  fillConsent(); initDonateForm(); initRecs();
   if ($('#youth-info')) renderYouth();
   if ($('#org-package')) renderOrg();
   if ($('#faq-list')) renderFaq();

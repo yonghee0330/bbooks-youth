@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect x=%226%22 y=%224%22 width=%228%22 height=%2224%22 rx=%221%22 fill=%22%231f3b2d%22/%3E%3Crect x=%2216%22 y=%228%22 width=%228%22 height=%2220%22 rx=%221%22 fill=%22%23e0662b%22/%3E%3C/svg%3E">
-<link rel="stylesheet" href="style.css?v=20261109j">
+<link rel="stylesheet" href="style.css?v=20261109k">
 </head>
 <body data-page="donate" data-side="adult">
 <a class="skip" href="#content">본문으로 바로 가기</a>
@@ -74,6 +74,15 @@
     </div>
     <label class="check anon-check"><input type="checkbox" name="anon" id="d-anon"><span><b class="plain">키다리아저씨로 참여</b> <em>(익명 — 책 사줄게 현황과 서가에 이름과 한 줄이 보이지 않아요)</em></span></label>
     <div class="f-row" id="d-line-row"><label for="d-line">청소년에게 남기는 한 줄 <em>(선택)</em> <span class="cnt" id="d-line-cnt">0/40</span></label><input id="d-line" name="line" maxlength="40" placeholder="예) 네가 고른 책이 네 편이길"></div>
+    <fieldset class="f-row rec-box" id="d-rec">
+      <legend>내가 추천하고 싶은 책 <em>(선택 · 최대 5권)</em></legend>
+      <p class="small">청소년에게 권하고 싶은 책이 있으면 찾아서 넣어 주세요. 비북스가 살펴보고 「책사줄게 추천도서」에 소개할 수 있어요.</p>
+      <div class="rec-search"><input id="rec-q" type="search" maxlength="60" placeholder="책 제목으로 찾기" autocomplete="off" aria-label="추천할 책 제목"><button type="button" class="btn btn-ghost" id="rec-go">찾기</button></div>
+      <p class="small rec-status" id="rec-status" aria-live="polite"></p>
+      <ul class="bs-results" id="rec-results"></ul>
+      <p class="rec-count" id="rec-count" aria-live="polite"></p>
+      <ul class="rec-list" id="rec-list"></ul>
+    </fieldset>
     <label class="check"><input type="checkbox" name="receipt" id="d-receipt"><span>현금영수증·지출증빙이 필요해요</span></label>
     <div class="f-row" id="d-receipt-row" hidden><label for="d-receiptNo">발급 번호 <em>(휴대폰 번호 또는 사업자등록번호, 비우면 연락처로)</em></label><input id="d-receiptNo" name="receiptNo" inputmode="numeric" maxlength="20"></div>
     <details class="consent-box"><summary>개인정보 수집·이용 안내</summary><div data-consent="donate"></div></details>
@@ -95,7 +104,7 @@
 
 <footer class="footer" id="site-footer"></footer>
 
-<script src="config.js?v=20261109j"></script>
-<script src="main.js?v=20261109j"></script>
+<script src="config.js?v=20261109k"></script>
+<script src="main.js?v=20261109k"></script>
 </body>
 </html>
