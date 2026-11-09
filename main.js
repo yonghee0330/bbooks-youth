@@ -884,6 +884,16 @@
   function renderTeenWeek() {
     var card = $('#teen-week'); if (!card) return;
     function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
+    // 함께한 어른과 그분들이 남긴 한 마디 (날짜 없이)
+    loadShelfAny().then(function (rounds) {
+      var T = shelfTotals(rounds), ul = $('#tw-dn-list'); if (!ul) return;
+      set('tw-dn-count', T.donors == null ? '' : '모두 ' + T.donors + '명');
+      ul.innerHTML = T.list.length ? T.list.map(function (d) {
+        var name = d.anon || !filled(d.name) ? anonName() : d.name;
+        return '<li><span class="tw-dn-name">' + esc(name) + (d.people > 1 ? ' <em>' + d.people + '명</em>' : '') + '</span>' +
+          (filled(d.line) ? '<span class="tw-dn-line">“' + esc(d.line) + '”</span>' : '') + '</li>';
+      }).join('') : '<li class="tw-dn-empty">첫 번째로 함께할 어른을 기다려요.</li>';
+    }).catch(function () { var ul = $('#tw-dn-list'); if (ul) ul.innerHTML = '<li class="tw-dn-empty">불러오지 못했어요.</li>'; });
     loadWeek().then(function (w) {
       set('tw-used', w.used); set('tw-limit', '/ ' + w.limit + '권');
       set('tw-state', w.open ? '신청 중' : '이번 주 마감');

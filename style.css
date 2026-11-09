@@ -1390,3 +1390,19 @@ button, input, select, textarea, summary { font-family: inherit; }
 .rec-list .rl-t { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .rec-list .rl-t small { color: var(--ink-2); font-size: .8rem; }
 .rec-list button { flex: none; font: inherit; font-weight: 700; font-size: .82rem; padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--ink); background: transparent; color: var(--ink); cursor: pointer; }
+
+/* 2026-11-09: 청소년 홈 대시보드 3/4 + 1/4 — 오른쪽에 함께한 어른과 한 마디 */
+.tw-wrap { display: grid; grid-template-columns: 3fr 1fr; gap: 14px; align-items: stretch; margin-bottom: 14px; }
+.tw-wrap .teen-week { margin: 0; }
+.tw-donors { display: flex; flex-direction: column; min-width: 0; min-height: 0; cursor: default; padding: 12px 12px 10px; }
+.tw-donors:hover { transform: none; box-shadow: none; }
+.tw-donors h3 { margin: 0; font-family: var(--font); font-weight: 800; font-size: 1.15rem; letter-spacing: -0.03em; }
+.tw-dn-count { margin: 2px 0 8px; font-size: .76rem; font-weight: 700; opacity: .75; }
+.tw-dn-count:empty { display: none; }
+.tw-dn-list { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1 1 0; min-height: 0; max-height: 24rem; display: grid; gap: 8px; align-content: start; }
+.tw-dn-list li { padding: 8px 10px; border-radius: 10px; background: #f7efe6; border: 1.5px solid rgba(74, 32, 24, .2); }
+.tw-dn-name { display: block; font-weight: 800; font-size: .9rem; line-height: 1.3; overflow-wrap: anywhere; }
+.tw-dn-name em { font-style: normal; font-size: .68rem; font-weight: 800; padding: 1px 6px; border-radius: 6px; background: #4a2018; color: #fff6ec; margin-left: 2px; }
+.tw-dn-line { display: block; margin-top: 3px; font-size: .8rem; font-weight: 500; line-height: 1.5; overflow-wrap: anywhere; }
+.tw-dn-list li.tw-dn-empty { background: transparent; border-style: dashed; font-size: .8rem; opacity: .75; }
+@media (max-width: 759px) { .tw-wrap { grid-template-columns: 1fr; } .tw-dn-list { flex: none; max-height: 15rem; } }
