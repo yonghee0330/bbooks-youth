@@ -189,6 +189,17 @@
   var BOOK_COLORS = ['#4a2018', '#e09a7a', '#6f8f95', '#c4643f', '#8a4a34', '#9fb4b6', '#b9694b'];
   function bookFill(b) { return BOOK_COLORS[hash(b.id || '') % BOOK_COLORS.length]; }
   function anonName() { return C.anonName || '키다리아저씨'; }
+  // 익명 후원자는 신청 순서대로 번호: 키다리아저씨1, 2 … (서버가 anonNo를 주면 그대로, 없으면 오래된 순서로 센다)
+  function donorNames(list) {
+    var n = 0, out = new Array(list.length);
+    for (var i = list.length - 1; i >= 0; i--) {  // 목록은 최신이 위 — 맨 아래가 첫 번째 신청
+      var d = list[i], anon = d.anon || !filled(d.name);
+      if (!anon) { out[i] = d.name; continue; }
+      if (d.seed) { out[i] = anonName(); continue; }
+      n++; out[i] = anonName() + (d.anonNo > 0 ? d.anonNo : n);
+    }
+    return out;
+  }
   function displayName(b) { return b.public && filled(b.nickname) ? b.nickname : anonName(); }
 
   function renderTabs() {
@@ -888,8 +899,9 @@
     loadShelfAny().then(function (rounds) {
       var T = shelfTotals(rounds), ul = $('#tw-dn-list'); if (!ul) return;
       set('tw-dn-count', T.donors == null ? '' : '모두 ' + T.donors + '명');
-      ul.innerHTML = T.list.length ? T.list.map(function (d) {
-        var name = d.anon || !filled(d.name) ? anonName() : d.name;
+      var names = donorNames(T.list);
+      ul.innerHTML = T.list.length ? T.list.map(function (d, i) {
+        var name = names[i];
         return '<li><span class="tw-dn-name">' + esc(name) + '</span>' +
           (filled(d.line) ? '<span class="tw-dn-line">“' + esc(d.line) + '”</span>' : '') + '</li>';
       }).join('') : '<li class="tw-dn-empty">첫 번째로 함께할 어른을 기다려요.</li>';
@@ -949,8 +961,9 @@
   function renderDash(rounds) {
     var T = shelfTotals(rounds); fillStats(T);
     var dl = $('#dash-donors');
-    if (dl) dl.innerHTML = T.list.length ? T.list.map(function (d) {
-      var name = d.anon || !filled(d.name) ? anonName() : d.name;
+    var dnames = donorNames(T.list);
+    if (dl) dl.innerHTML = T.list.length ? T.list.map(function (d, i) {
+      var name = dnames[i];
       return '<li' + (d.seed ? ' class="dn-seed"' : '') + '><span class="dn-name">' + esc(name) + (d.seed ? ' <em>' + (SIDE === 'teen' ? '씨앗 · 0.1평 점주' : '씨앗 펀딩 · 0.1평 점주') + '</em>' : '') + (d.org ? ' <em>단체</em>' : '') + '</span>' +
         (filled(d.line) ? '<span class="dn-line">“' + esc(d.line) + '”</span>' : '') + '<span class="dn-date">' + esc(fmtDate(d.at)) + '</span></li>';
     }).join('') : '<li class="dn-empty">첫 번째로 함께할 어른을 기다려요.' + (SIDE === 'teen' ? '' : ' <a href="' + href('donate.html') + '">책 사줄게 참여 →</a>') + '</li>';
