@@ -1368,3 +1368,7 @@ button, input, select, textarea, summary { font-family: inherit; }
 .week-banner b { font-weight: 900; }
 .week-banner.closed { border-color: var(--orange); }
 .week-banner[hidden] { display: none; }
+
+/* 2026-11-09: 2개월에 한 권 안내 */
+.share-rule { margin: 6px 0 14px; padding: 10px 14px; border-radius: 12px; background: var(--paper-2); border: 2px solid var(--line); font-size: .95rem; line-height: 1.6; }
+.share-rule b { font-weight: 800; }

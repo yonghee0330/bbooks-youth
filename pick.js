@@ -38,6 +38,8 @@
   /* ── 안내 ── */
   function renderRules() {
     var items = ['한 사람이 한 권' + (filled(C.bookPrice) ? ', 정가 ' + Number(C.bookPrice).toLocaleString('ko-KR') + '원 이하 책' : '') + '을 받아요. 참고서·문제집은 제외예요.'];
+    items.push('책은 2개월에 한 권씩, 한 해 최대 6권까지 받을 수 있어요. 1월에 신청했다면 3월에 다시 신청할 수 있어요(달 기준).');
+    items.push('같은 연락처·이메일·닉네임과 학교로 확인해요.');
     items.push('신청하면 비북스가 책을 주문해 준비해요.');
     if (MAX > 1) items.push('예비 도서를 한 권 더 고를 수 있어요(선택). 신청 도서를 구하기 어려우면 예비 도서로 구해 드려요.');
     items.splice(0, 0, (filled(C.regionLimit) ? C.regionLimit + ' ' : '') + (filled(C.ageRange) ? C.ageRange + ' ' : '') + '청소년이면 누구나 신청할 수 있어요.');
