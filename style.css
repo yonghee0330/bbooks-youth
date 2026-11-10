@@ -1406,3 +1406,7 @@ button, input, select, textarea, summary { font-family: inherit; }
 .tw-dn-line { display: block; margin-top: 3px; font-size: .8rem; font-weight: 500; line-height: 1.5; overflow-wrap: anywhere; }
 .tw-dn-list li.tw-dn-empty { background: transparent; border-style: dashed; font-size: .8rem; opacity: .75; }
 @media (max-width: 759px) { .tw-wrap { grid-template-columns: 1fr; } .tw-dn-list { flex: none; max-height: 15rem; } }
+
+.tw-adult-btn { flex: none; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; min-height: 44px; padding: 0 10px; border-radius: 12px; background: #4a2018; color: #fff6ec; font-weight: 800; font-size: .95rem; letter-spacing: -0.02em; text-decoration: none; }
+.tw-adult-btn:hover { background: var(--orange); }
+.tw-adult-btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
