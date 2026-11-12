@@ -668,7 +668,7 @@
         ['정말 무료예요?', ['네, 무료예요. 어른들이 미리 책값을 내 두셨어요. 한 사람이 한 번에 한 권(정가 ' + won(price) + ' 이하)을 받아요.']],
         ['몇 번 받을 수 있나요?', ['책은 2개월에 한 권씩, 한 해 최대 6권까지 받을 수 있어요. 1월에 신청했다면 3월에 다시 신청할 수 있어요. 날짜가 아니라 달을 기준으로 해요.']],
         ['직접 가서 고를 수도 있나요?', ['네. **온라인으로 고르는 것 말고도, 부천 원미동 비북스에 직접 와서 책을 눈으로 보고 고를 수 있어요. 현장에서 고르면 비북스 키링을 선물로 드려요.** 방법은 문의로 물어봐 주세요.']],
-        ['언제 신청할 수 있나요?', ['신청은 **매주 월요일 저녁 6시**에 열려요. 한 주에 10명까지 받고, 일요일 자정까지 받아요. 10명이 차면 그 주는 일찍 마감되고, 다음 주 월요일 저녁 6시에 다시 열려요.']],
+        ['언제 신청할 수 있나요?', ['신청은 **매주 월요일 저녁 6시**에 시작해서 다음 월요일 저녁 6시에 마감돼요. 한 주에 10명까지 받고, 10명이 차면 그 주는 일찍 마감돼요. 다음 신청은 월요일 저녁 6시부터예요.']],
         ['어떻게 고르나요?', ['「책 고르기」에서 추천 목록을 보고 골라도 되고, 목록에 없는 책을 직접 골라도 돼요. ' + (((C.pick || {}).customRule) || '')]],
         ['책은 어떻게 받나요?', ['신청하면 비북스가 책을 주문해요. 책이 도착하면 연락이 오고, 부천 원미동 비북스에 방문해서 받아가요. 택배는 없어요.']],
         ['내 신청을 어디서 봐요?', ['같은 폰·컴퓨터에서 「내 신청」을 열면 접수번호가 보여요. 다른 기기에서 신청했다면 안 보일 수 있어요. 그때는 비북스에 물어봐 주세요.']]
@@ -890,9 +890,8 @@
   function fmtMD(iso) { var k = new Date(new Date(iso).getTime() + 9 * 3600 * 1000); return (k.getUTCMonth() + 1) + '.' + k.getUTCDate(); }
   function weekMsg(w) {
     var nxt = fmtMD(w.opensAt || w.resetAt);
-    return w.notYet ? '새로운 주 신청은 월요일 저녁 6시에 열려요.'
-      : w.open ? '이번 주 ' + w.remaining + '명 더 신청할 수 있어요. 일요일 자정까지 받아요.'
-      : '이번 주 책사줄게는 마감됐어요. 다음 신청은 월요일(' + nxt + ') 저녁 6시에 열려요.';
+    return w.open ? '이번 주 ' + w.remaining + '명 더 신청할 수 있어요. 월요일(' + nxt + ') 저녁 6시에 마감돼요.'
+      : '이번 주 신청은 마감됐어요. 다음 신청은 월요일(' + nxt + ') 저녁 6시부터예요.';
   }
   window.ybgWeek = loadWeek; window.ybgWeekMsg = weekMsg;
   function renderTeenWeek() {
@@ -911,7 +910,7 @@
     }).catch(function () { var ul = $('#tw-dn-list'); if (ul) ul.innerHTML = '<li class="tw-dn-empty">불러오지 못했어요.</li>'; });
     loadWeek().then(function (w) {
       set('tw-used', w.used); set('tw-limit', '/ ' + w.limit + '권');
-      set('tw-state', w.notYet ? '월 저녁 6시 오픈' : w.open ? '신청 중' : '이번 주 마감');
+      set('tw-state', w.open ? '신청 중' : '이번 주 마감');
       card.classList.toggle('closed', !w.open);
       var bar = $('#tw-bar'); if (bar) { bar.firstElementChild.style.width = Math.min(100, Math.round(w.used / w.limit * 100)) + '%'; bar.setAttribute('aria-valuenow', w.used); bar.setAttribute('aria-valuemax', w.limit); }
       set('tw-msg', weekMsg(w));
