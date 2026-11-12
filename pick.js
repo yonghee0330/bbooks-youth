@@ -155,10 +155,11 @@
   }
 
   /* ── 고르는 방법: 큐레이션 목록 탭 + 직접 고르기 ── */
+  function special() { return state.list === 'custom' || state.list === 'visit'; }
   function currentList() { return lists.filter(function (l) { return l.id === state.list; })[0] || null; }
   function renderGroupTabs() {
     var el = $('#group-tabs'), cur = currentList();
-    if (!cur || !cur.groups || !cur.groups.length || state.list === 'custom') {
+    if (!cur || !cur.groups || !cur.groups.length || special()) {
       el.hidden = true; el.innerHTML = ''; return;
     }
     if (!state.group || !cur.groups.some(function (g) { return g.id === state.group; })) state.group = cur.groups[0].id;
@@ -171,7 +172,7 @@
     }).join('');
   }
   function renderListIntro() {
-    var el = $('#list-intro'), cur = currentList(), it = cur && state.list !== 'custom' ? cur.intro : null;
+    var el = $('#list-intro'), cur = currentList(), it = cur && !special() ? cur.intro : null;
     if (!it || !it.paragraphs || !it.paragraphs.length) { el.hidden = true; el.innerHTML = ''; return; }
     el.hidden = false;
     el.innerHTML = '<h3 class="li-label">' + esc(it.label || '소개') + '</h3>' +
@@ -179,7 +180,7 @@
       (filled(it.sign) ? '<p class="li-sign">— ' + esc(it.sign) + '</p>' : '');
   }
   function renderGroupDesc() {
-    var el = $('#group-desc'), g = state.list === 'custom' ? null : currentGroup();
+    var el = $('#group-desc'), g = special() ? null : currentGroup();
     if (!g || !filled(g.desc)) { el.hidden = true; el.innerHTML = ''; return; }
     el.hidden = false;
     el.innerHTML = '<p class="gd-kicker">' + esc(g.title) + '</p><h3 class="gd-name">' + esc(g.name || '') + '</h3>' +
@@ -192,11 +193,13 @@
         esc(l.title) + '<span>' + (n ? n + '권' : '준비 중') + '</span></button>';
     });
     if (P.custom !== false) tabs.push('<button type="button" role="tab" data-list="custom" aria-selected="' + (state.list === 'custom') + '" class="custom-tab">직접 고르기<span>목록에 없는 책</span></button>');
+    if (P.visit !== false) tabs.push('<button type="button" role="tab" data-list="visit" aria-selected="' + (state.list === 'visit') + '" class="custom-tab visit-tab">방문해서 고르기<span>비북스에서 눈으로 보고</span></button>');
     $('#list-tabs').innerHTML = tabs.join('');
-    var cur = currentList(), isCustom = state.list === 'custom', n = listCount(cur);
-    $('#list-desc').textContent = isCustom ? '' : cur ? (cur.desc || '') + (filled(cur.by) && cur.desc.indexOf(cur.by) < 0 ? ' — ' + cur.by : '') : '';
-    $('#list-panel').hidden = isCustom || (cur && !n);
+    var cur = currentList(), isCustom = state.list === 'custom', isVisit = state.list === 'visit', n = listCount(cur);
+    $('#list-desc').textContent = isCustom || isVisit ? '' : cur ? (cur.desc || '') + (filled(cur.by) && cur.desc.indexOf(cur.by) < 0 ? ' — ' + cur.by : '') : '';
+    $('#list-panel').hidden = isCustom || isVisit || (cur && !n);
     $('#custom-panel').hidden = !isCustom;
+    $('#visit-panel').hidden = !isVisit;
     if (cur && !n) $('#list-desc').textContent = (cur.desc || '') + ' 곧 채워질 거예요.';
     renderListIntro(); renderGroupTabs(); renderGroupDesc();
   }
@@ -204,7 +207,7 @@
     state.list = id; state.genre = ''; state.q = ''; state.group = ''; $('#q').value = '';
     var cur = currentList();
     if (cur && cur.groups && cur.groups.length) state.group = cur.groups[0].id;
-    renderTabs(); if (id !== 'custom') { renderGenres(); renderGrid(); }
+    renderTabs(); if (!special()) { renderGenres(); renderGrid(); }
   }
   function selectGroup(id) {
     state.group = id; state.genre = ''; state.q = ''; $('#q').value = '';
@@ -258,6 +261,7 @@
     picks.push(id); savePicks(); renderGrid(); renderTray(); return true;
   }
   function initCustom() {
+    $('#visit-rule').innerHTML = '<p><strong>비북스에 직접 와서 책을 눈으로 보고 고를 수 있어요.</strong></p><p><b>현장에서 고르면 비북스 키링을 선물로 드려요.</b></p><p>아래에서 방문 신청을 남겨 주세요. 신청 양식은 같고, 책 대신 「방문해서 고르기」로 접수돼요. 방문 시간과 방법은 문의로 물어봐 주세요.</p>';
     $('#custom-rule').innerHTML = '<p><strong>목록에 없는 책도 골라도 돼요.</strong></p><p>' + esc(P.customRule || '') + '</p>';
     // 직접 적기(검색을 못 쓰거나 책이 안 나올 때만 열려요)
     var form = $('#custom-form'), msg = $('.form-msg', form);
@@ -292,7 +296,7 @@
     var at = picks.indexOf(id);
     if (at >= 0) picks.splice(at, 1);
     else if (picks.length >= MAX) { toast(MAX > 1 ? '신청 도서 1권과 예비 도서 1권, 두 권까지 고를 수 있어요. 하나를 빼고 다시 골라주세요.' : '한 권만 고를 수 있어요. 고른 책을 빼고 다시 골라주세요.'); return; }
-    else picks.push(id);
+    else { picks.push(id); visit = false; }
     savePicks(); renderGrid(); renderTray(); if (lastResults.length) renderResults();
   }
 
@@ -304,7 +308,7 @@
   function applied() { try { return JSON.parse(localStorage.getItem(DONE_KEY) || 'null'); } catch (e) { return null; } }
 
   /* ── 이번 주 신청 현황: 한 주에 10명까지(월요일 저녁 6시 ~ 다음 월요일 저녁 6시). 다 차면 다음 월요일 저녁 6시부터 새로 신청 ── */
-  var week = null;
+  var week = null, visit = false;  // visit: 책을 비북스에서 직접 보고 고르는 신청
   function weekClosed() { return !!week && !week.open; }
   function renderWeek() {
     var el = $('#week-banner'); if (!el) return;
@@ -317,17 +321,18 @@
     window.ybgWeek().then(function (w) { week = w; renderWeek(); renderTray(); }).catch(function () { /* 현황을 못 불러와도 신청은 서버가 판단해요 */ });
   }
   function renderTray() {
-    var n = picks.length, done = applied();
-    $('#nav-count').textContent = n;
+    var n = picks.length, done = applied(), has = n > 0 || visit;
+    $('#nav-count').textContent = has ? Math.max(n, 1) : 0;
     if (!$('#tray-sum').classList.contains('warn')) {
-      $('#tray-sum').innerHTML = done && !n ? '신청 완료 · 접수번호 <b>' + esc(done.id) + '</b>'
+      $('#tray-sum').innerHTML = done && !has ? '신청 완료 · 접수번호 <b>' + esc(done.id) + '</b>'
+        : visit && !n ? '<b>방문해서 고르기</b> · 비북스에서 직접 보고 골라요'
         : n ? '<b>' + esc(byId[picks[0]].title) + '</b>' + (n > 1 ? ' 외 예비 도서 1권' : '') : '아직 고른 책이 없어요';
     }
-    $('#tray-go').disabled = (!n && !done) || (n && weekClosed());
-    $('#tray-go').textContent = n && weekClosed() ? '이번 주 마감' : !n && done ? '신청 내역' : '신청하기';
+    $('#tray-go').disabled = (!has && !done) || (has && weekClosed());
+    $('#tray-go').textContent = has && weekClosed() ? '이번 주 마감' : !has && done ? '신청 내역' : '신청하기';
     var sb = $('#youth-form button[type=submit]'); if (sb) { sb.disabled = weekClosed(); if (weekClosed()) sb.textContent = '이번 주 마감'; }
 
-    $('#tray-list').innerHTML = n ? picks.map(function (id, i) {
+    $('#tray-list').innerHTML = visit && !n ? '<li><span class="tl-n">방문</span><div class="tl-book"><b>방문해서 고르기</b><span>비북스에 직접 와서 책을 눈으로 보고 골라요 · 현장에서 고르면 비북스 키링을 선물로 드려요</span></div><div class="tl-act"><button type="button" data-vdel="1">빼기</button></div></li>' : n ? picks.map(function (id, i) {
       var b = byId[id];
       return '<li><span class="tl-n">' + label(i) + '</span><div class="tl-book"><b>' + esc(b.title) + '</b><span>' + esc([b.author, b.publisher].filter(filled).join(' · ')) +
         (b.custom ? ' <em class="tag-custom">직접 고름 · 확인 후 주문' + (b.price > 0 ? ' · 정가 ' + won(b.price) : '') + '</em>' : '') + '</span></div>' +
@@ -337,12 +342,14 @@
 
     $('#tray-pickup').innerHTML = '<p class="acc-label">책 받기</p><p>책이 도착하면 안내가 가요.<br><span class="small">신청할 때 적은 연락처로 연락드려요.</span></p>';
 
-    $('#youth-form').hidden = !n;
-    $('#tray-note').hidden = !n;
+    $('#youth-form').hidden = !has;
+    $('#tray-note').hidden = !has;
+    var vsb = $('#youth-form button[type=submit]'); if (vsb && !weekClosed()) vsb.textContent = visit && !n ? '방문해서 고르기로 신청하기' : '이 책으로 신청하기';
     var dn = $('#youth-done');
-    if (!n && done) { dn.hidden = false; dn.innerHTML = doneHtml(done); } else if (n) dn.hidden = true;
+    if (!has && done) { dn.hidden = false; dn.innerHTML = doneHtml(done); } else if (has) dn.hidden = true;
   }
   function doneHtml(d) {
+    if (d.visit) return '<p class="done-h">신청이 됐어요.</p><p>접수번호 <b>' + esc(d.id) + '</b> · ' + esc(d.nick) + '</p><p>신청 방식: <b>방문해서 고르기</b></p><p><b>비북스에 직접 와서 책을 눈으로 보고 고르면 돼요. 현장에서 고르면 비북스 키링을 선물로 드려요.</b> 오시기 전에 문의로 알려 주세요.</p>';
     return '<p class="done-h">신청이 됐어요.</p><p>접수번호 <b>' + esc(d.id) + '</b> · ' + esc(d.nick) + '</p>' +
       '<p>신청 도서: ' + esc(d.book) + '</p>' + (d.book2 ? '<p>예비 도서: ' + esc(d.book2) + '</p>' : '') + '<p>비북스가 책을 주문해 준비해요. 책이 도착하면 연락처와 이메일로 안내해 드려요.' + (d.book2 ? ' 신청 도서를 구하기 어려우면 예비 도서로 구해 드려요.' : ' 책을 구하기 어렵거나 문제가 있으면 따로 연락드려요.') + '</p>';
   }
@@ -359,7 +366,7 @@
     if (!Y || !filled(C.api)) { btn.disabled = true; btn.textContent = '접수 준비 중'; }
     form.addEventListener('submit', function (e) {
       e.preventDefault(); msg.textContent = '';
-      if (!picks.length) { msg.textContent = '받을 책을 먼저 골라주세요.'; return; }
+      if (!picks.length && !visit) { msg.textContent = '받을 책을 먼저 골라주세요.'; return; }
       var err = Y.checkFields(form, [
         ['nick', null, '닉네임을 적어주세요.'], ['age', null, '학년을 골라주세요.'],
         ['school', function (el) { return form.elements.age.value === '학교 밖 청소년' || !!el.value.trim(); }, '학교 이름을 적어주세요.'],
@@ -369,19 +376,19 @@
         ['consent', Y.isChecked, '개인정보 수집·이용에 동의해 주세요.']
       ]);
       if (err) { msg.textContent = err; return; }
-      var f = form.elements, b1 = byId[picks[0]], b2 = picks[1] ? byId[picks[1]] : null;
+      var f = form.elements, isVisit = visit && !picks.length, b1 = isVisit ? null : byId[picks[0]], b2 = picks[1] ? byId[picks[1]] : null;
       btn.disabled = true; btn.textContent = '보내는 중…';
       Y.post('youth', {
         nick: f.nick.value, age: f.age.value, school: f.school.value, bucheon: f.bucheon.checked, phone: f.phone.value, email: f.email.value,
-        book1: bookText(b1), isbn1: b1.isbn || '', book2: b2 ? bookText(b2) : '', isbn2: b2 ? (b2.isbn || '') : '',
-        custom1: !!b1.custom, custom2: !!(b2 && b2.custom),
+        book1: isVisit ? '(방문해서 고르기)' : bookText(b1), isbn1: isVisit ? '' : (b1.isbn || ''), book2: b2 ? bookText(b2) : '', isbn2: b2 ? (b2.isbn || '') : '',
+        custom1: !isVisit && !!b1.custom, custom2: !!(b2 && b2.custom), visit: isVisit,
         route: f.route.value, routeEtc: f.route.value === '기타' ? f.routeEtc.value : '',
         anon: false, hideTitle: false, pv: 2, consent: f.consent.checked
       }, f.website.value).then(function (res) {
         if (!res.ok) throw new Error(res.error || '접수하지 못했어요.');
-        var rec = { id: res.id, nick: f.nick.value, book: b1.title, book2: b2 ? b2.title : '' };
+        var rec = { id: res.id, nick: f.nick.value, book: isVisit ? '방문해서 고르기' : b1.title, book2: b2 ? b2.title : '', visit: isVisit };
         try { localStorage.setItem(DONE_KEY, JSON.stringify(rec)); } catch (x) { /* 저장 못 해도 접수는 됐다 */ }
-        picks = []; savePicks(); form.reset(); renderGrid(); renderTray();
+        picks = []; visit = false; savePicks(); form.reset(); renderGrid(); renderTray();
         $('#youth-done').focus();
       }).catch(function (err) {
         msg.textContent = err.message === 'Failed to fetch' ? '보내지 못했어요. 인터넷 연결을 확인하고 다시 눌러주세요.' : err.message;
@@ -417,11 +424,16 @@
     $('#q').addEventListener('input', function () { state.q = this.value; renderGrid(); });
     $('#sort').addEventListener('change', function () { state.sort = this.value; renderGrid(); });
     $('#tray-go').addEventListener('click', openTray);
+    $('#visit-go').addEventListener('click', function () {
+      if (weekClosed()) { toast('이번 주 신청이 마감됐어요.'); return; }
+      picks = []; visit = true; savePicks(); renderGrid(); renderTray(); openTray();
+    });
     $('#open-tray').addEventListener('click', openTray);
     $('#tray-close').addEventListener('click', closeTray);
     $('#tray').addEventListener('click', function (e) {
       if (e.target === this) { closeTray(); return; } // 바깥(배경) 누르면 닫기
       var del = e.target.getAttribute('data-del'), up = e.target.getAttribute('data-up');
+      if (e.target.getAttribute('data-vdel')) { visit = false; renderTray(); return; }
       if (del) { picks.splice(picks.indexOf(del), 1); savePicks(); renderGrid(); renderTray(); if (lastResults.length) renderResults(); }
       if (up) { picks = [up].concat(picks.filter(function (x) { return x !== up; })); savePicks(); renderGrid(); renderTray(); }
     });
