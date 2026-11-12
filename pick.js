@@ -255,6 +255,7 @@
       .then(function () { if (seq === searchSeq) btn.disabled = false; });
   }
   function addCustom(b) {
+    if (overLimit(b)) { toast('정가 ' + won(C.bookPrice) + '을 넘는 책은 고를 수 없어요.'); return false; }
     if (picks.length >= MAX) { toast(MAX > 1 ? '신청 도서 1권과 예비 도서 1권, 두 권까지 고를 수 있어요. 내 선택에서 하나를 빼고 다시 골라주세요.' : '한 권만 고를 수 있어요. 고른 책을 빼고 다시 골라주세요.'); return false; }
     var id = 'c' + Date.now().toString(36);
     custom[id] = byId[id] = { id: id, custom: true, title: b.title, author: b.authors || '', publisher: b.publisher || '', isbn: b.isbn || '', price: b.price || 0, cover: b.thumb || '' };
