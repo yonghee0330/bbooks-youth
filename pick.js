@@ -40,13 +40,13 @@
   function renderRules() {
     var items = ['한 사람이 한 권' + (filled(C.bookPrice) ? ', 정가 ' + Number(C.bookPrice).toLocaleString('ko-KR') + '원 이하 책' : '') + '을 받아요. 참고서·문제집은 제외예요.'];
     items.push('책은 2개월에 한 권씩, 한 해 최대 6권까지 받을 수 있어요. 1월에 신청했다면 3월에 다시 신청할 수 있어요(달 기준).');
-    items.push('**신청은 매주 월요일 저녁 6시에 시작해요.** 한 주에 10명까지 받고, 다음 월요일 저녁 6시에 마감돼요.');
+    items.push('**신청은 매주 월요일 저녁 6시에 시작해요.** 한 주 10명 중 **방문 신청 7명 · 온라인 주문 3명**을 받고, 다음 월요일 저녁 6시에 마감돼요.');
     items.push('신청하면 비북스가 책을 주문해 준비해요.');
     if (MAX > 1) items.push('예비 도서를 한 권 더 고를 수 있어요(선택). 신청 도서를 구하기 어려우면 예비 도서로 구해 드려요.');
     items.splice(0, 0, (filled(C.regionLimit) ? C.regionLimit + ' ' : '') + (filled(C.ageRange) ? C.ageRange + ' ' : '') + '청소년이면 누구나 신청할 수 있어요. ' + (filled(C.gradeNote) ? '**' + C.gradeNote + '** ' : '') + '학교 밖 청소년도 신청할 수 있어요.');
     items.push('실명 대신 닉네임으로 신청해요. 학교 이름은 지역 확인에만 써요.');
-    items.push('**온라인으로 고르는 것 말고도, 비북스에 직접 와서 책을 눈으로 보고 고를 수 있어요. 현장에서 고르면 비북스 키링을 선물로 드려요.** 방법은 문의로 물어봐 주세요.');
-    items.push('책이 도착하면 연락처로 안내해 드려요. 안내를 받고 비북스에 방문해서 받아가요.');
+    items.push('**비북스에 직접 와서 책을 눈으로 보고 고르는 「방문해서 고르기」를 가장 권해요. 현장에서 고르면 비북스 키링을 선물로 드려요.** 방법은 문의로 물어봐 주세요.');
+    items.push('온라인으로 책을 골라 주문하면 책이 도착한 뒤 연락처로 안내해 드려요. 안내를 받고 비북스에 방문해서 받아가요.');
     $('#pick-rules').innerHTML = items.map(function (t) { return '<li>' + rich(t) + '</li>'; }).join('');
   }
 
@@ -193,10 +193,11 @@
         esc(l.title) + '<span>' + (n ? n + '권' : '준비 중') + '</span></button>';
     });
     if (P.custom !== false) tabs.push('<button type="button" role="tab" data-list="custom" aria-selected="' + (state.list === 'custom') + '" class="custom-tab">직접 고르기<span>목록에 없는 책</span></button>');
-    if (P.visit !== false) tabs.push('<button type="button" role="tab" data-list="visit" aria-selected="' + (state.list === 'visit') + '" class="custom-tab visit-tab">방문해서 고르기<span>비북스에서 눈으로 보고</span></button>');
+    if (P.visit !== false) tabs.unshift('<button type="button" role="tab" data-list="visit" aria-selected="' + (state.list === 'visit') + '" class="custom-tab visit-tab">방문해서 고르기<span>추천 · 눈으로 보고 · 주 ' + (P.visitLimit || 7) + '명</span></button>');
     $('#list-tabs').innerHTML = tabs.join('');
     var cur = currentList(), isCustom = state.list === 'custom', isVisit = state.list === 'visit', n = listCount(cur);
-    $('#list-desc').textContent = isCustom || isVisit ? '' : cur ? (cur.desc || '') + (filled(cur.by) && cur.desc.indexOf(cur.by) < 0 ? ' — ' + cur.by : '') : '';
+    $('#list-desc').textContent = isCustom || isVisit ? '' : (cur ? (cur.desc || '') + (filled(cur.by) && cur.desc.indexOf(cur.by) < 0 ? ' — ' + cur.by : '') : '');
+    if (!isVisit) { var on = document.createElement('span'); on.className = 'online-hint'; on.textContent = ' 온라인 주문은 한 주 ' + (P.onlineLimit || 3) + '명까지예요. 비북스에 직접 와서 고르는 「방문해서 고르기」(주 ' + (P.visitLimit || 7) + '명)를 권해요.'; $('#list-desc').appendChild(on); }
     $('#list-panel').hidden = isCustom || isVisit || (cur && !n);
     $('#custom-panel').hidden = !isCustom;
     $('#visit-panel').hidden = !isVisit;
@@ -262,7 +263,8 @@
     picks.push(id); savePicks(); renderGrid(); renderTray(); return true;
   }
   function initCustom() {
-    $('#visit-rule').innerHTML = '<p><strong>비북스에 직접 와서 책을 눈으로 보고 고를 수 있어요.</strong></p><p><b>현장에서 고르면 비북스 키링을 선물로 드려요.</b></p><p>아래에서 방문 신청을 남겨 주세요. 신청 양식은 같고, 책 대신 「방문해서 고르기」로 접수돼요. 방문 시간과 방법은 문의로 물어봐 주세요.</p>';
+    $('#visit-rule').innerHTML = '<p><strong>비북스에 직접 와서 책을 눈으로 보고 고르는 방법이에요. 한 주에 ' + (P.visitLimit || 7) + '명까지 받아요.</strong></p><p><b>현장에서 고르면 비북스 키링을 선물로 드려요.</b></p><p>아래 버튼으로 방문 신청을 남겨 주세요. 신청 양식은 같고, 책 대신 「방문해서 고르기」로 접수돼요. 방문 시간과 방법은 문의로 물어봐 주세요.</p><p class="small muted">온라인에서 책을 골라 주문하는 신청은 한 주 ' + (P.onlineLimit || 3) + '명까지예요.</p>';
+    var pn = $('#purpose-note'); if (pn) pn.textContent = (P.purpose || '') + ' ' + (P.quota || '');
     $('#custom-rule').innerHTML = '<p><strong>목록에 없는 책도 골라도 돼요.</strong></p><p>' + esc(P.customRule || '') + '</p>';
     // 직접 적기(검색을 못 쓰거나 책이 안 나올 때만 열려요)
     var form = $('#custom-form'), msg = $('.form-msg', form);
@@ -310,12 +312,17 @@
 
   /* ── 이번 주 신청 현황: 한 주에 10명까지(월요일 저녁 6시 ~ 다음 월요일 저녁 6시). 다 차면 다음 월요일 저녁 6시부터 새로 신청 ── */
   var week = null, visit = false;  // visit: 책을 비북스에서 직접 보고 고르는 신청
-  function weekClosed() { return !!week && !week.open; }
+  function weekClosed() {
+    if (!week) return false;
+    if (!week.online) return !week.open;
+    return visit && !picks.length ? !week.visit.open : !week.online.open;   // 방문 신청과 온라인 주문은 자리를 따로 센다
+  }
+  function closedLabel() { return visit && !picks.length ? '방문 신청 마감' : '온라인 주문 마감'; }
   function renderWeek() {
     var el = $('#week-banner'); if (!el) return;
     if (!week) { el.hidden = true; return; }
     el.hidden = false; el.classList.toggle('closed', !week.open);
-    el.innerHTML = '<b>이번 주 ' + week.used + ' / ' + week.limit + '권</b> · ' + esc(window.ybgWeekMsg ? window.ybgWeekMsg(week) : '');
+    el.innerHTML = '<b>이번 주 ' + week.used + ' / ' + week.limit + '명</b>' + (week.online ? ' · 방문 신청 ' + week.visit.used + '/' + week.visit.limit + ' · 온라인 주문 ' + week.online.used + '/' + week.online.limit : '') + '<br><span class="wb-msg">' + esc(window.ybgWeekMsg ? window.ybgWeekMsg(week) : '') + '</span>';
   }
   function loadWeekState() {
     if (!window.ybgWeek) return;
@@ -330,8 +337,8 @@
         : n ? '<b>' + esc(byId[picks[0]].title) + '</b>' + (n > 1 ? ' 외 예비 도서 1권' : '') : '아직 고른 책이 없어요';
     }
     $('#tray-go').disabled = (!has && !done) || (has && weekClosed());
-    $('#tray-go').textContent = has && weekClosed() ? '이번 주 마감' : !has && done ? '신청 내역' : '신청하기';
-    var sb = $('#youth-form button[type=submit]'); if (sb) { sb.disabled = weekClosed(); if (weekClosed()) sb.textContent = '이번 주 마감'; }
+    $('#tray-go').textContent = has && weekClosed() ? closedLabel() : !has && done ? '신청 내역' : '신청하기';
+    var sb = $('#youth-form button[type=submit]'); if (sb) { sb.disabled = weekClosed(); if (weekClosed()) sb.textContent = closedLabel(); }
 
     $('#tray-list').innerHTML = visit && !n ? '<li><span class="tl-n">방문</span><div class="tl-book"><b>방문해서 고르기</b><span>비북스에 직접 와서 책을 눈으로 보고 골라요 · 현장에서 고르면 비북스 키링을 선물로 드려요</span></div><div class="tl-act"><button type="button" data-vdel="1">빼기</button></div></li>' : n ? picks.map(function (id, i) {
       var b = byId[id];
@@ -351,7 +358,7 @@
   }
   function doneHtml(d) {
     if (d.visit) return '<p class="done-h">신청이 됐어요.</p><p>접수번호 <b>' + esc(d.id) + '</b> · ' + esc(d.nick) + '</p><p>신청 방식: <b>방문해서 고르기</b></p><p><b>비북스에 직접 와서 책을 눈으로 보고 고르면 돼요. 현장에서 고르면 비북스 키링을 선물로 드려요.</b> 오시기 전에 문의로 알려 주세요.</p>';
-    return '<p class="done-h">신청이 됐어요.</p><p>접수번호 <b>' + esc(d.id) + '</b> · ' + esc(d.nick) + '</p>' +
+    return '<p class="done-h">신청이 됐어요.</p><p>접수번호 <b>' + esc(d.id) + '</b> · ' + esc(d.nick) + '</p><p>신청 방식: <b>온라인 주문</b></p>' +
       '<p>신청 도서: ' + esc(d.book) + '</p>' + (d.book2 ? '<p>예비 도서: ' + esc(d.book2) + '</p>' : '') + '<p>비북스가 책을 주문해 준비해요. 책이 도착하면 연락처와 이메일로 안내해 드려요.' + (d.book2 ? ' 신청 도서를 구하기 어려우면 예비 도서로 구해 드려요.' : ' 책을 구하기 어렵거나 문제가 있으면 따로 연락드려요.') + '</p>';
   }
 
@@ -426,7 +433,7 @@
     $('#sort').addEventListener('change', function () { state.sort = this.value; renderGrid(); });
     $('#tray-go').addEventListener('click', openTray);
     $('#visit-go').addEventListener('click', function () {
-      if (weekClosed()) { toast('이번 주 신청이 마감됐어요.'); return; }
+      if (week && week.visit && !week.visit.open) { toast('이번 주 방문 신청이 마감됐어요.' + (week.online && week.online.open ? ' 온라인 주문은 아직 받고 있어요.' : '')); return; }
       picks = []; visit = true; savePicks(); renderGrid(); renderTray(); openTray();
     });
     $('#open-tray').addEventListener('click', openTray);
@@ -468,7 +475,7 @@
           return l;
         });
       var first = lists.filter(function (l) { return listCount(l); })[0];
-      state.list = first ? first.id : (P.custom !== false ? 'custom' : lists[0].id);
+      state.list = P.visit !== false ? 'visit' : first ? first.id : (P.custom !== false ? 'custom' : lists[0].id);
       if (first && first.groups && first.groups.length) state.group = first.groups[0].id;
       loadCustom();
       var hasStock = books.some(function (b) { return b.stock !== null && b.stock !== undefined; });

@@ -1410,3 +1410,16 @@ button, input, select, textarea, summary { font-family: inherit; }
 .tw-adult-btn { flex: none; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; min-height: 44px; padding: 0 10px; border-radius: 12px; background: #4a2018; color: #fff6ec; font-weight: 800; font-size: .95rem; letter-spacing: -0.02em; text-decoration: none; }
 .tw-adult-btn:hover { background: var(--orange); }
 .tw-adult-btn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+/* 2026-11-16 방문 7 · 온라인 3 */
+.purpose-note { margin: 10px 0 0; padding: 12px 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); font-size: .92rem; font-weight: 700; line-height: 1.6; color: var(--ink); }
+.purpose-note:empty { display: none; }
+.week-banner .wb-msg { font-weight: 600; }
+.online-hint { display: block; margin-top: 4px; font-weight: 700; color: var(--orange); }
+.tw-purpose { margin: 8px 0 4px; font-size: .92rem; line-height: 1.55; }
+.tw-split { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 8px; }
+.tw-split > span { display: flex; flex-direction: column; gap: 2px; padding: 8px 12px; border-radius: 12px; background: rgba(255,255,255,.55); border: 1px solid rgba(74,32,24,.25); }
+.tw-split em { font-style: normal; font-size: .82rem; font-weight: 800; }
+.tw-split em small { display: block; font-weight: 600; opacity: .75; }
+.tw-split b { font-size: 1.15rem; font-weight: 900; font-variant-numeric: tabular-nums; }
+.tw-split > span.full b::after { content: ' · 마감'; font-size: .78rem; font-weight: 800; color: var(--orange); }
