@@ -1,7 +1,7 @@
 {
   "title": "책을 받은 친구들",
   "items": [
-    { "date": "2026-11-17", "book": "인생의 역사", "author": "신형철", "photo": "images/receipts/p1.webp", "memo": "images/receipts/m1.webp", "alt": "『인생의 역사』를 들고 있는 청소년" },
-    { "date": "2026-11-17", "book": "이다의 도시관찰일기", "author": "이다", "photo": "images/receipts/p2.webp", "memo": "images/receipts/m2.webp", "alt": "『이다의 도시관찰일기』를 들고 있는 청소년" }
+    { "date": "2026-11-17", "nick": "시은", "book": "인생의 역사", "author": "신형철", "photo": "images/receipts/p1.webp", "memo": "images/receipts/m1.webp", "alt": "『인생의 역사』를 들고 있는 청소년" },
+    { "date": "2026-11-17", "nick": "yw8224", "book": "이다의 도시관찰일기", "author": "이다", "photo": "images/receipts/p2.webp", "memo": "images/receipts/m2.webp", "alt": "『이다의 도시관찰일기』를 들고 있는 청소년" }
   ]
 }

@@ -1082,7 +1082,7 @@
         return '<li class="rc-slide" data-i="' + i + '"><div class="rc-card">' +
           '<figure class="rc-photo"><img src="' + esc(ROOT + x.photo) + '" alt="' + esc(x.alt || '책을 받은 청소년') + '" loading="lazy"></figure>' +
           (x.memo ? '<figure class="rc-memo"><img src="' + esc(ROOT + x.memo) + '" alt="청소년이 선결제 어른께 남긴 손글씨 메모" loading="lazy"><figcaption>선결제 어른께 남긴 메모</figcaption></figure>' : '') +
-          '<p class="rc-cap">' + (x.book ? '『' + esc(x.book) + '』' + (x.author ? ' · ' + esc(x.author) : '') : '') + (when ? '<span>' + esc(when) + '</span>' : '') + '</p></div></li>';
+          '<p class="rc-cap">' + (x.nick ? '<strong class="rc-nick">' + esc(x.nick) + '</strong>' : '') + (x.book ? '『' + esc(x.book) + '』' + (x.author ? ' · ' + esc(x.author) : '') : '') + (when ? '<span>' + esc(when) + '</span>' : '') + '</p></div></li>';
       }).join('');
       dots.innerHTML = items.map(function (x, i) { return '<button type="button" data-go="' + i + '" aria-label="' + (i + 1) + '번째 친구"></button>'; }).join('');
       sec.hidden = false;

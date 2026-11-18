@@ -1449,3 +1449,4 @@ button, input, select, textarea, summary { font-family: inherit; }
 .rc-dots button { width: 10px; height: 10px; padding: 0; border-radius: 50%; border: 0; background: var(--line); cursor: pointer; }
 .rc-dots button.on { background: var(--orange); transform: scale(1.25); }
 @media (max-width: 560px) { .rc-card { grid-template-columns: 1fr; } .rc-photo img { aspect-ratio: 4 / 5; } .rc-nav.prev { left: 2px; } .rc-nav.next { right: 2px; } }
+.rc-nick { display: block; font-size: 1.05rem; font-weight: 900; }
