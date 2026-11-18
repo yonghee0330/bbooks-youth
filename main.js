@@ -218,7 +218,8 @@
   function renderMeta(r) {
     var real = r.books.filter(function (b) { return !b.example; }).length;
     var ex = r.books.length - real, html = '';
-    html += '<span class="shelf-count">꽂힌 책 <b>' + real + '</b>권</span>';
+    var linkedN = r.books.filter(function (b) { return !b.example && filled(b.youthCode); }).length;
+    html += '<span class="shelf-count">꽂힌 책 <b>' + real + '</b>권 · 청소년과 연결된 책 <b>' + linkedN + '</b>권</span>';
     if (r.closed) html += '<span class="badge">아카이브 · 고정된 서가</span>';
     if (ex) html += '<span class="badge">예시 ' + ex + '권 — 실제 책 사줄게가 아니에요</span>';
     if (!r.closed && Number(r.pending) > 0) html += '<span class="badge pending-badge">' + pendingText(r.pending) + '</span>';
@@ -259,8 +260,8 @@
         continue;
       }
       var h = rowH * (0.7 + (hash(b.id + 'h') % 23) / 100), y = floor - h;
-      var label = displayName(b) + '님이 건넨 책' + (filled(b.youthCode) ? ', 청소년에게 연결됨' : '') + (b.example ? ', 예시' : '');
-      svg += '<g class="book' + (isNew(b) ? ' new' : '') + (b.example ? ' example' : '') + '" tabindex="0" role="button" aria-haspopup="dialog" data-i="' + i +
+      var label = displayName(b) + '님이 건넨 책' + (filled(b.youthCode) ? ', 청소년에게 연결됨' : ', 청소년을 기다리는 중') + (b.example ? ', 예시' : '');
+      svg += '<g class="book' + (filled(b.youthCode) ? ' linked' : ' free') + (isNew(b) ? ' new' : '') + (b.example ? ' example' : '') + '" tabindex="0" role="button" aria-haspopup="dialog" data-i="' + i +
         '" aria-label="' + esc(label) + '" style="animation-delay:' + Math.round(i * delayStep) + 'ms">' +
         '<rect class="cover" x="' + x + '" y="' + y + '" width="' + bookW + '" height="' + h + '" rx="2" style="fill:' + bookFill(b) + '"/>' +
         '<rect class="spine-line" x="' + x + '" y="' + (y + h * 0.16) + '" width="' + bookW + '" height="2.5"/>' +
@@ -955,7 +956,7 @@
     var r = T.round, out = [];
     for (var i = 0; i < goal; i++) {
       var b = r.books[i];
-      out.push(b ? '<i class="bk' + (isNew(b) ? ' new' : '') + (filled(b.youthCode) ? ' linked' : '') + '" style="--c:' + bookFill(b) + ';--h:' + (72 + hash((b.id || i) + 'h') % 24) + '%;--d:' + Math.min(i * 45, 1800) + 'ms"></i>' : '<i class="em"></i>');
+      out.push(b ? '<i class="bk' + (isNew(b) ? ' new' : '') + (filled(b.youthCode) ? ' linked' : ' free') + '" style="--c:' + bookFill(b) + ';--h:' + (72 + hash((b.id || i) + 'h') % 24) + '%;--d:' + Math.min(i * 45, 1800) + 'ms"></i>' : '<i class="em"></i>');
     }
     return out.join('');
   }

@@ -1456,3 +1456,14 @@ button, input, select, textarea, summary { font-family: inherit; }
 .mo-left b { font-size: 1.3rem; font-weight: 900; margin: 0 2px; }
 .cum-line { margin: 4px 0 0; font-size: 1.05rem; font-weight: 700; }
 .cum-line b { font-size: 1.4rem; font-weight: 900; margin: 0 2px; }
+
+/* 서가: 확보된 책은 흐릿하게(가능성), 청소년과 연결된 책만 또렷하게 */
+.shelf-svg .book.free .cover { opacity: .3; }
+.shelf-svg .book.free .spine-line { opacity: .35; }
+.shelf-svg .book.free:hover .cover { opacity: .5; filter: none; }
+.shelf-svg .book.linked .cover { stroke: var(--ink); stroke-width: 1.5; }
+.lp-shelf i.bk.free::before { background: color-mix(in srgb, var(--c) 28%, transparent); }
+.shelf-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 10px 2px 0; font-size: .85rem; color: var(--muted); }
+.shelf-legend span::before { content: ""; display: inline-block; width: 9px; height: 15px; margin-right: 6px; vertical-align: -2px; border-radius: 2px; background: var(--wood-d); }
+.shelf-legend .lg-free::before { opacity: .3; }
+.shelf-legend .lg-linked::before { border: 1.5px solid var(--ink); background: var(--orange); }
