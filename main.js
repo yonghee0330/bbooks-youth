@@ -977,6 +977,16 @@
   /* ── shelf.html 대시보드: 함께한 어른 · 책을 받은 청소년 · 사진 ── */
   function renderDash(rounds) {
     var T = shelfTotals(rounds); fillStats(T); loadLeft();
+    // 이번 달 진행 현황(기본 화면): 서버가 알려주는 month. 없으면(옛 데이터) 어른·책은 명단 날짜로 센다
+    (function () {
+      function setT(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
+      var mo = (rounds.meta || {}).month, now = new Date(Date.now() + 9 * 3600 * 1000), ym = now.getUTCFullYear() * 12 + now.getUTCMonth();
+      if (!mo) {
+        var inM = T.list.filter(function (d) { var k = new Date(new Date(d.at).getTime() + 9 * 3600 * 1000); return !d.seed && k.getUTCFullYear() * 12 + k.getUTCMonth() === ym; });
+        mo = { month: now.getUTCMonth() + 1, donors: inM.reduce(function (a, d) { return a + (Number(d.people) || 1); }, 0), books: inM.reduce(function (a, d) { return a + (Number(d.books) || 0); }, 0), applied: '–', received: '–' };
+      }
+      setT('mo-label', mo.month + '월'); setT('mo-donors', mo.donors); setT('mo-books', mo.books); setT('mo-applied', mo.applied); setT('mo-received', mo.received);
+    })();
     var dl = $('#dash-donors');
     var dnames = donorNames(T.list);
     if (dl) dl.innerHTML = T.list.length ? T.list.map(function (d, i) {
@@ -1076,40 +1086,58 @@
   }
 
 
-  /* ── 책을 받은 친구들: 수령 사진 + 손글씨 메모를 한 사람 한 칸씩 슬라이드 ── */
+  /* ── 책을 받은 친구들: 한 사람 한 칸. 칸 안에서 사진 → 손글씨 메모로 넘기고, 누르면 크게 본다 ── */
   function initReceipts() {
     var sec = $('#receipts'); if (!sec) return;
     fetch(ROOT + 'data/receipts.json', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (d) {
       var items = (d.items || []).filter(function (x) { return x && x.photo; });
       if (!items.length) return;
-      var track = $('#rc-track'), dots = $('#rc-dots');
-      track.innerHTML = items.map(function (x, i) {
+      var grid = $('#rc-grid');
+      grid.innerHTML = items.map(function (x, i) {
         var dt = x.date ? new Date(x.date + 'T00:00:00+09:00') : null;
         var when = dt ? (dt.getMonth() + 1) + '월 ' + dt.getDate() + '일 수령' : '';
-        return '<li class="rc-slide" data-i="' + i + '"><div class="rc-card">' +
-          '<figure class="rc-photo"><img src="' + esc(ROOT + x.photo) + '" alt="' + esc(x.alt || '책을 받은 청소년') + '" loading="lazy"></figure>' +
-          (x.memo ? '<figure class="rc-memo"><img src="' + esc(ROOT + x.memo) + '" alt="청소년이 선결제 어른께 남긴 손글씨 메모" loading="lazy"><figcaption>선결제 어른께 남긴 메모</figcaption></figure>' : '') +
-          '<p class="rc-cap">' + (x.nick ? '<strong class="rc-nick">' + esc(x.nick) + '</strong>' : '') + (x.book ? '『' + esc(x.book) + '』' + (x.author ? ' · ' + esc(x.author) : '') : '') + (when ? '<span>' + esc(when) + '</span>' : '') + '</p></div></li>';
+        var pages = [{ k: '사진', src: x.photo, alt: x.alt || '책을 받은 청소년' }];
+        if (x.memo) pages.push({ k: '메모', src: x.memo, alt: '선결제 어른께 남긴 손글씨 메모' });
+        return '<li class="rc-tile" data-i="' + i + '"><div class="rc-pages" tabindex="0" aria-label="' + esc((x.nick || '') + ' 사진과 메모') + '">' +
+          pages.map(function (p, k) { return '<button type="button" class="rc-page" data-i="' + i + '" data-p="' + k + '" aria-label="' + esc(p.k + ' 크게 보기') + '"><img src="' + esc(ROOT + p.src) + '" alt="' + esc(p.alt) + '" loading="lazy"></button>'; }).join('') + '</div>' +
+          (pages.length > 1 ? '<div class="rc-dots"><i class="on"></i><i></i></div>' : '') +
+          '<p class="rc-cap">' + (x.nick ? '<strong class="rc-nick">' + esc(x.nick) + '</strong>' : '') + (x.book ? '『' + esc(x.book) + '』' : '') + (when ? '<span>' + esc(when) + '</span>' : '') + '</p></li>';
       }).join('');
-      dots.innerHTML = items.map(function (x, i) { return '<button type="button" data-go="' + i + '" aria-label="' + (i + 1) + '번째 친구"></button>'; }).join('');
       sec.hidden = false;
-      var cur = 0;
-      function slideW() { var s = track.querySelector('.rc-slide'); return s ? s.getBoundingClientRect().width : 1; }
-      function sync() {
-        cur = Math.max(0, Math.min(items.length - 1, Math.round(track.scrollLeft / slideW())));
-        Array.prototype.forEach.call(dots.children, function (b, i) { b.classList.toggle('on', i === cur); });
-        $('#rc-prev').disabled = cur === 0; $('#rc-next').disabled = cur === items.length - 1;
-        $('#rc-slider').classList.toggle('single', items.length < 2);
-        dots.hidden = items.length < 2;
+      // 칸 안에서 사진 → 메모로 넘길 때 점 표시
+      Array.prototype.forEach.call(grid.querySelectorAll('.rc-pages'), function (pg) {
+        pg.addEventListener('scroll', function () {
+          var dots = pg.parentNode.querySelectorAll('.rc-dots i'), k = Math.round(pg.scrollLeft / Math.max(1, pg.clientWidth));
+          Array.prototype.forEach.call(dots, function (el, n) { el.classList.toggle('on', n === k); });
+        });
+        pg.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { pg.scrollBy({ left: (e.key === 'ArrowRight' ? 1 : -1) * pg.clientWidth, behavior: 'smooth' }); e.preventDefault(); } });
+      });
+      // 크게 보기: 같은 사람의 사진과 메모를 오가며 읽는다
+      var lb = null, cur = { i: 0, p: 0 };
+      function pagesOf(i) { var x = items[i], o = [{ k: '사진', src: x.photo, alt: x.alt || '책을 받은 청소년' }]; if (x.memo) o.push({ k: '메모', src: x.memo, alt: '선결제 어른께 남긴 손글씨 메모' }); return o; }
+      function paint() {
+        var ps = pagesOf(cur.i), p = ps[cur.p], x = items[cur.i];
+        lb.querySelector('img').src = ROOT + p.src; lb.querySelector('img').alt = p.alt;
+        lb.querySelector('.lb-cap').textContent = (x.nick ? x.nick + ' · ' : '') + (x.book ? '『' + x.book + '』 ' : '') + '(' + p.k + ')';
+        lb.querySelector('.lb-prev').hidden = ps.length < 2; lb.querySelector('.lb-next').hidden = ps.length < 2;
+        lb.querySelector('.lb-prev').disabled = cur.p === 0; lb.querySelector('.lb-next').disabled = cur.p === ps.length - 1;
       }
-      function go(i) { track.scrollTo({ left: i * slideW(), behavior: 'smooth' }); }
-      track.addEventListener('scroll', function () { window.requestAnimationFrame(sync); });
-      $('#rc-prev').addEventListener('click', function () { go(cur - 1); });
-      $('#rc-next').addEventListener('click', function () { go(cur + 1); });
-      dots.addEventListener('click', function (e) { var g = e.target.getAttribute && e.target.getAttribute('data-go'); if (g !== null && g !== undefined) go(Number(g)); });
-      track.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') { go(cur + 1); e.preventDefault(); } if (e.key === 'ArrowLeft') { go(cur - 1); e.preventDefault(); } });
-      window.addEventListener('resize', function () { track.scrollLeft = cur * slideW(); });
-      sync();
+      function closeLb() { if (lb) { lb.remove(); lb = null; document.removeEventListener('keydown', onKey); } }
+      function onKey(e) { if (e.key === 'Escape') closeLb(); else if (e.key === 'ArrowRight' && cur.p < pagesOf(cur.i).length - 1) { cur.p++; paint(); } else if (e.key === 'ArrowLeft' && cur.p > 0) { cur.p--; paint(); } }
+      function openLb(i, p) {
+        closeLb(); cur = { i: i, p: p };
+        lb = document.createElement('div'); lb.className = 'rc-lb'; lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-modal', 'true'); lb.setAttribute('aria-label', '크게 보기');
+        lb.innerHTML = '<button type="button" class="lb-x" aria-label="닫기">×</button><button type="button" class="lb-nav lb-prev" aria-label="앞">‹</button><figure><img alt=""><figcaption class="lb-cap"></figcaption></figure><button type="button" class="lb-nav lb-next" aria-label="뒤">›</button>';
+        document.body.appendChild(lb); paint();
+        lb.addEventListener('click', function (e) {
+          if (e.target.closest('.lb-prev')) { if (cur.p > 0) { cur.p--; paint(); } }
+          else if (e.target.closest('.lb-next')) { if (cur.p < pagesOf(cur.i).length - 1) { cur.p++; paint(); } }
+          else if (!e.target.closest('figure img')) closeLb();
+        });
+        document.addEventListener('keydown', onKey);
+        lb.querySelector('.lb-x').focus();
+      }
+      grid.addEventListener('click', function (e) { var b = e.target.closest('.rc-page'); if (b) openLb(Number(b.getAttribute('data-i')), Number(b.getAttribute('data-p'))); });
     }).catch(function (err) { console.warn('수령 후기를 불러오지 못했어요:', err); });
   }
 

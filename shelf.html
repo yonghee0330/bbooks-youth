@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect x=%226%22 y=%224%22 width=%228%22 height=%2224%22 rx=%221%22 fill=%22%231f3b2d%22/%3E%3Crect x=%2216%22 y=%228%22 width=%228%22 height=%2220%22 rx=%221%22 fill=%22%23e0662b%22/%3E%3C/svg%3E">
-<link rel="stylesheet" href="style.css?v=20261118d">
+<link rel="stylesheet" href="style.css?v=20261118e">
 </head>
 <body data-page="shelf" data-side="adult">
 <a class="skip" href="#content">본문으로 바로 가기</a>
@@ -26,11 +26,20 @@
   <p class="who">비북스가 책을 청소년에게 연결해요</p>
   <h1 class="page-title" id="shelf-title">책 사줄게 현황</h1>
 
-  <section class="dash-sum" aria-label="진행 현황">
-    <div class="ds ds-main"><em>청소년에게 연결된 책 <small class="ds-note">누적</small></em><b id="st-youth">0</b><small>권</small></div>
-    <div class="ds"><em>지금까지 마련된 책 <small class="ds-note">누적</small></em><b id="st-books">0</b><small>권</small></div>
-    <div class="ds"><em>지금 나눌 수 있는 책</em><b id="st-left">–</b><small>권</small></div>
-    <div class="ds"><em>함께한 어른</em><b id="st-donors">–</b><small>명</small></div>
+  <section class="part mo-wrap" aria-labelledby="mo-h">
+    <h2 id="mo-h"><span id="mo-label">이번 달</span> 책 사줄게 진행 현황</h2>
+    <div class="dash-sum mo-sum">
+      <div class="ds ds-main"><em>이번 달 함께한 어른</em><b id="mo-donors">–</b><small>명</small></div>
+      <div class="ds"><em>이번 달 마련된 책</em><b id="mo-books">–</b><small>권</small></div>
+      <div class="ds"><em>이번 달 신청한 청소년</em><b id="mo-applied">–</b><small>명</small></div>
+      <div class="ds"><em>이번 달 책을 받은 청소년</em><b id="mo-received">–</b><small>명</small></div>
+    </div>
+    <p class="mo-left">지금 나눌 수 있는 책 <b id="st-left">–</b>권</p>
+  </section>
+
+  <section class="part cum-wrap" aria-labelledby="cum-h">
+    <h2 id="cum-h">누적 진행 현황</h2>
+    <p class="cum-line">지금까지 함께한 어른 <b id="st-donors">–</b>명 · 책을 받은 청소년 <b id="st-youth">–</b>명</p>
   </section>
 
   <section class="part dash-shelf">
@@ -61,13 +70,8 @@
 
   <section class="part receipts" id="receipts" aria-labelledby="rc-h" hidden>
     <h2 id="rc-h">책을 받은 친구들</h2>
-    <p class="rc-sub">비북스에 와서 책을 받은 청소년의 모습과, 선결제한 어른께 남긴 손글씨 메모예요.</p>
-    <div class="rc-slider" id="rc-slider">
-      <ul class="rc-track" id="rc-track" tabindex="0" aria-label="책을 받은 친구들"></ul>
-      <button type="button" class="rc-nav prev" id="rc-prev" aria-label="이전">‹</button>
-      <button type="button" class="rc-nav next" id="rc-next" aria-label="다음">›</button>
-    </div>
-    <div class="rc-dots" id="rc-dots"></div>
+    <p class="rc-sub">비북스에 와서 책을 받은 청소년이에요. 사진을 옆으로 넘기면 선결제한 어른께 남긴 메모가 보이고, 누르면 크게 볼 수 있어요.</p>
+    <ul class="rc-grid" id="rc-grid"></ul>
   </section>
 </div>
 <nav class="wrap page-nav" id="page-nav" aria-label="이전 다음 페이지"></nav>
@@ -75,7 +79,7 @@
 
 <footer class="footer" id="site-footer"></footer>
 
-<script src="config.js?v=20261118d"></script>
-<script src="main.js?v=20261118d"></script>
+<script src="config.js?v=20261118e"></script>
+<script src="main.js?v=20261118e"></script>
 </body>
 </html>
