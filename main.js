@@ -219,7 +219,7 @@
     html += '<span class="shelf-count">꽂힌 책 <b>' + real + '</b>권</span>';
     if (r.closed) html += '<span class="badge">아카이브 · 고정된 서가</span>';
     if (ex) html += '<span class="badge">예시 ' + ex + '권 — 실제 책 사줄게가 아니에요</span>';
-    if (!r.closed && Number(r.pending) > 0) html += '<span class="badge pending-badge">작은 책값이 모이는 중 · 다음 한 권까지 ' + won(r.pending) + '</span>';
+    if (!r.closed && Number(r.pending) > 0) html += '<span class="badge pending-badge">' + pendingText(r.pending) + '</span>';
     $('#shelf-meta').innerHTML = html;
   }
 
@@ -939,10 +939,13 @@
       list: meta.donors || [], got: meta.youth || []
     };
   }
+  // 모이는 중인 작은 책값은 원이 아니라 책 권수(0.5권 단위)로 말한다
+  function pendingText(p) { var n = halfBooks(p); return Number(n) > 0 ? '책 ' + n + '권 몫이 모이는 중이에요' : '작은 책값이 모이는 중이에요'; }
   function fillStats(T) {
     function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
     set('st-books', T.books);
-    set('st-amount', manShort(T.amount)); set('st-amount-goal', '원 · 책 ' + halfBooks(T.amount) + '권');
+    // 돈 금액은 보여주지 않는다. 지금 나눌 수 있는 책 = 마련된 책 − 신청된 책 (서버 week.left가 오면 그 값으로 바꾼다)
+    set('st-left', T.left != null ? T.left : Math.max(0, (Number(T.books) || 0) - (Number(T.youth) || 0)));
     set('st-donors', T.donors == null ? '–' : T.donors); set('st-youth', T.youth);
   }
   // 서가: 책이 늘면 칸도 늘어요(20칸 단위). 칸마다 책이 위에서 내려와 꽂힌다 (새 책은 반짝)
@@ -954,6 +957,10 @@
     }
     return out.join('');
   }
+  function loadLeft() {
+    if (!document.getElementById('st-left')) return;
+    loadWeek().then(function (w) { var el = document.getElementById('st-left'); if (el && w && w.left != null) el.textContent = w.left; }).catch(function () { /* 못 불러오면 위의 기본 계산값을 그대로 둔다 */ });
+  }
   function renderStatusHero() {
     var box = $('#lp-shelf'); if (!box) return;
     box.innerHTML = slotsHtml({ round: { books: [] } }, 20);
@@ -962,14 +969,14 @@
     loadShelfAny().then(function (rounds) {
       var T = shelfTotals(rounds);
       box.innerHTML = slotsHtml(T, Math.max(20, Math.ceil((T.round.books.length + 1) / 20) * 20));
-      fillStats(T);
+      fillStats(T); loadLeft();
       setTimeout(function () { box.classList.add('go'); }, REDUCED ? 0 : 40);
     }).catch(function () { fillStats({ books: 0, amount: 0, donors: null, youth: 0 }); box.classList.add('go'); });
   }
 
   /* ── shelf.html 대시보드: 함께한 어른 · 책을 받은 청소년 · 사진 ── */
   function renderDash(rounds) {
-    var T = shelfTotals(rounds); fillStats(T);
+    var T = shelfTotals(rounds); fillStats(T); loadLeft();
     var dl = $('#dash-donors');
     var dnames = donorNames(T.list);
     if (dl) dl.innerHTML = T.list.length ? T.list.map(function (d, i) {
@@ -990,7 +997,7 @@
         : [0, 1, 2].map(function () { return '<figure class="ph-empty"><span>책을 받은 모습</span></figure>'; }).join('');
     }
     var pd = $('#dash-pending');
-    if (pd) { pd.hidden = !T.pending; pd.textContent = T.pending ? '작은 책값이 모이는 중 · 다음 한 권까지 ' + won(T.pending) : ''; }
+    if (pd) { pd.hidden = !T.pending; pd.textContent = T.pending ? pendingText(T.pending) : ''; }
   }
 
   /* ── 네컷 만화 (스토리 · 책 사줄게 참여) ── 포스터의 아이 그림을 그대로 쓴다 */

@@ -1450,3 +1450,11 @@ button, input, select, textarea, summary { font-family: inherit; }
 .rc-dots button.on { background: var(--orange); transform: scale(1.25); }
 @media (max-width: 560px) { .rc-card { grid-template-columns: 1fr; } .rc-photo img { aspect-ratio: 4 / 5; } .rc-nav.prev { left: 2px; } .rc-nav.next { right: 2px; } }
 .rc-nick { display: block; font-size: 1.05rem; font-weight: 900; }
+/* 책을 받은 친구들은 현황(shelf.html) 안에서만 — 기본 틀 폭에 맞춘다 */
+.receipts.part { margin: 0; padding: 0; background: none; border: 0; border-radius: 0; }
+.receipts.part .rc-slider { max-width: 560px; }
+.receipts.part .rc-card { gap: 10px; }
+.receipts.part .rc-photo img { aspect-ratio: 3 / 4; max-height: 300px; }
+.receipts.part .rc-memo img { max-height: 300px; object-fit: contain; }
+@media (max-width: 560px) { .receipts.part .rc-card { grid-template-columns: 1fr 1fr; } .receipts.part .rc-photo img, .receipts.part .rc-memo img { max-height: 210px; } .receipts.part .rc-nav.prev { left: -4px; } .receipts.part .rc-nav.next { right: -4px; } }
+.ds-note { font-size: .7rem; font-weight: 800; padding: 1px 7px; margin-left: 4px; border-radius: 999px; background: rgba(74,32,24,.12); vertical-align: middle; }
