@@ -1068,6 +1068,44 @@
     });
   }
 
+
+  /* ── 책을 받은 친구들: 수령 사진 + 손글씨 메모를 한 사람 한 칸씩 슬라이드 ── */
+  function initReceipts() {
+    var sec = $('#receipts'); if (!sec) return;
+    fetch(ROOT + 'data/receipts.json', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function (d) {
+      var items = (d.items || []).filter(function (x) { return x && x.photo; });
+      if (!items.length) return;
+      var track = $('#rc-track'), dots = $('#rc-dots');
+      track.innerHTML = items.map(function (x, i) {
+        var dt = x.date ? new Date(x.date + 'T00:00:00+09:00') : null;
+        var when = dt ? (dt.getMonth() + 1) + '월 ' + dt.getDate() + '일 수령' : '';
+        return '<li class="rc-slide" data-i="' + i + '"><div class="rc-card">' +
+          '<figure class="rc-photo"><img src="' + esc(ROOT + x.photo) + '" alt="' + esc(x.alt || '책을 받은 청소년') + '" loading="lazy"></figure>' +
+          (x.memo ? '<figure class="rc-memo"><img src="' + esc(ROOT + x.memo) + '" alt="청소년이 선결제 어른께 남긴 손글씨 메모" loading="lazy"><figcaption>선결제 어른께 남긴 메모</figcaption></figure>' : '') +
+          '<p class="rc-cap">' + (x.book ? '『' + esc(x.book) + '』' + (x.author ? ' · ' + esc(x.author) : '') : '') + (when ? '<span>' + esc(when) + '</span>' : '') + '</p></div></li>';
+      }).join('');
+      dots.innerHTML = items.map(function (x, i) { return '<button type="button" data-go="' + i + '" aria-label="' + (i + 1) + '번째 친구"></button>'; }).join('');
+      sec.hidden = false;
+      var cur = 0;
+      function slideW() { var s = track.querySelector('.rc-slide'); return s ? s.getBoundingClientRect().width : 1; }
+      function sync() {
+        cur = Math.max(0, Math.min(items.length - 1, Math.round(track.scrollLeft / slideW())));
+        Array.prototype.forEach.call(dots.children, function (b, i) { b.classList.toggle('on', i === cur); });
+        $('#rc-prev').disabled = cur === 0; $('#rc-next').disabled = cur === items.length - 1;
+        $('#rc-slider').classList.toggle('single', items.length < 2);
+        dots.hidden = items.length < 2;
+      }
+      function go(i) { track.scrollTo({ left: i * slideW(), behavior: 'smooth' }); }
+      track.addEventListener('scroll', function () { window.requestAnimationFrame(sync); });
+      $('#rc-prev').addEventListener('click', function () { go(cur - 1); });
+      $('#rc-next').addEventListener('click', function () { go(cur + 1); });
+      dots.addEventListener('click', function (e) { var g = e.target.getAttribute && e.target.getAttribute('data-go'); if (g !== null && g !== undefined) go(Number(g)); });
+      track.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') { go(cur + 1); e.preventDefault(); } if (e.key === 'ArrowLeft') { go(cur - 1); e.preventDefault(); } });
+      window.addEventListener('resize', function () { track.scrollLeft = cur * slideW(); });
+      sync();
+    }).catch(function (err) { console.warn('수령 후기를 불러오지 못했어요:', err); });
+  }
+
   // 책 고르기 페이지를 끄면 링크를 숨긴다
   if ((C.pick || {}).enabled === false) Array.prototype.forEach.call(document.querySelectorAll('[data-pick]'), function (el) { el.hidden = true; });
 
@@ -1085,5 +1123,6 @@
   if ($('#privacy')) renderPrivacy();
   if ($('#shelf-wrap')) initShelf();
   renderTeenStatus(); renderTeenContact(); fillHowtoPlace();
+  initReceipts();
   renderTeenWeek();
 })();

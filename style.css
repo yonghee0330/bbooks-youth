@@ -1423,3 +1423,29 @@ button, input, select, textarea, summary { font-family: inherit; }
 .tw-split em small { display: block; font-weight: 600; opacity: .75; }
 .tw-split b { font-size: 1.15rem; font-weight: 900; font-variant-numeric: tabular-nums; }
 .tw-split > span.full b::after { content: ' · 마감'; font-size: .78rem; font-weight: 800; color: var(--orange); }
+
+/* 2026-11-18 책을 받은 친구들 슬라이드 */
+.receipts { margin: 22px 0 6px; padding: 18px 16px 16px; border-radius: var(--radius); background: var(--card); border: 1px solid var(--line); }
+.receipts[hidden] { display: none; }
+.receipts h2 { margin: 0 0 4px; font-size: 1.25rem; font-weight: 900; }
+.rc-sub { margin: 0 0 12px; color: var(--ink-2); font-size: .9rem; }
+.rc-slider { position: relative; }
+.rc-track { display: flex; margin: 0; padding: 0; list-style: none; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; outline-offset: 4px; }
+.rc-track::-webkit-scrollbar { display: none; }
+.rc-slide { flex: 0 0 100%; scroll-snap-align: start; padding: 0 2px; box-sizing: border-box; }
+.rc-card { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+.rc-card figure { margin: 0; }
+.rc-card img { display: block; width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); background: var(--paper-2); }
+.rc-photo img { aspect-ratio: 3 / 4; object-fit: cover; }
+.rc-memo figcaption { margin-top: 6px; font-size: .78rem; color: var(--ink-2); text-align: center; }
+.rc-cap { grid-column: 1 / -1; margin: 2px 0 0; font-weight: 800; text-align: center; line-height: 1.5; }
+.rc-cap span { display: block; font-size: .82rem; font-weight: 600; color: var(--ink-2); }
+.rc-nav { position: absolute; top: 40%; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); background: rgba(255,255,255,.92); color: #3a1a12; font-size: 1.5rem; line-height: 1; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.18); }
+.rc-nav.prev { left: -6px; } .rc-nav.next { right: -6px; }
+.rc-nav:disabled { opacity: .35; cursor: default; }
+.rc-slider.single .rc-nav { display: none; }
+.rc-dots { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+.rc-dots[hidden] { display: none; }
+.rc-dots button { width: 10px; height: 10px; padding: 0; border-radius: 50%; border: 0; background: var(--line); cursor: pointer; }
+.rc-dots button.on { background: var(--orange); transform: scale(1.25); }
+@media (max-width: 560px) { .rc-card { grid-template-columns: 1fr; } .rc-photo img { aspect-ratio: 4 / 5; } .rc-nav.prev { left: 2px; } .rc-nav.next { right: 2px; } }
