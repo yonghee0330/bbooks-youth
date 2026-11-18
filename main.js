@@ -188,6 +188,8 @@
   }
   var BOOK_COLORS = ['#4a2018', '#e09a7a', '#6f8f95', '#c4643f', '#8a4a34', '#9fb4b6', '#b9694b'];
   function bookFill(b) { return BOOK_COLORS[hash(b.id || '') % BOOK_COLORS.length]; }
+  // 청소년 이름 마스킹: 한글 이름(2~4자)은 첫 글자만 보이게(시은 → 시*, 황민영 → 황**). 영문·숫자 닉네임은 그대로
+  function maskYouth(n) { n = String(n || '').trim(); return /^[가-힣]{2,4}$/.test(n) ? n.charAt(0) + new Array(n.length).join('*') : n; }
   function anonName() { return C.anonName || '키다리아저씨'; }
   // 익명 후원자는 신청 순서대로 번호: 키다리아저씨1, 2 … (서버가 anonNo를 주면 그대로, 없으면 오래된 순서로 센다)
   function donorNames(list) {
@@ -299,7 +301,7 @@
     openBook = g; g.classList.add('is-open');
     var card = $('#book-card');
     var yc = filled(b.youthCode) ? (String(b.youthCode).charAt(0) === '#' ? b.youthCode : '#' + b.youthCode) : '';
-    var youth = yc ? (filled(b.youthName) ? b.youthName : '익명 청소년') + ' ' + yc : '책을 받으면 연결돼요';
+    var youth = yc ? (filled(b.youthName) ? maskYouth(b.youthName) : '익명 청소년') + ' ' + yc : '책을 받으면 연결돼요';
     card.innerHTML =
       '<button type="button" class="bc-close" aria-label="닫기">×</button>' +
       '<span class="bc-mind">건넨 어른' + (b.example ? ' · 예시' : '') + '</span>' +
@@ -997,7 +999,7 @@
     var yl = $('#dash-youth');
     if (yl) yl.innerHTML = T.got.length ? T.got.map(function (y) {
       var code = String(y.code).charAt(0) === '#' ? y.code : '#' + y.code;
-      return '<li><span class="dn-name">' + esc(filled(y.name) ? y.name : '익명 청소년') + ' <em>' + esc(code) + '</em></span>' +
+      return '<li><span class="dn-name">' + esc(filled(y.name) ? maskYouth(y.name) : '익명 청소년') + ' <em>' + esc(code) + '</em></span>' +
         (filled(y.title) ? '<span class="dn-line">“' + esc(y.title) + '”</span>' : '') + '</li>';
     }).join('') : '<li class="dn-empty">청소년이 책을 받으면 채워져요. 닉네임과 고른 책 제목이 보여요.</li>';
     var pg = $('#dash-photos');
