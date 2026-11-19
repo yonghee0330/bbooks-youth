@@ -8,7 +8,8 @@
       "author": "신형철",
       "photo": "images/receipts/p1.webp",
       "memo": "images/receipts/m1.webp",
-      "alt": "『인생의 역사』를 들고 있는 청소년"
+      "alt": "『인생의 역사』를 들고 있는 청소년",
+      "code": "#01"
     },
     {
       "date": "2026-11-17",
@@ -17,7 +18,8 @@
       "author": "이다",
       "photo": "images/receipts/p2.webp",
       "memo": "images/receipts/m2.webp",
-      "alt": "『이다의 도시관찰일기』를 들고 있는 청소년"
+      "alt": "『이다의 도시관찰일기』를 들고 있는 청소년",
+      "code": "#02"
     },
     {
       "date": "2026-11-17",
@@ -26,7 +28,8 @@
       "author": "히가시노 게이고",
       "photo": "images/receipts/p3.webp",
       "memo": "images/receipts/m3.webp",
-      "alt": "『나미야 잡화점의 기적』을 들고 있는 청소년"
+      "alt": "『나미야 잡화점의 기적』을 들고 있는 청소년",
+      "code": "#03"
     },
     {
       "date": "2026-11-18",
@@ -35,7 +38,28 @@
       "author": "유은실",
       "photo": "images/receipts/p4.webp",
       "memo": "images/receipts/m4.webp",
-      "alt": "『순례 주택』을 들고 있는 청소년"
+      "alt": "『순례 주택』을 들고 있는 청소년",
+      "code": "#04"
+    },
+    {
+      "date": "2026-11-19",
+      "nick": "종**",
+      "book": "나는 소망한다 내게 금지된 것을",
+      "author": "양귀자",
+      "photo": "images/receipts/p5.webp",
+      "memo": "images/receipts/m5.webp",
+      "alt": "『나는 소망한다 내게 금지된 것을』을 들고 있는 청소년",
+      "code": "#05"
+    },
+    {
+      "date": "2026-11-19",
+      "nick": "정**",
+      "book": "한번 더 스쳐갔다",
+      "author": "김계정",
+      "photo": "images/receipts/p6.webp",
+      "memo": "images/receipts/m6.webp",
+      "alt": "『한번 더 스쳐갔다』를 들고 있는 청소년",
+      "code": "#06"
     }
   ]
 }
