@@ -27,6 +27,15 @@
       "photo": "images/receipts/p3.webp",
       "memo": "images/receipts/m3.webp",
       "alt": "『나미야 잡화점의 기적』을 들고 있는 청소년"
+    },
+    {
+      "date": "2026-11-18",
+      "nick": "우**",
+      "book": "순례 주택",
+      "author": "유은실",
+      "photo": "images/receipts/p4.webp",
+      "memo": "images/receipts/m4.webp",
+      "alt": "『순례 주택』을 들고 있는 청소년"
     }
   ]
 }
