@@ -80,6 +80,26 @@
       "memo": "images/receipts/m8.webp",
       "alt": "『율의 시선』을 들고 있는 청소년",
       "code": "#08"
+    },
+    {
+      "date": "2026-11-21",
+      "nick": "김**",
+      "book": "불편한 편의점",
+      "author": "김호연",
+      "photo": "images/receipts/p9.webp",
+      "memo": "images/receipts/m9.webp",
+      "alt": "『불편한 편의점』을 들고 있는 청소년",
+      "code": "#09"
+    },
+    {
+      "date": "2026-11-21",
+      "nick": "쿠**",
+      "book": "지구 끝의 온실",
+      "author": "김초엽",
+      "photo": "images/receipts/p10.webp",
+      "memo": "images/receipts/m10.webp",
+      "alt": "『지구 끝의 온실』을 들고 있는 청소년",
+      "code": "#10"
     }
   ]
 }
