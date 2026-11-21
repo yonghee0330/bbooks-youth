@@ -60,6 +60,26 @@
       "memo": "images/receipts/m5.webp",
       "alt": "『나는 소망한다 내게 금지된 것을』을 들고 있는 청소년",
       "code": "#06"
+    },
+    {
+      "date": "2026-11-21",
+      "nick": "덩**",
+      "book": "치트키 차일드 1",
+      "author": "",
+      "photo": "images/receipts/p7.webp",
+      "memo": "images/receipts/m7.webp",
+      "alt": "『치트키 차일드 1』를 들고 있는 청소년",
+      "code": "#07"
+    },
+    {
+      "date": "2026-11-21",
+      "nick": "삼**",
+      "book": "율의 시선",
+      "author": "김민서",
+      "photo": "images/receipts/p8.webp",
+      "memo": "images/receipts/m8.webp",
+      "alt": "『율의 시선』을 들고 있는 청소년",
+      "code": "#08"
     }
   ]
 }
