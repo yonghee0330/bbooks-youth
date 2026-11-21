@@ -189,7 +189,7 @@
   var BOOK_COLORS = ['#4a2018', '#e09a7a', '#6f8f95', '#c4643f', '#8a4a34', '#9fb4b6', '#b9694b'];
   function bookFill(b) { return BOOK_COLORS[hash(b.id || '') % BOOK_COLORS.length]; }
   // 청소년 이름 마스킹: 한글 이름(2~4자)은 첫 글자만 보이게(시은 → 시*, 황민영 → 황**). 영문·숫자 닉네임은 그대로
-  function maskYouth(n) { n = String(n || '').trim(); return /^[가-힣]{2,4}$/.test(n) ? n.charAt(0) + new Array(n.length).join('*') : n; }
+  function maskYouth(n) { return String(n || '').trim(); } // 이름 가림은 서버(shownName_)가 정함
   function anonName() { return C.anonName || '키다리아저씨'; }
   // 익명 후원자는 신청 순서대로 번호: 키다리아저씨1, 2 … (서버가 anonNo를 주면 그대로, 없으면 오래된 순서로 센다)
   function donorNames(list) {
