@@ -100,6 +100,26 @@
       "memo": "images/receipts/m10.webp",
       "alt": "『지구 끝의 온실』을 들고 있는 청소년",
       "code": "#10"
+    },
+    {
+      "date": "2026-11-21",
+      "nick": "한*",
+      "book": "영원에 빚을 져서",
+      "author": "예소연",
+      "photo": "images/receipts/p11.webp",
+      "memo": "images/receipts/m11.webp",
+      "alt": "『영원에 빚을 져서』을 들고 있는 청소년",
+      "code": "#11"
+    },
+    {
+      "date": "2026-11-21",
+      "nick": "효*",
+      "book": "우리 사이엔 오해가 있다",
+      "author": "이슬아·남궁인",
+      "photo": "images/receipts/p12.webp",
+      "memo": "images/receipts/m12.webp",
+      "alt": "『우리 사이엔 오해가 있다』을 들고 있는 청소년",
+      "code": "#12"
     }
   ]
 }
