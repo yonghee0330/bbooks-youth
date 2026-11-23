@@ -908,7 +908,7 @@
     function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
     // 함께한 어른과 그분들이 남긴 한 마디 (날짜 없이)
     loadShelfAny().then(function (rounds) {
-      var T = shelfTotals(rounds), ul = $('#tw-dn-list'); if (!ul) return;
+      var T = shelfTotals(rounds), ul = $('#tw-dn-list'); fillStats(T); loadLeft(rounds); if (!ul) return;
       set('tw-dn-count', T.donors == null ? '' : '모두 ' + T.donors + '명');
       var names = donorNames(T.list);
       ul.innerHTML = T.list.length ? T.list.map(function (d, i) {
@@ -924,8 +924,6 @@
       card.classList.toggle('closed', !w.open);
       var bar = $('#tw-bar'); if (bar) { bar.firstElementChild.style.width = Math.min(100, Math.round(w.used / w.limit * 100)) + '%'; bar.setAttribute('aria-valuenow', w.used); bar.setAttribute('aria-valuemax', w.limit); }
       set('tw-msg', weekMsg(w));
-      set('tw-books', w.books); set('tw-applied', w.applied); set('tw-left', w.left); set('tw-recv', w.received);
-      var tot = Math.max(1, w.books), bar2 = $('#tw-bar2'); if (bar2) { bar2.firstElementChild.style.width = Math.min(100, Math.round(w.left / tot * 100)) + '%'; bar2.setAttribute('aria-valuenow', w.left); bar2.setAttribute('aria-valuemax', w.books); }
     }).catch(function () { set('tw-msg', '현황을 불러오지 못했어요. 잠시 뒤 다시 열어주세요.'); });
   }
 
