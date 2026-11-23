@@ -1456,6 +1456,10 @@ button, input, select, textarea, summary { font-family: inherit; }
 .mo-left b { font-size: 1.3rem; font-weight: 900; margin: 0 2px; }
 .cum-line { margin: 4px 0 0; font-size: 1.05rem; font-weight: 700; }
 .cum-line b { font-size: 1.4rem; font-weight: 900; margin: 0 2px; }
+.q-share p { margin: 8px 0 0; }
+.q-list { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.q-list li { padding: 10px 14px; border: 1.5px solid var(--ink, #222); border-radius: 12px; font-weight: 700; }
+.q-list b { font-weight: 900; }
 
 /* 서가: 확보된 책은 흐릿하게(가능성), 청소년과 연결된 책만 또렷하게 */
 .shelf-svg .book.free .cover { opacity: .3; }

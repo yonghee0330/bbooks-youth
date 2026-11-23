@@ -219,10 +219,8 @@
     var real = r.books.filter(function (b) { return !b.example; }).length;
     var ex = r.books.length - real, html = '';
     var linkedN = r.books.filter(function (b) { return !b.example && filled(b.youthCode); }).length;
-    html += '<span class="shelf-count">꽂힌 책 <b>' + real + '</b>권 · 청소년과 연결된 책 <b>' + linkedN + '</b>권</span>';
     if (r.closed) html += '<span class="badge">아카이브 · 고정된 서가</span>';
     if (ex) html += '<span class="badge">예시 ' + ex + '권 — 실제 책 사줄게가 아니에요</span>';
-    if (!r.closed && Number(r.pending) > 0) html += '<span class="badge pending-badge">' + pendingText(r.pending) + '</span>';
     $('#shelf-meta').innerHTML = html;
   }
 
@@ -590,7 +588,7 @@
         var a = C.account || {}, done = $('#donate-done');
         form.hidden = true; done.hidden = false;
         done.innerHTML = '<p class="done-h">책사줄게 참여 신청이 됐어요. 고맙습니다.</p><p>접수번호 <b>' + esc(res.id) + '</b></p>' +
-          '<p>아직 입금 전이라면 아래 계좌로 보내주세요. 입금이 확인되면 서가에 책이 꽂혀요.</p>' +
+          '<p>아직 입금 전이라면 아래 계좌로 보내주세요. 입금이 확인되면 서가에 책이 꽂혀요. 진행 현황은 분기마다 메일로 알려드려요.</p>' +
           (filled(a.number) ? '<p class="done-acc">' + esc(a.bank) + ' ' + esc(a.number) + ' · ' + esc(a.holder) + '<br>입금자명 ' + esc(f.payer.value) + ' · ' + won(digits(f.amount.value)) + '</p>' : '') +
           '<a class="btn btn-ghost" href="shelf.html">책 사줄게 현황 보러 가기</a>';
         done.focus();
@@ -647,7 +645,7 @@
       '받은 정보는 청소년 책사줄게를 진행하는 데만 써요. 다른 용도로 따로 보관하지 않아요.',
       '실명, 학교, 연락처는 공개하지 않아요.',
       '책을 받은 청소년은 책 사줄게 현황에 닉네임과 고른 책 제목이 보여요. 실명, 학교, 연락처, 이메일은 어디에도 공개하지 않아요.',
-      '모인 금액, 전달한 권수, 남은 금액 처리는 정기적으로 공지해요.'
+      '참여한 어른께는 분기(3개월)마다 전체 진행 현황 — 참여한 사람 수, 모인 금액으로 사줄 수 있는 책 권수, 책을 전한 청소년 수 — 을 정리해서 알려드려요.'
     ];
   }
   function faqData() {
@@ -659,6 +657,7 @@
         ['얼마부터 함께할 수 있나요?', ['책 1권(' + won(price) + ')부터 5권, 그 이상은 원하는 만큼 함께할 수 있어요.']],
         ['선결제금은 어디에 쓰이나요?', ['부천 청소년이 스스로 고른 책을 사는 데만 써요. 신청이 들어오면 비북스가 책을 주문해 준비해요.']],
         ['남으면 어떻게 되나요?', [filled(fa.leftover) ? fa.leftover : NOT_YET]],
+        ['참여한 뒤 진행 상황은 어떻게 알 수 있나요?', ['참여하신 어른께는 분기(3개월)마다 전체 진행 현황을 정리해서 메일로 알려드려요. 몇 명이 참여했는지, 모인 금액으로 총 몇 권을 사줄 수 있는지, 그 가운데 몇 명의 청소년에게 책을 전했는지를 담아요.']],
         ['영수증을 받을 수 있나요?', [filled(fa.receipt) ? fa.receipt : NOT_YET]],
         ['이름을 밝히지 않고 선결제할 수 있나요?', ['네. 참여할 때 "' + anonName() + '로 참여"에 체크하면 책 사줄게 현황과 서가에 이름과 한 줄이 보이지 않아요. "' + anonName() + '"로만 표시돼요.']],
         ['기관·단체·기업·종교단체도 함께할 수 있나요?', ['네. 참여할 때 "기관·단체·기업·종교단체"를 고르고 이름을 적어주세요. 한 반, 한 동아리 몫처럼 여러 권을 함께 건넬 수도 있어요. 궁금한 건 아래 연락처로 물어봐 주세요.']],
@@ -948,8 +947,7 @@
     function set(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
     set('st-books', T.books);
     // 돈 금액은 보여주지 않는다. 지금 나눌 수 있는 책 = 마련된 책 − 신청된 책 (서버 week.left가 오면 그 값으로 바꾼다)
-    set('st-left', T.left != null ? T.left : Math.max(0, (Number(T.books) || 0) - (Number(T.youth) || 0)));
-    set('st-donors', T.donors == null ? '–' : T.donors); set('st-youth', T.youth);
+    set('st-donors', T.donors == null ? '–' : T.donors);
   }
   // 서가: 책이 늘면 칸도 늘어요(20칸 단위). 칸마다 책이 위에서 내려와 꽂힌다 (새 책은 반짝)
   function slotsHtml(T, goal) {
@@ -960,9 +958,18 @@
     }
     return out.join('');
   }
-  function loadLeft() {
-    if (!document.getElementById('st-left')) return;
-    loadWeek().then(function (w) { var el = document.getElementById('st-left'); if (el && w && w.left != null) el.textContent = w.left; }).catch(function () { /* 못 불러오면 위의 기본 계산값을 그대로 둔다 */ });
+  // 신청한 청소년: 출발한 달(2026년 11월)에는 그 달 신청 수, 달이 지나면 지금까지 누적 신청 수
+  function loadLeft(rounds) {
+    var el = document.getElementById('st-applied'); if (!el) return;
+    var lab = document.getElementById('st-applied-label');
+    var kst = new Date(Date.now() + 9 * 3600 * 1000), inLaunch = kst.getUTCFullYear() < 2026 || (kst.getUTCFullYear() === 2026 && kst.getUTCMonth() <= 10);
+    if (inLaunch) {
+      var mo = rounds && rounds.meta && rounds.meta.month;
+      if (lab) lab.textContent = '11월에 신청한 청소년';
+      if (mo && mo.applied != null && mo.applied !== '–') { el.textContent = mo.applied; return; }
+    }
+    if (lab) lab.textContent = inLaunch ? '11월에 신청한 청소년' : '지금까지 신청한 청소년';
+    loadWeek().then(function (w) { if (w && w.applied != null) el.textContent = w.applied; }).catch(function () { /* 못 불러오면 – 로 둔다 */ });
   }
   function renderStatusHero() {
     var box = $('#lp-shelf'); if (!box) return;
@@ -972,14 +979,14 @@
     loadShelfAny().then(function (rounds) {
       var T = shelfTotals(rounds);
       box.innerHTML = slotsHtml(T, Math.max(20, Math.ceil((T.round.books.length + 1) / 20) * 20));
-      fillStats(T); loadLeft();
+      fillStats(T); loadLeft(rounds);
       setTimeout(function () { box.classList.add('go'); }, REDUCED ? 0 : 40);
     }).catch(function () { fillStats({ books: 0, amount: 0, donors: null, youth: 0 }); box.classList.add('go'); });
   }
 
   /* ── shelf.html 대시보드: 함께한 어른 · 책을 받은 청소년 · 사진 ── */
   function renderDash(rounds) {
-    var T = shelfTotals(rounds); fillStats(T); loadLeft();
+    var T = shelfTotals(rounds); fillStats(T); loadLeft(rounds);
     // 이번 달 진행 현황(기본 화면): 서버가 알려주는 month. 없으면(옛 데이터) 어른·책은 명단 날짜로 센다
     (function () {
       function setT(id, v) { var el = document.getElementById(id); if (el) el.textContent = v; }
@@ -1010,7 +1017,7 @@
         : [0, 1, 2].map(function () { return '<figure class="ph-empty"><span>책을 받은 모습</span></figure>'; }).join('');
     }
     var pd = $('#dash-pending');
-    if (pd) { pd.hidden = !T.pending; pd.textContent = T.pending ? pendingText(T.pending) : ''; }
+    if (pd) { pd.hidden = true; pd.textContent = ''; }
   }
 
   /* ── 네컷 만화 (스토리 · 책 사줄게 참여) ── 포스터의 아이 그림을 그대로 쓴다 */
